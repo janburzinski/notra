@@ -110,9 +110,13 @@ const cronConfigSchema = z
     }
   });
 
-export const scheduleSourceConfigSchema = z.object({
-  cron: cronConfigSchema,
-});
+export const scheduleSourceConfigSchema = z
+  .object({
+    cron: cronConfigSchema.openapi({
+      description: "When the schedule runs, in UTC.",
+    }),
+  })
+  .openapi({ description: "Timing settings for the schedule." });
 
 const integrationIdsSchema = z.array(z.string().trim().min(1));
 
@@ -154,14 +158,16 @@ export const scheduleTargetsSchema = z
       "Data sources each run reads from. Set at least one GitHub or Linear integration.",
   });
 
-export const storedScheduleTargetsSchema = z.object({
-  repositoryIds: z.array(z.string()).openapi({
-    description: repositoryIdsDescription,
-  }),
-  linearIntegrationIds: z.array(z.string()).optional().openapi({
-    description: linearIntegrationIdsDescription,
-  }),
-});
+export const storedScheduleTargetsSchema = z
+  .object({
+    repositoryIds: z.array(z.string()).openapi({
+      description: repositoryIdsDescription,
+    }),
+    linearIntegrationIds: z.array(z.string()).optional().openapi({
+      description: linearIntegrationIdsDescription,
+    }),
+  })
+  .openapi({ description: "Data sources each run reads from." });
 
 export const scheduleOutputConfigSchema = z
   .object({
@@ -196,7 +202,11 @@ export const scheduleOutputConfigSchema = z
       example: { slack: true, email: false },
     }),
   })
-  .optional();
+  .optional()
+  .openapi({
+    description:
+      "Writing and notification settings for generated content, or null or absent when none are set.",
+  });
 
 export const createScheduleRequestSchema = z.object({
   name: z.string().trim().min(1).max(MAX_SCHEDULE_NAME_LENGTH).openapi({
@@ -286,62 +296,94 @@ export const patchScheduleRequestSchema = z
   })
   .openapi("PatchScheduleRequest");
 
-const scheduleSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  name: z.string(),
-  sourceType: z.literal("cron"),
-  sourceConfig: scheduleSourceConfigSchema,
-  targets: storedScheduleTargetsSchema,
-  outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES),
-  outputConfig: scheduleOutputConfigSchema.nullable().optional(),
-  enabled: z.boolean().openapi({
+const scheduleSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "The schedule's ID, used as scheduleId in /v1/schedules/{scheduleId}.",
+    }),
+    organizationId: z.string().openapi({
+      description: "ID of the organization that owns the schedule.",
+    }),
+    name: z
+      .string()
+      .openapi({ description: "Display name shown in the dashboard." }),
+    sourceType: z.literal("cron").openapi({
+      description: "Always cron for schedules.",
+    }),
+    sourceConfig: scheduleSourceConfigSchema,
+    targets: storedScheduleTargetsSchema,
+    outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES).openapi({
+      description: "Type of content each run generates.",
+    }),
+    outputConfig: scheduleOutputConfigSchema.nullable().optional(),
+    enabled: z.boolean().openapi({
+      description:
+        "Whether the schedule runs. Disabled schedules are stored but never fire.",
+    }),
+    autoPublish: z.boolean().openapi({
+      description:
+        "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the schedule was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description:
+        "When the schedule was last changed, as an ISO 8601 timestamp.",
+    }),
+    lookbackWindow: z.enum(lookbackWindowEnum.enumValues).openapi({
+      description: "How far back each run collects source activity.",
+    }),
+  })
+  .openapi({
     description:
-      "Whether the schedule runs. Disabled schedules are stored but never fire.",
-  }),
-  autoPublish: z.boolean().openapi({
+      "A recurring automation that generates content on a cron schedule.",
+  });
+
+export const getSchedulesResponseSchema = z
+  .object({
+    schedules: z.array(scheduleSchema).openapi({
+      description: "Schedules, newest first.",
+    }),
+    repositoryMap: z.record(z.string(), z.string()).openapi({
+      description:
+        "Maps each targeted GitHub integration ID to an owner/repo label, followed by the default branch when one is known. Integrations without an owner and repo are left out.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({
     description:
-      "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  lookbackWindow: z.enum(lookbackWindowEnum.enumValues).openapi({
-    description: "How far back each run collects source activity.",
-  }),
-});
+      "The workspace's schedules with labels for the repositories they target.",
+  });
 
-export const getSchedulesResponseSchema = z.object({
-  schedules: z.array(scheduleSchema).openapi({
-    description: "Schedules, newest first.",
-  }),
-  repositoryMap: z.record(z.string(), z.string()).openapi({
-    description:
-      "Maps each targeted GitHub integration ID to an owner/repo label, followed by the default branch when one is known. Integrations without an owner and repo are left out.",
-  }),
-  organization: organizationResponseSchema,
-});
+export const scheduleResponseSchema = z
+  .object({
+    schedule: scheduleSchema,
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The schedule as saved." });
 
-export const scheduleResponseSchema = z.object({
-  schedule: scheduleSchema,
-  organization: organizationResponseSchema,
-});
-
-export const deleteScheduleResponseSchema = z.object({
-  id: z.string(),
-  organization: organizationResponseSchema,
-});
+export const deleteScheduleResponseSchema = z
+  .object({
+    id: z.string().openapi({ description: "ID of the deleted schedule." }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "Confirms which schedule was deleted." });
 
 export const scheduleTargetsRepositoryIdsSchema = z.object({
   repositoryIds: z.array(z.string()),
 });
 
-export const runScheduleResponseSchema = z.object({
-  runId: z.string().openapi({
-    description:
-      "ID of the run, as listed by `GET /v1/schedules/{scheduleId}/runs`.",
-  }),
-  organization: organizationResponseSchema,
-});
+export const runScheduleResponseSchema = z
+  .object({
+    runId: z.string().openapi({
+      description:
+        "ID of the run, as listed by `GET /v1/schedules/{scheduleId}/runs`.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The run that was started for the schedule." });
 
 export const listScheduleRunsQuerySchema = z.object({
   limit: z.coerce
@@ -357,7 +399,7 @@ export const listScheduleRunsQuerySchema = z.object({
 });
 
 const scheduleRunSchema = z.object({
-  id: z.string(),
+  id: z.string().openapi({ description: "The run's ID." }),
   status: z.enum(AUTOMATION_RUN_STATUSES).openapi({
     description:
       "`running` until the run reports back. A run that never reports back is shown as `failed` after six hours.",
@@ -376,15 +418,19 @@ const scheduleRunSchema = z.object({
   manual: z.boolean().openapi({
     description: "Started on demand rather than by the schedule.",
   }),
-  startedAt: z.string(),
+  startedAt: z.string().openapi({
+    description: "When the run started, as an ISO 8601 timestamp.",
+  }),
   finishedAt: z.string().nullable().openapi({
     description: "When the run reported its result. Null while running.",
   }),
 });
 
-export const listScheduleRunsResponseSchema = z.object({
-  runs: z.array(scheduleRunSchema).openapi({
-    description: "Runs, newest first.",
-  }),
-  organization: organizationResponseSchema,
-});
+export const listScheduleRunsResponseSchema = z
+  .object({
+    runs: z.array(scheduleRunSchema).openapi({
+      description: "Runs, newest first.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The schedule's most recent runs." });

@@ -17,7 +17,9 @@ const promptSchema = z
       description:
         "Use as `promptId` in the prompt endpoints, including `GET /v1/projects/{projectId}/geo/prompts/{promptId}/history`. A UUID for custom prompts, a fixed slug such as `best-tools` for auto prompts.",
     }),
-    prompt: z.string(),
+    prompt: z.string().openapi({
+      description: "Question asked to AI engines during scans.",
+    }),
     enabled: z.boolean().openapi({
       description: "Whether project scans ask this prompt.",
     }),
@@ -34,7 +36,8 @@ const promptSchema = z
       description: "When the custom prompt was added. `null` for auto prompts.",
     }),
   })
-  .openapi("GeoPrompt");
+  .openapi("GeoPrompt")
+  .openapi({ description: "A prompt tracked in the project's scans." });
 
 export const listPromptsResponseSchema = z
   .object({
@@ -48,14 +51,22 @@ export const listPromptsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoPromptsResponse");
+  .openapi("ListGeoPromptsResponse")
+  .openapi({
+    description:
+      "The project's tracked prompts and the workspace they belong to.",
+  });
 
 export const promptResponseSchema = z
   .object({
     prompt: promptSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPromptResponse");
+  .openapi("GeoPromptResponse")
+  .openapi({
+    description:
+      "The created, updated or accepted prompt and the workspace it belongs to.",
+  });
 
 // Strict, so clients that still send the removed `tags` field get a
 // validation error instead of a success that silently drops it.
@@ -78,7 +89,11 @@ export const deletePromptResponseSchema = z
     id: z.string().openapi({ description: "Id of the deleted prompt." }),
     organization: organizationResponseSchema,
   })
-  .openapi("DeleteGeoPromptResponse");
+  .openapi("DeleteGeoPromptResponse")
+  .openapi({
+    description:
+      "Confirmation of the deleted prompt and the workspace it belonged to.",
+  });
 
 const promptImportRowSchema = z.object({
   prompt: geoPromptTextSchema,
@@ -122,7 +137,10 @@ export const importPromptsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ImportGeoPromptsResponse");
+  .openapi("ImportGeoPromptsResponse")
+  .openapi({
+    description: "Counts of imported, skipped and rejected prompt rows.",
+  });
 
 const promptSuggestionSchema = z
   .object({
@@ -136,11 +154,16 @@ const promptSuggestionSchema = z
       description:
         "Suggested headline for an article that could win this prompt, or `null`.",
     }),
-    source: z.literal("search_console"),
+    source: z.literal("search_console").openapi({
+      description:
+        "Where the suggestion came from, which is always Google Search Console.",
+    }),
     keywords: z
       .array(
         z.object({
-          query: z.string(),
+          query: z.string().openapi({
+            description: "Google search query from Search Console.",
+          }),
           clicks: z.number().openapi({
             description:
               "Search Console clicks over the 28 days ending 3 days before the suggestion was created (Search Console data lags by about 3 days).",
@@ -158,9 +181,15 @@ const promptSuggestionSchema = z
       .openapi({
         description: "Search Console queries the suggestion was derived from.",
       }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the suggestion was created, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("GeoPromptSuggestion");
+  .openapi("GeoPromptSuggestion")
+  .openapi({
+    description:
+      "A prompt suggested from Search Console queries, pending review.",
+  });
 
 export const promptSuggestionParamsSchema = projectParamsSchema.extend({
   suggestionId: resourceIdSchema("suggestionId").openapi({
@@ -175,15 +204,22 @@ export const listPromptSuggestionsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoPromptSuggestionsResponse");
+  .openapi("ListGeoPromptSuggestionsResponse")
+  .openapi({
+    description: "Pending prompt suggestions and the workspace they belong to.",
+  });
 
 export const dismissPromptSuggestionResponseSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({ description: "Id of the dismissed suggestion." }),
     dismissed: z.boolean().openapi({
       description:
         "Always `true`. Dismissing an unknown or already handled suggestion returns 404.",
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("DismissGeoPromptSuggestionResponse");
+  .openapi("DismissGeoPromptSuggestionResponse")
+  .openapi({
+    description:
+      "Confirmation of the dismissed suggestion and the workspace it belongs to.",
+  });

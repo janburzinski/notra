@@ -84,7 +84,9 @@ const configuredField = z.boolean().openapi({
 
 const importedSchema = z
   .object({
-    provider: z.enum(ANALYTICS_IMPORT_PROVIDERS),
+    provider: z.enum(ANALYTICS_IMPORT_PROVIDERS).openapi({
+      description: "Analytics provider the history was imported from.",
+    }),
     until: z.string().openapi({ description: "Last imported day." }),
     nativeStart: z.string().nullable().openapi({
       description: "First day Notra tracked natively, when known.",
@@ -98,7 +100,10 @@ const importedSchema = z
   });
 
 const breakdownSchema = z.object({
-  value: z.string(),
+  value: z.string().openapi({
+    description:
+      "Breakdown value, which is a country code, device class or browser language depending on the list.",
+  }),
   visitors: z.number().int().openapi({
     description: "Visitors in the window.",
   }),
@@ -115,7 +120,7 @@ export const webAnalyticsResponseSchema = z
     hosts: z
       .array(
         z.object({
-          host: z.string(),
+          host: z.string().openapi({ description: "Hostname." }),
           siteId: z.string().openapi({
             description: "Notra Sites site id, empty for your own domains.",
           }),
@@ -129,36 +134,54 @@ export const webAnalyticsResponseSchema = z
         description:
           "Hosts with page views in the window, ignoring the host filter, most viewed first.",
       }),
-    totals: z.object({
-      views: z.number().int().openapi({
-        description:
-          "Human page views in the window, including imported history.",
-      }),
-      previousViews: z.number().int().openapi({
-        description:
-          "Page views in the previous window of the same length, immediately before this one.",
-      }),
-      visitors: z.number().int(),
-      previousVisitors: z.number().int(),
-      sessions: z.number().int().openapi({
-        description: "Sessions, counted on each session's first page.",
-      }),
-      previousSessions: z.number().int(),
-      engagedSessions: z.number().int().openapi({
-        description:
-          "Sessions that viewed at least two pages. For imported history, visits minus bounces.",
-      }),
-      aiVisitors: z.number().int().openapi({
-        description: "Visitors who arrived from an AI assistant.",
-      }),
-      previousAiVisitors: z.number().int(),
-    }),
+    totals: z
+      .object({
+        views: z.number().int().openapi({
+          description:
+            "Human page views in the window, including imported history.",
+        }),
+        previousViews: z.number().int().openapi({
+          description:
+            "Page views in the previous window of the same length, immediately before this one.",
+        }),
+        visitors: z.number().int().openapi({
+          description: "Unique human visitors in the window.",
+        }),
+        previousVisitors: z.number().int().openapi({
+          description:
+            "Unique visitors in the previous window of the same length.",
+        }),
+        sessions: z.number().int().openapi({
+          description: "Sessions, counted on each session's first page.",
+        }),
+        previousSessions: z.number().int().openapi({
+          description: "Sessions in the previous window of the same length.",
+        }),
+        engagedSessions: z.number().int().openapi({
+          description:
+            "Sessions that viewed at least two pages. For imported history, visits minus bounces.",
+        }),
+        aiVisitors: z.number().int().openapi({
+          description: "Visitors who arrived from an AI assistant.",
+        }),
+        previousAiVisitors: z.number().int().openapi({
+          description:
+            "AI-referred visitors in the previous window of the same length.",
+        }),
+      })
+      .openapi({ description: "Totals for the whole window." }),
     points: z
       .array(
         z.object({
           day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
-          views: z.number().int(),
-          visitors: z.number().int(),
+          views: z
+            .number()
+            .int()
+            .openapi({ description: "Human page views that day." }),
+          visitors: z
+            .number()
+            .int()
+            .openapi({ description: "Unique visitors that day." }),
         })
       )
       .openapi({
@@ -167,7 +190,10 @@ export const webAnalyticsResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoWebAnalyticsResponse");
+  .openapi("GeoWebAnalyticsResponse", {
+    description:
+      "Human web analytics totals, daily views and hosts for the window.",
+  });
 
 export const webAnalyticsBreakdownsResponseSchema = z
   .object({
@@ -176,14 +202,20 @@ export const webAnalyticsBreakdownsResponseSchema = z
     pages: z
       .array(
         z.object({
-          host: z.string(),
-          path: z.string(),
-          views: z.number().int(),
+          host: z.string().openapi({ description: "Hostname of the page." }),
+          path: z.string().openapi({ description: "Page path." }),
+          views: z
+            .number()
+            .int()
+            .openapi({ description: "Human page views in the window." }),
           previousViews: z.number().int().openapi({
             description:
               "Views in the previous window of the same length, immediately before this one.",
           }),
-          visitors: z.number().int(),
+          visitors: z
+            .number()
+            .int()
+            .openapi({ description: "Unique visitors to this page." }),
           landings: z.number().int().openapi({
             description: "Sessions that started on this page.",
           }),
@@ -201,7 +233,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
             description:
               "Referrer group of the session's first page: ai, direct, search, social or other. Internal referrals are left out.",
           }),
-          source: z.string(),
+          source: z.string().openapi({
+            description:
+              "Referrer name, such as a search engine, social network, AI assistant or referring host, or empty for direct traffic.",
+          }),
           aiProduct: z.string().openapi({
             description:
               "Company behind the AI source, such as openai, anthropic, google or microsoft; the source itself when Notra has no mapping. Empty for non-AI groups.",
@@ -213,7 +248,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
             description:
               "Sessions in the previous window of the same length. Null when filtered to a path and the previous window starts before the 90 days of visits Notra keeps.",
           }),
-          visitors: z.number().int(),
+          visitors: z
+            .number()
+            .int()
+            .openapi({ description: "Unique visitors from this source." }),
         })
       )
       .openapi({
@@ -233,7 +271,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
             description:
               "AI source the session landed from. The row with an empty source covers all sessions, AI-referred ones included.",
           }),
-          sessions: z.number().int(),
+          sessions: z
+            .number()
+            .int()
+            .openapi({ description: "Sessions in the window." }),
           pagesPerSession: z.number().openapi({
             description: "Average page views per session.",
           }),
@@ -253,7 +294,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
           url: z.string().openapi({
             description: "Destination host and path, without the query.",
           }),
-          clicks: z.number().int(),
+          clicks: z
+            .number()
+            .int()
+            .openapi({ description: "Clicks in the window." }),
           previousClicks: z.number().int().nullable().openapi({
             description:
               "Clicks in the previous window of the same length, immediately before this one. Null when that window starts before the 90 days of clicks Notra keeps.",
@@ -270,7 +314,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
     vitals: z
       .array(
         z.object({
-          metric: z.enum(WEB_VITAL_METRICS),
+          metric: z.enum(WEB_VITAL_METRICS).openapi({
+            description:
+              "Web Vital the row measures, which is largest contentful paint, interaction to next paint, cumulative layout shift, first contentful paint or time to first byte.",
+          }),
           p75: z.number().openapi({
             description:
               "75th percentile in milliseconds, or the layout shift score x1000 for cls.",
@@ -291,7 +338,10 @@ export const webAnalyticsBreakdownsResponseSchema = z
             description:
               "Scrubbed before storage: no query strings, emails or long ids.",
           }),
-          source: z.string(),
+          source: z.string().openapi({
+            description:
+              "URL of the script that threw, without query or fragment, or empty when unknown.",
+          }),
           events: z.number().int().openapi({
             description: "Times this error was reported.",
           }),
@@ -309,33 +359,55 @@ export const webAnalyticsBreakdownsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoWebAnalyticsBreakdownsResponse");
+  .openapi("GeoWebAnalyticsBreakdownsResponse", {
+    description:
+      "Human web analytics broken down by page, referrer, country, device and more.",
+  });
 
 export const webAnalyticsUtmResponseSchema = z
   .object({
-    dimension: z.enum(WEB_UTM_DIMENSIONS),
-    rows: z.array(
-      z.object({
-        value: z.string().openapi({
-          description:
-            "Source and medium are lowercased. Campaign, term and content values that look like an email address, a UUID or a token are reported as `:id`.",
-        }),
-        sessions: z.number().int().openapi({
-          description: "Sessions whose first page carried this UTM value.",
-        }),
-        previousSessions: z.number().int().nullable().openapi({
-          description:
-            "Sessions in the previous window of the same length, immediately before this one. Null when read from visits Notra keeps for 90 days (term, content, or any parameter filtered to a path) and the previous window starts before them.",
-        }),
-        visitors: z.number().int(),
-      })
-    ),
+    dimension: z.enum(WEB_UTM_DIMENSIONS).openapi({
+      description: "UTM parameter the rows break down.",
+    }),
+    rows: z
+      .array(
+        z.object({
+          value: z.string().openapi({
+            description:
+              "Source and medium are lowercased. Campaign, term and content values that look like an email address, a UUID or a token are reported as `:id`.",
+          }),
+          sessions: z.number().int().openapi({
+            description: "Sessions whose first page carried this UTM value.",
+          }),
+          previousSessions: z.number().int().nullable().openapi({
+            description:
+              "Sessions in the previous window of the same length, immediately before this one. Null when read from visits Notra keeps for 90 days (term, content, or any parameter filtered to a path) and the previous window starts before them.",
+          }),
+          visitors: z
+            .number()
+            .int()
+            .openapi({ description: "Unique visitors with this UTM value." }),
+        })
+      )
+      .openapi({
+        description: "One row per UTM value, most sessions first.",
+      }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoWebAnalyticsUtmResponse");
+  .openapi("GeoWebAnalyticsUtmResponse", {
+    description: "Sessions and visitors per value of one UTM parameter.",
+  });
 
 const journeyDailySchema = z
-  .array(z.object({ day: z.string(), journeys: z.number().int() }))
+  .array(
+    z.object({
+      day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
+      journeys: z
+        .number()
+        .int()
+        .openapi({ description: "Journeys that started that day." }),
+    })
+  )
   .openapi({
     description:
       "Journeys per UTC day in the window, by the day they started. Days without journeys are omitted.",
@@ -347,8 +419,16 @@ export const journeyStatsResponseSchema = z
     sources: z
       .array(
         z.object({
-          source: z.string(),
-          visitorType: z.enum(["crawler", "ai_referral", "human", "unknown"]),
+          source: z.string().openapi({
+            description:
+              "Crawler name for crawlers, or the AI assistant a referral came from.",
+          }),
+          visitorType: z
+            .enum(["crawler", "ai_referral", "human", "unknown"])
+            .openapi({
+              description:
+                "Kind of AI traffic, where crawler means an AI bot fetched pages and ai_referral means a person arrived from an AI assistant's link.",
+            }),
           journeys: z.number().int().openapi({
             description: "Journeys that started in the window.",
           }),
@@ -386,7 +466,10 @@ export const journeyStatsResponseSchema = z
             description:
               "Journeys started in the window that fetched this page.",
           }),
-          previousJourneys: z.number().int(),
+          previousJourneys: z.number().int().openapi({
+            description:
+              "Journeys started in the previous window of the same length that fetched this page.",
+          }),
           entries: z.number().int().openapi({
             description: "Journeys whose first fetch was this page.",
           }),
@@ -410,77 +493,112 @@ export const journeyStatsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoJourneyStatsResponse");
+  .openapi("GeoJourneyStatsResponse", {
+    description:
+      "AI crawler and AI referral journey counts per source and per page.",
+  });
 
 export const analyticsImportsResponseSchema = z
   .object({
-    imports: z.array(
-      z.object({
-        id: z.string(),
-        projectId: z.string(),
-        provider: z.enum(ANALYTICS_IMPORT_PROVIDERS),
-        kind: z.enum(ANALYTICS_IMPORT_KINDS).openapi({
-          description: "web: page views; geo: AI crawler requests.",
-        }),
-        sourceLabel: z.string().openapi({
-          description:
-            "Name of the site in the source provider, or its reference when it has no name.",
-        }),
-        host: z.string().openapi({
-          description:
-            "Hostname the import was set up for. Imported rows without a hostname are counted under it; Plausible and Cloudflare imports also write rows for its subdomains.",
-        }),
-        status: z.enum(ANALYTICS_IMPORT_STATUSES),
-        startDay: z.string().nullable().openapi({
-          description: "First day the import covers.",
-        }),
-        endDay: z.string().nullable().openapi({
-          description: "Last day the import covers.",
-        }),
-        cutoffDay: z.string().nullable().openapi({
-          description: "First day of native tracking; imports stop before it.",
-        }),
-        chunksTotal: z.number().int().openapi({
-          description:
-            "Date-range chunks the import is split into. 0 until planned.",
-        }),
-        chunksDone: z.number().int().openapi({
-          description: "Chunks imported so far.",
-        }),
-        pageviewsImported: z.number().int().openapi({
-          description: "Page views imported so far across finished chunks.",
-        }),
-        rowsWritten: z.number().int().openapi({
-          description: "Analytics rows written so far across finished chunks.",
-        }),
-        capabilities: z
-          .object({
-            visitors: z.boolean(),
-            visits: z.boolean(),
-            bounces: z.boolean(),
-            utm: z.boolean(),
-            entryPages: z.boolean(),
-            sampled: z.boolean().openapi({
-              description:
-                "True when the provider reports estimates extrapolated from sampled data rather than exact counts (both Cloudflare providers).",
-            }),
-          })
-          .openapi({
-            description:
-              "Metrics the provider can supply; metrics it cannot supply read as 0.",
+    imports: z
+      .array(
+        z.object({
+          id: z.string().openapi({ description: "Import id." }),
+          projectId: z
+            .string()
+            .openapi({ description: "Project the history is imported into." }),
+          provider: z.enum(ANALYTICS_IMPORT_PROVIDERS).openapi({
+            description: "Analytics provider the history comes from.",
           }),
-        lastError: z.string().nullable().openapi({
-          description:
-            "Why the import failed or is waiting. Cleared when a chunk succeeds.",
-        }),
-        retryAt: z.string().nullable().openapi({
-          description:
-            "When a waiting import resumes (ISO timestamp). Null unless the status is waiting_rate_limit.",
-        }),
-        createdAt: z.string(),
-        completedAt: z.string().nullable(),
-      })
-    ),
+          kind: z.enum(ANALYTICS_IMPORT_KINDS).openapi({
+            description: "web: page views; geo: AI crawler requests.",
+          }),
+          sourceLabel: z.string().openapi({
+            description:
+              "Name of the site in the source provider, or its reference when it has no name.",
+          }),
+          host: z.string().openapi({
+            description:
+              "Hostname the import was set up for. Imported rows without a hostname are counted under it; Plausible and Cloudflare imports also write rows for its subdomains.",
+          }),
+          status: z.enum(ANALYTICS_IMPORT_STATUSES).openapi({
+            description:
+              "Progress of the import, where waiting_rate_limit means the provider's rate limit paused it until retryAt and deleting means Notra is removing the imported rows.",
+          }),
+          startDay: z.string().nullable().openapi({
+            description: "First day the import covers.",
+          }),
+          endDay: z.string().nullable().openapi({
+            description: "Last day the import covers.",
+          }),
+          cutoffDay: z.string().nullable().openapi({
+            description:
+              "First day of native tracking; imports stop before it.",
+          }),
+          chunksTotal: z.number().int().openapi({
+            description:
+              "Date-range chunks the import is split into. 0 until planned.",
+          }),
+          chunksDone: z.number().int().openapi({
+            description: "Chunks imported so far.",
+          }),
+          pageviewsImported: z.number().int().openapi({
+            description: "Page views imported so far across finished chunks.",
+          }),
+          rowsWritten: z.number().int().openapi({
+            description:
+              "Analytics rows written so far across finished chunks.",
+          }),
+          capabilities: z
+            .object({
+              visitors: z.boolean().openapi({
+                description: "Whether it supplies unique visitors.",
+              }),
+              visits: z.boolean().openapi({
+                description:
+                  "Whether the provider supplies visits, which it calls sessions.",
+              }),
+              bounces: z
+                .boolean()
+                .openapi({ description: "Whether it supplies bounces." }),
+              utm: z.boolean().openapi({
+                description: "Whether it supplies UTM breakdowns.",
+              }),
+              entryPages: z
+                .boolean()
+                .openapi({ description: "Whether it supplies entry pages." }),
+              sampled: z.boolean().openapi({
+                description:
+                  "True when the provider reports estimates extrapolated from sampled data rather than exact counts (both Cloudflare providers).",
+              }),
+            })
+            .openapi({
+              description:
+                "Metrics the provider can supply; metrics it cannot supply read as 0.",
+            }),
+          lastError: z.string().nullable().openapi({
+            description:
+              "Why the import failed or is waiting. Cleared when a chunk succeeds.",
+          }),
+          retryAt: z.string().nullable().openapi({
+            description:
+              "When a waiting import resumes (ISO timestamp). Null unless the status is waiting_rate_limit.",
+          }),
+          createdAt: z.string().openapi({
+            description: "ISO timestamp when the import was created.",
+          }),
+          completedAt: z.string().nullable().openapi({
+            description:
+              "ISO timestamp when the import finished, or null until completed.",
+          }),
+        })
+      )
+      .openapi({
+        description: "History imports that are not deleted, newest first.",
+      }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoAnalyticsImportsResponse");
+  .openapi("GeoAnalyticsImportsResponse", {
+    description:
+      "Analytics history imports for the project and their progress.",
+  });

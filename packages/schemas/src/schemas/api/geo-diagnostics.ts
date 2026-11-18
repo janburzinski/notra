@@ -61,6 +61,15 @@ const sentimentDayBucketSchema = sentimentBucketSchema.extend({
   day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
 });
 
+const periodSchema = z.object({
+  from: z.string().openapi({
+    description: "First day of the range in UTC, formatted as YYYY-MM-DD.",
+  }),
+  to: z.string().openapi({
+    description: "Last day of the range in UTC, formatted as YYYY-MM-DD.",
+  }),
+});
+
 export const geoSentimentResponseSchema = z
   .object({
     configured: z.literal(true).openapi({
@@ -70,7 +79,13 @@ export const geoSentimentResponseSchema = z
       description: "Totals for the selected period.",
     }),
     engines: z
-      .array(sentimentBucketSchema.extend({ engine: z.string() }))
+      .array(
+        sentimentBucketSchema.extend({
+          engine: z.string().openapi({
+            description: "Answer engine id, as listed by listGeoEngines.",
+          }),
+        })
+      )
       .openapi({
         description: "Totals per engine that answered in the selected period.",
       }),
@@ -80,10 +95,10 @@ export const geoSentimentResponseSchema = z
     }),
     comparison: z
       .object({
-        current: z.object({ from: z.string(), to: z.string() }).openapi({
+        current: periodSchema.openapi({
           description: "Selected period as inclusive UTC days (YYYY-MM-DD).",
         }),
-        previous: z.object({ from: z.string(), to: z.string() }).openapi({
+        previous: periodSchema.openapi({
           description:
             "Period of the same length right before it, as inclusive UTC days (YYYY-MM-DD).",
         }),
@@ -105,7 +120,10 @@ export const geoSentimentResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoSentimentResponse");
+  .openapi("GeoSentimentResponse", {
+    description:
+      "How positively answers mention the brand, per engine and day, compared with the previous period.",
+  });
 
 export const geoSentimentEvidenceQuerySchema =
   geoSentimentWindowQuerySchema.extend({
@@ -118,19 +136,25 @@ export const geoSentimentEvidenceResponseSchema = z
       .array(
         z.object({
           id: z.string().openapi({ description: "Check id of the answer." }),
-          scanId: z.string(),
+          scanId: z
+            .string()
+            .openapi({ description: "Scan that captured the answer." }),
           promptId: z.string().openapi({
             description:
               "Prompt the answer belongs to: `custom-` plus the prompt id for custom prompts, the slug for auto prompts.",
           }),
-          prompt: z.string(),
-          engine: z.string(),
+          prompt: z.string().openapi({ description: "Prompt text." }),
+          engine: z.string().openapi({
+            description: "Answer engine id, as listed by listGeoEngines.",
+          }),
           language: z.string().openapi({
             description:
               "Language the prompt was asked in, such as `English`. An empty string means English.",
           }),
-          capturedAt: z.string(),
-          answer: z.string(),
+          capturedAt: z.string().openapi({
+            description: "ISO timestamp when the answer was captured.",
+          }),
+          answer: z.string().openapi({ description: "Full answer text." }),
           excerpt: z.string().openapi({
             description: "Part of the answer around the brand mention.",
           }),
@@ -146,7 +170,9 @@ export const geoSentimentEvidenceResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoSentimentEvidenceResponse");
+  .openapi("GeoSentimentEvidenceResponse", {
+    description: "A page of answers that mentioned the brand negatively.",
+  });
 
 const sentimentEvidenceSchema = z.object({
   checkId: z.string().openapi({
@@ -156,9 +182,15 @@ const sentimentEvidenceSchema = z.object({
     description:
       "Quote from that answer. It matches the answer text except for whitespace, quote marks and dash style.",
   }),
-  prompt: z.string(),
-  engine: z.string(),
-  capturedAt: z.string(),
+  prompt: z
+    .string()
+    .openapi({ description: "Prompt the answer responded to." }),
+  engine: z
+    .string()
+    .openapi({ description: "Answer engine id, as listed by listGeoEngines." }),
+  capturedAt: z
+    .string()
+    .openapi({ description: "ISO timestamp when the answer was captured." }),
 });
 
 export const geoSentimentAnalysisResponseSchema = z
@@ -174,7 +206,9 @@ export const geoSentimentAnalysisResponseSchema = z
         fingerprint: z.string().openapi({
           description: "Identifies the set of answers that was analyzed.",
         }),
-        generatedAt: z.string(),
+        generatedAt: z.string().openapi({
+          description: "ISO timestamp when the analysis was generated.",
+        }),
         sampled: z.number().int().openapi({
           description:
             "Answers sent to the model, at most 12 positive and 12 negative.",
@@ -183,35 +217,43 @@ export const geoSentimentAnalysisResponseSchema = z
           description:
             "Positive or negative brand mentions in the period when the analysis ran.",
         }),
-        themes: z.array(
-          z.object({
-            title: z.string().openapi({
-              description: "The attribute praised or criticized.",
-            }),
-            polarity: z.enum(["positive", "negative"]),
-            claims: z
-              .array(
-                z.object({
-                  statement: z.string().openapi({
-                    description:
-                      "What the answers say about the brand, written by the model.",
-                  }),
-                  evidence: z.array(sentimentEvidenceSchema).openapi({
-                    description:
-                      "Quotes backing this claim, each checked against its answer text. Claims without a matching quote are dropped.",
-                  }),
-                })
-              )
-              .openapi({
-                description:
-                  "Claims under this theme, each with at least one verified quote.",
+        themes: z
+          .array(
+            z.object({
+              title: z.string().openapi({
+                description: "The attribute praised or criticized.",
               }),
-            evidence: z.array(sentimentEvidenceSchema).openapi({
-              description:
-                "Every quote from the theme's claims in one list, in claim order, with repeated quotes from the same answer listed once.",
-            }),
-          })
-        ),
+              polarity: z.enum(["positive", "negative"]).openapi({
+                description:
+                  "Whether answers praise or criticize this attribute.",
+              }),
+              claims: z
+                .array(
+                  z.object({
+                    statement: z.string().openapi({
+                      description:
+                        "What the answers say about the brand, written by the model.",
+                    }),
+                    evidence: z.array(sentimentEvidenceSchema).openapi({
+                      description:
+                        "Quotes backing this claim, each checked against its answer text. Claims without a matching quote are dropped.",
+                    }),
+                  })
+                )
+                .openapi({
+                  description:
+                    "Claims under this theme, each with at least one verified quote.",
+                }),
+              evidence: z.array(sentimentEvidenceSchema).openapi({
+                description:
+                  "Every quote from the theme's claims in one list, in claim order, with repeated quotes from the same answer listed once.",
+              }),
+            })
+          )
+          .openapi({
+            description:
+              "Attributes the answers praise or criticize, each with supporting claims.",
+          }),
       })
       .nullable()
       .openapi({
@@ -224,10 +266,15 @@ export const geoSentimentAnalysisResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoSentimentAnalysisResponse");
+  .openapi("GeoSentimentAnalysisResponse", {
+    description:
+      "The stored AI analysis of what answers praise and criticize about the brand.",
+  });
 
 const changeStateSchema = z.object({
-  mentioned: z.boolean(),
+  mentioned: z.boolean().openapi({
+    description: "Whether the answer mentioned the brand.",
+  }),
   position: z.number().nullable().openapi({
     description:
       "1-based rank of the brand in a list of recommended brands, or `null` when it is not mentioned or not in a list.",
@@ -235,8 +282,11 @@ const changeStateSchema = z.object({
 });
 
 const changeScanSchema = z.object({
-  id: z.string(),
-  finishedAt: z.string().nullable(),
+  id: z.string().openapi({ description: "Scan id." }),
+  finishedAt: z.string().nullable().openapi({
+    description:
+      "ISO timestamp when the scan finished, or null when not recorded.",
+  }),
 });
 
 export const geoChangesResponseSchema = z
@@ -258,7 +308,9 @@ export const geoChangesResponseSchema = z
           description:
             "Pairs that no longer mention the brand, including those where a competitor took its place.",
         }),
-        positionImproved: z.number().int(),
+        positionImproved: z.number().int().openapi({
+          description: "Pairs where the brand moved up a list.",
+        }),
         positionDropped: z.number().int().openapi({
           description:
             "Pairs where the brand moved down a list, including when a new competitor moved above it.",
@@ -277,20 +329,30 @@ export const geoChangesResponseSchema = z
     events: z
       .array(
         z.object({
-          kind: z.enum([
-            "gained_mention",
-            "lost_mention",
-            "position_improved",
-            "position_dropped",
-            "competitor_displaced",
-            "citation_added",
-            "citation_removed",
-            "competitor_cited",
-            "new_engine",
-          ]),
-          promptId: z.string(),
-          prompt: z.string(),
-          engine: z.string(),
+          kind: z
+            .enum([
+              "gained_mention",
+              "lost_mention",
+              "position_improved",
+              "position_dropped",
+              "competitor_displaced",
+              "citation_added",
+              "citation_removed",
+              "competitor_cited",
+              "new_engine",
+            ])
+            .openapi({
+              description:
+                "Type of change, where competitor_displaced means competitors took the brand's place or moved above it, competitor_cited means competitor sites were newly cited and new_engine means the engine had no answer in the previous scan.",
+            }),
+          promptId: z.string().openapi({
+            description:
+              "ID of the tracked prompt, which is a custom prompt UUID or an auto prompt slug.",
+          }),
+          prompt: z.string().openapi({ description: "Prompt text." }),
+          engine: z.string().openapi({
+            description: "Answer engine id, as listed by listGeoEngines.",
+          }),
           previous: changeStateSchema.nullable().openapi({
             description:
               "State in the previous scan, or `null` for `new_engine`.",
@@ -314,7 +376,10 @@ export const geoChangesResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoChangesResponse");
+  .openapi("GeoChangesResponse", {
+    description:
+      "What changed in brand mentions, positions and citations between the two latest completed scans.",
+  });
 
 export const geoPromptHistoryParamsSchema = projectParamsSchema.extend({
   promptId: z.string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH).openapi({
@@ -345,9 +410,15 @@ export const geoPromptHistoryResponseSchema = z
             description:
               "Check id, usable with the prompt-result detail endpoint.",
           }),
-          scanId: z.string(),
-          engine: z.string(),
-          mentioned: z.boolean(),
+          scanId: z
+            .string()
+            .openapi({ description: "Scan that captured the answer." }),
+          engine: z.string().openapi({
+            description: "Answer engine id, as listed by listGeoEngines.",
+          }),
+          mentioned: z.boolean().openapi({
+            description: "Whether the answer mentioned the brand.",
+          }),
           ownedSourceCited: z.boolean().optional().openapi({
             description:
               "Whether the answer cited a page on the project's own site.",
@@ -368,7 +439,9 @@ export const geoPromptHistoryResponseSchema = z
             description:
               "Language the prompt was asked in, such as `English`. An empty string means English.",
           }),
-          capturedAt: z.string(),
+          capturedAt: z.string().openapi({
+            description: "ISO timestamp when the answer was captured.",
+          }),
         })
       )
       .openapi({
@@ -377,6 +450,8 @@ export const geoPromptHistoryResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPromptHistoryResponse");
+  .openapi("GeoPromptHistoryResponse", {
+    description: "Past answers to one tracked prompt across engines and scans.",
+  });
 
 export { geoSentimentWindowQuerySchema as geoSentimentQuerySchema };

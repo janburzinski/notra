@@ -37,7 +37,8 @@ const competitorSchema = z
       description: "Custom chart color, or `null` to use the default palette.",
     }),
   })
-  .openapi("GeoCompetitor");
+  .openapi("GeoCompetitor")
+  .openapi({ description: "A competitor tracked in AI answers." });
 
 export const listCompetitorsResponseSchema = z
   .object({
@@ -46,7 +47,11 @@ export const listCompetitorsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoCompetitorsResponse");
+  .openapi("ListGeoCompetitorsResponse")
+  .openapi({
+    description:
+      "The project's tracked competitors and the workspace they belong to.",
+  });
 
 export const competitorSuggestionsQuerySchema = z.object({
   domain: z
@@ -73,8 +78,13 @@ export const competitorSuggestionsResponseSchema = z
     competitors: z
       .array(
         z.object({
-          name: z.string(),
-          domain: z.string().nullable(),
+          name: z.string().openapi({
+            description: "Name of the suggested competitor.",
+          }),
+          domain: z.string().nullable().openapi({
+            description:
+              "Website domain of the suggested competitor, or `null` when the lookup found none.",
+          }),
           description: z.string().nullable().openapi({
             description:
               "Short description of the suggested competitor, or `null`.",
@@ -91,7 +101,11 @@ export const competitorSuggestionsResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoCompetitorSuggestionsResponse");
+  .openapi("GeoCompetitorSuggestionsResponse")
+  .openapi({
+    description:
+      "Competitors suggested for a website domain, which Notra does not save.",
+  });
 
 export const putCompetitorRequestSchema = z
   .object({
@@ -168,4 +182,8 @@ export const importCompetitorsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ImportGeoCompetitorsResponse");
+  .openapi("ImportGeoCompetitorsResponse")
+  .openapi({
+    description:
+      "Counts of imported, updated, skipped and rejected competitor rows, plus the resulting competitor list.",
+  });

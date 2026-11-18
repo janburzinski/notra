@@ -248,17 +248,21 @@ export const errorResponseSchema = z
   })
   .openapi("ErrorResponse");
 
-export const organizationResponseSchema = z.object({
-  id: z.string().openapi({
-    description:
-      "Workspace ID. Account API keys can send it, or the slug, as X-Notra-Organization-Id.",
-  }),
-  slug: z.string(),
-  name: z.string(),
-  logo: z.string().nullable().openapi({
-    description: "Workspace logo image URL. Null when none is set.",
-  }),
-});
+export const organizationResponseSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "Workspace ID. Account API keys can send it, or the slug, as X-Notra-Organization-Id.",
+    }),
+    slug: z.string().openapi({
+      description: "URL-safe workspace handle, unique across Notra.",
+    }),
+    name: z.string().openapi({ description: "Workspace display name." }),
+    logo: z.string().nullable().openapi({
+      description: "Workspace logo image URL. Null when none is set.",
+    }),
+  })
+  .openapi({ description: "Workspace the request ran in." });
 
 const websiteUrlSchema = z
   .string()
@@ -279,85 +283,111 @@ const websiteUrlSchema = z
     }
   });
 
-const brandIdentityResponseSchema = z.object({
-  id: z.string().openapi({
+const brandIdentityResponseSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "Pass as brandIdentityId to post generation or the brandIdentityId filter of GET /v1/posts.",
+    }),
+    name: z.string().openapi({
+      description: "Display name, unique within the organization.",
+    }),
+    isDefault: z.boolean().openapi({
+      description:
+        "The organization's default brand identity, used when post generation omits brandIdentityId.",
+    }),
+    websiteUrl: z.string().openapi({
+      description: "Website the identity was analyzed from.",
+    }),
+    companyName: z.string().nullable().openapi({
+      description:
+        "Filled in by the website analysis. Null until the analysis completes or when not set.",
+    }),
+    companyDescription: z.string().nullable().openapi({
+      description:
+        "Filled in by the website analysis. Null until the analysis completes or when not set.",
+    }),
+    toneProfile: z.string().nullable().openapi({
+      description:
+        "Preset tone: Conversational, Professional, Casual or Formal. Ignored while customTone is set.",
+    }),
+    customTone: z.string().nullable().openapi({
+      description:
+        "Free-text voice notes. When set, generation follows them instead of toneProfile.",
+    }),
+    customInstructions: z.string().nullable().openapi({
+      description: "Extra writing instructions applied to generated content.",
+    }),
+    audience: z.string().nullable().openapi({
+      description:
+        "Target audience. Filled in by the website analysis; null until it completes or when not set.",
+    }),
+    language: z.string().nullable().openapi({
+      description:
+        "Language generated content is written in. Null means no language is enforced.",
+    }),
+    createdAt: z.string().openapi({
+      description:
+        "When the brand identity was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description:
+        "When the brand identity was last changed, as an ISO 8601 timestamp.",
+    }),
+  })
+  .openapi({
     description:
-      "Pass as brandIdentityId to post generation or the brandIdentityId filter of GET /v1/posts.",
-  }),
-  name: z.string(),
-  isDefault: z.boolean().openapi({
-    description:
-      "The organization's default brand identity, used when post generation omits brandIdentityId.",
-  }),
-  websiteUrl: z.string().openapi({
-    description: "Website the identity was analyzed from.",
-  }),
-  companyName: z.string().nullable().openapi({
-    description:
-      "Filled in by the website analysis. Null until the analysis completes or when not set.",
-  }),
-  companyDescription: z.string().nullable().openapi({
-    description:
-      "Filled in by the website analysis. Null until the analysis completes or when not set.",
-  }),
-  toneProfile: z.string().nullable().openapi({
-    description:
-      "Preset tone: Conversational, Professional, Casual or Formal. Ignored while customTone is set.",
-  }),
-  customTone: z.string().nullable().openapi({
-    description:
-      "Free-text voice notes. When set, generation follows them instead of toneProfile.",
-  }),
-  customInstructions: z.string().nullable().openapi({
-    description: "Extra writing instructions applied to generated content.",
-  }),
-  audience: z.string().nullable().openapi({
-    description:
-      "Target audience. Filled in by the website analysis; null until it completes or when not set.",
-  }),
-  language: z.string().nullable().openapi({
-    description:
-      "Language generated content is written in. Null means no language is enforced.",
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+      "A brand identity with the company details, tone and audience that Notra writes content for.",
+  });
 
-const githubIntegrationResponseSchema = z.object({
-  id: z.string().openapi({
-    description:
-      "GitHub integration ID. Use it in integrations.github for post generation, as integrationId for post pull requests and as repositoryId for scheduled GitHub publishing.",
-  }),
-  displayName: z.string().openapi({
-    description:
-      "Label for the repository, owner/repo when created through the API.",
-  }),
-  owner: z.string().nullable().openapi({
-    description:
-      "Repository owner (user or organization). Null only for integrations connected before Notra stored the owner and repository name on the integration; every connection path sets both today.",
-  }),
-  repo: z.string().nullable().openapi({
-    description:
-      "Repository name without the owner. Null under the same condition as owner.",
-  }),
-  defaultBranch: z.string().nullable().openapi({
-    description:
-      "Branch Notra reads activity from. Null means the repository's default branch on GitHub.",
-  }),
-});
+const githubIntegrationResponseSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "GitHub integration ID. Use it in integrations.github for post generation, as integrationId for post pull requests and as repositoryId for scheduled GitHub publishing.",
+    }),
+    displayName: z.string().openapi({
+      description:
+        "Label for the repository, owner/repo when created through the API.",
+    }),
+    owner: z.string().nullable().openapi({
+      description:
+        "Repository owner (user or organization). Null only for integrations connected before Notra stored the owner and repository name on the integration; every connection path sets both today.",
+    }),
+    repo: z.string().nullable().openapi({
+      description:
+        "Repository name without the owner. Null under the same condition as owner.",
+    }),
+    defaultBranch: z.string().nullable().openapi({
+      description:
+        "Branch Notra reads activity from. Null means the repository's default branch on GitHub.",
+    }),
+  })
+  .openapi({ description: "A GitHub repository connected to Notra." });
 
 const linearIntegrationResponseSchema = z.object({
-  id: z.string(),
-  displayName: z.string(),
+  id: z.string().openapi({
+    description:
+      "ID of the Linear integration, used in integrations.linear when generating posts.",
+  }),
+  displayName: z.string().openapi({
+    description: "Label for the integration shown in Notra.",
+  }),
   linearOrganizationId: z.string().openapi({
     description: "ID of the connected Linear workspace.",
   }),
-  linearOrganizationName: z.string().nullable(),
+  linearOrganizationName: z.string().nullable().openapi({
+    description:
+      "Name of the connected Linear workspace, or null when unknown.",
+  }),
   linearTeamId: z.string().nullable().openapi({
     description:
       "Linear team that issues are read from. Null means every team in the Linear workspace.",
   }),
-  linearTeamName: z.string().nullable(),
+  linearTeamName: z.string().nullable().openapi({
+    description:
+      "Name of the Linear team issues are read from, or null when linearTeamId is null.",
+  }),
 });
 
 const GITHUB_PAT_PREFIXES = [
@@ -408,10 +438,12 @@ export const createGitHubIntegrationRequestSchema = z.object({
     }),
 });
 
-export const createGitHubIntegrationResponseSchema = z.object({
-  github: githubIntegrationResponseSchema,
-  organization: organizationResponseSchema,
-});
+export const createGitHubIntegrationResponseSchema = z
+  .object({
+    github: githubIntegrationResponseSchema,
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The newly connected GitHub repository." });
 
 const postCoverImageResponseSchema = z
   .object({
@@ -434,36 +466,66 @@ const authorProfileLinksResponseSchema = z.object({
     description: "Author's website.",
     example: "https://janedoe.dev",
   }),
-  x: z.string().nullable().openapi({ example: "https://x.com/janedoe" }),
-  linkedin: z.string().nullable(),
-  github: z.string().nullable(),
-  youtube: z.string().nullable(),
-  bluesky: z.string().nullable(),
-  mastodon: z.string().nullable(),
-  threads: z.string().nullable(),
-  instagram: z.string().nullable(),
+  x: z.string().nullable().openapi({
+    description: "X profile URL, or null when not set.",
+    example: "https://x.com/janedoe",
+  }),
+  linkedin: z.string().nullable().openapi({
+    description: "LinkedIn profile URL, or null when not set.",
+  }),
+  github: z.string().nullable().openapi({
+    description: "GitHub profile URL, or null when not set.",
+  }),
+  youtube: z.string().nullable().openapi({
+    description: "YouTube channel URL, or null when not set.",
+  }),
+  bluesky: z.string().nullable().openapi({
+    description: "Bluesky profile URL, or null when not set.",
+  }),
+  mastodon: z.string().nullable().openapi({
+    description: "Mastodon profile URL, or null when not set.",
+  }),
+  threads: z.string().nullable().openapi({
+    description: "Threads profile URL, or null when not set.",
+  }),
+  instagram: z.string().nullable().openapi({
+    description: "Instagram profile URL, or null when not set.",
+  }),
 });
 
 const postAuthorSummarySchema = z.object({
-  id: z.string().openapi({ example: "auth_8f2kq1" }),
+  id: z.string().openapi({
+    description:
+      "Author ID from GET /v1/posts/authors, or a site:<id> ref for an author from the post's Notra Sites site.",
+    example: "auth_8f2kq1",
+  }),
   slug: z.string().openapi({
     description:
       "Stable author handle; hosted sites list the author's posts at /author/{slug}.",
     example: "jane-doe",
   }),
-  name: z.string().openapi({ example: "Jane Doe" }),
-  title: z.string().nullable().openapi({ example: "Head of Product" }),
-  avatarUrl: z
-    .string()
-    .nullable()
-    .openapi({ example: "https://cdn.example.com/avatars/jane.png" }),
+  name: z.string().openapi({
+    description: "Author's display name.",
+    example: "Jane Doe",
+  }),
+  title: z.string().nullable().openapi({
+    description: "Job title shown next to the name, or null when not set.",
+    example: "Head of Product",
+  }),
+  avatarUrl: z.string().nullable().openapi({
+    description: "Avatar image URL, or null when not set.",
+    example: "https://cdn.example.com/avatars/jane.png",
+  }),
   ...authorProfileLinksResponseSchema.shape,
 });
 
 const postMetadataResponseSchema = z
   .object({
     coverImage: postCoverImageResponseSchema.nullable(),
-    tags: z.array(z.string()).openapi({ example: ["editor", "performance"] }),
+    tags: z.array(z.string()).openapi({
+      description: "Post tags in display order, or empty when none are set.",
+      example: ["editor", "performance"],
+    }),
     excerpt: z.string().nullable().openapi({
       description:
         "Summary shown on post cards and in meta descriptions. Null means it is derived from the first paragraph.",
@@ -498,76 +560,105 @@ const postMetadataResponseSchema = z
       "Site metadata for blog posts and changelogs, written into the frontmatter when the post is published to a site.",
   });
 
-const postResponseSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  slug: z.string().nullable().openapi({
-    description:
-      "URL slug. Only blog posts and changelogs have one; null when none is set.",
-  }),
-  content: z.string().openapi({
-    description:
-      "Rendered HTML for text posts. For image posts, this is the public CDN URL of the rendered image.",
-  }),
-  htmlUrl: z.string().nullable().openapi({
-    description:
-      "Public CDN URL of the generated HTML artifact for image posts. Null for non-image posts.",
-  }),
-  markdown: z.string().nullable().openapi({
-    description: "Markdown source for text posts. Null for image posts.",
-  }),
-  rawHtml: z.string().nullable().openapi({
-    description:
-      "Legacy inline generated HTML for image posts. New generated image HTML is stored as htmlUrl. Null for non-image posts.",
-  }),
-  recommendations: z.string().nullable().openapi({
-    description:
-      "Publishing suggestions written by the generator as Markdown, such as when and where to share the post. Null when there are none.",
-  }),
-  contentType: postContentTypeSchema,
-  sourceMetadata: z.unknown().nullable().openapi({
-    description:
-      "Free-form JSON recorded by whatever produced the post, such as a generation run or chat. Null for posts created with POST /v1/posts. Posts from generation runs (POST /v1/posts/generate, schedules, event triggers and GEO content briefs) include brandVoiceId, the brand identity the run wrote in (absent when the workspace had none), which the brandIdentityId filter of GET /v1/posts reads.",
-  }),
-  metadata: postMetadataResponseSchema.nullable().openapi({
-    description:
-      "Cover image, tags, excerpt, authors and other site metadata. Set for blog posts and changelogs, null for every other content type.",
-  }),
-  status: postStatusSchema,
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+const postResponseSchema = z
+  .object({
+    id: z.string().openapi({
+      description: "ID of the post, used as postId in the /v1/posts endpoints.",
+    }),
+    title: z.string().openapi({ description: "Post title." }),
+    slug: z.string().nullable().openapi({
+      description:
+        "URL slug. Only blog posts and changelogs have one; null when none is set.",
+    }),
+    content: z.string().openapi({
+      description:
+        "Rendered HTML for text posts. For image posts, this is the public CDN URL of the rendered image.",
+    }),
+    htmlUrl: z.string().nullable().openapi({
+      description:
+        "Public CDN URL of the generated HTML artifact for image posts. Null for non-image posts.",
+    }),
+    markdown: z.string().nullable().openapi({
+      description: "Markdown source for text posts. Null for image posts.",
+    }),
+    rawHtml: z.string().nullable().openapi({
+      description:
+        "Legacy inline generated HTML for image posts. New generated image HTML is stored as htmlUrl. Null for non-image posts.",
+    }),
+    recommendations: z.string().nullable().openapi({
+      description:
+        "Publishing suggestions written by the generator as Markdown, such as when and where to share the post. Null when there are none.",
+    }),
+    contentType: postContentTypeSchema.openapi({
+      description:
+        "Kind of content. image posts hold a rendered image instead of text; only blog_post and changelog have a slug and metadata.",
+    }),
+    sourceMetadata: z.unknown().nullable().openapi({
+      description:
+        "Free-form JSON recorded by whatever produced the post, such as a generation run or chat. Null for posts created with POST /v1/posts. Posts from generation runs (POST /v1/posts/generate, schedules, event triggers and GEO content briefs) include brandVoiceId, the brand identity the run wrote in (absent when the workspace had none), which the brandIdentityId filter of GET /v1/posts reads.",
+    }),
+    metadata: postMetadataResponseSchema.nullable().openapi({
+      description:
+        "Cover image, tags, excerpt, authors and other site metadata. Set for blog posts and changelogs, null for every other content type.",
+    }),
+    status: postStatusSchema.openapi({
+      description:
+        "Publishing state of the post in Notra, where GET /v1/posts only returns published posts unless its status filter includes draft.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the post was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the post was last changed, as an ISO 8601 timestamp.",
+    }),
+  })
+  .openapi({ description: "A post with its content and site metadata." });
 
-const postsPaginationSchema = z.object({
-  limit: z.number().int().min(1),
-  currentPage: z.number().int().min(1),
-  nextPage: z.number().int().min(1).nullable().openapi({
-    description: "Null on the last page.",
-  }),
-  previousPage: z.number().int().min(1).nullable().openapi({
-    description: "Null on the first page.",
-  }),
-  totalPages: z.number().int().min(1).openapi({
-    description: "At least 1, even when no posts match.",
-  }),
-  totalItems: z.number().int().min(0).openapi({
-    description: "Posts matching the filters across all pages.",
-  }),
-});
+const postsPaginationSchema = z
+  .object({
+    limit: z.number().int().min(1).openapi({
+      description: "Maximum number of posts per page.",
+    }),
+    currentPage: z.number().int().min(1).openapi({
+      description: "Page returned, starting at 1.",
+    }),
+    nextPage: z.number().int().min(1).nullable().openapi({
+      description: "Null on the last page.",
+    }),
+    previousPage: z.number().int().min(1).nullable().openapi({
+      description: "Null on the first page.",
+    }),
+    totalPages: z.number().int().min(1).openapi({
+      description: "At least 1, even when no posts match.",
+    }),
+    totalItems: z.number().int().min(0).openapi({
+      description: "Posts matching the filters across all pages.",
+    }),
+  })
+  .openapi({ description: "Page position and totals for the post list." });
 
-export const getPostsResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  posts: z.array(postResponseSchema),
-  pagination: postsPaginationSchema,
-});
+export const getPostsResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    posts: z.array(postResponseSchema).openapi({
+      description:
+        "Posts on this page matching the filters, in the requested sort order.",
+    }),
+    pagination: postsPaginationSchema,
+  })
+  .openapi({ description: "One page of posts and the pagination state." });
 
-export const getPostResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  post: postResponseSchema.nullable().openapi({
-    description:
-      "Null when no post with this ID exists in the organization; the response is still 200.",
-  }),
-});
+export const getPostResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    post: postResponseSchema.nullable().openapi({
+      description:
+        "Null when no post with this ID exists in the organization; the response is still 200.",
+    }),
+  })
+  .openapi({
+    description: "The requested post, or null when it does not exist.",
+  });
 
 const patchPostMetadataRequestSchema = z
   .object({
@@ -673,28 +764,50 @@ export const patchPostRequestSchema = z
     }
   );
 
-export const patchPostResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  post: postResponseSchema,
-});
+export const patchPostResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    post: postResponseSchema.openapi({
+      description: "The post after the update was saved.",
+    }),
+  })
+  .openapi({ description: "The updated post." });
 
 const contentAuthorResponseSchema = z.object({
   id: z.string().openapi({
     description: "Pass this ID in metadata.authorIds when updating a post.",
     example: "auth_8f2kq1",
   }),
-  slug: z.string().openapi({ example: "jane-doe" }),
-  name: z.string().openapi({ example: "Jane Doe" }),
-  title: z.string().nullable().openapi({ example: "Head of Product" }),
-  bio: z.string().nullable(),
-  avatarUrl: z.string().nullable(),
+  slug: z.string().openapi({
+    description:
+      "Stable author handle; hosted sites list the author's posts at /author/{slug}.",
+    example: "jane-doe",
+  }),
+  name: z.string().openapi({
+    description: "Author's display name.",
+    example: "Jane Doe",
+  }),
+  title: z.string().nullable().openapi({
+    description: "Job title shown next to the name, or null when not set.",
+    example: "Head of Product",
+  }),
+  bio: z.string().nullable().openapi({
+    description: "Short author bio, or null when not set.",
+  }),
+  avatarUrl: z.string().nullable().openapi({
+    description: "Avatar image URL, or null when not set.",
+  }),
   ...authorProfileLinksResponseSchema.shape,
 });
 
-export const listPostAuthorsResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  authors: z.array(contentAuthorResponseSchema),
-});
+export const listPostAuthorsResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    authors: z.array(contentAuthorResponseSchema).openapi({
+      description: "Every author in the organization, sorted by name.",
+    }),
+  })
+  .openapi({ description: "Authors that can be credited on posts." });
 
 export const createPostRequestSchema = createPostFieldsSchema
   .extend({
@@ -711,10 +824,12 @@ export const createPostRequestSchema = createPostFieldsSchema
     },
   });
 
-export const createPostResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  post: postResponseSchema,
-});
+export const createPostResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    post: postResponseSchema.openapi({ description: "The created post." }),
+  })
+  .openapi({ description: "The newly created post." });
 
 export const createBrandIdentityRequestSchema = z.object({
   name: z.string().trim().min(1).max(BRAND_NAME_MAX_LENGTH).optional().openapi({
@@ -729,42 +844,63 @@ export const createBrandIdentityRequestSchema = z.object({
   }),
 });
 
-const brandAnalysisJobSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  brandIdentityId: z.string().openapi({
+const brandAnalysisJobSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "ID of the job, which you poll with GET /v1/brand-identities/generate/{jobId}.",
+    }),
+    organizationId: z.string().openapi({
+      description: "Workspace the job runs in.",
+    }),
+    brandIdentityId: z.string().openapi({
+      description:
+        "ID of the brand identity being analyzed. The identity is created immediately and its details are filled in as the job completes.",
+    }),
+    status: z.enum(["queued", "running", "completed", "failed"]).openapi({
+      description: "Job state. Stop polling once it is completed or failed.",
+    }),
+    step: z.enum(["scraping", "extracting", "saving"]).nullable().openapi({
+      description: "Current analysis step while the job is running.",
+    }),
+    currentStep: z.number().int().min(0).openapi({
+      description: "Progress through the analysis, out of totalSteps.",
+    }),
+    totalSteps: z.number().int().min(1).openapi({
+      description: "Number of steps the analysis takes.",
+    }),
+    workflowRunId: z.string().nullable().openapi({
+      description:
+        "Internal workflow run ID. Null until the analysis workflow has started.",
+    }),
+    error: z.string().nullable().openapi({
+      description: "Failure reason when status is failed.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the job was queued, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the job last changed, as an ISO 8601 timestamp.",
+    }),
+    completedAt: z.string().nullable().openapi({
+      description:
+        "When the job completed or failed. Null while it is queued or running.",
+    }),
+  })
+  .openapi({
     description:
-      "ID of the brand identity being analyzed. The identity is created immediately and its details are filled in as the job completes.",
-  }),
-  status: z.enum(["queued", "running", "completed", "failed"]).openapi({
-    description: "Job state. Stop polling once it is completed or failed.",
-  }),
-  step: z.enum(["scraping", "extracting", "saving"]).nullable().openapi({
-    description: "Current analysis step while the job is running.",
-  }),
-  currentStep: z.number().int().min(0).openapi({
-    description: "Progress through the analysis, out of totalSteps.",
-  }),
-  totalSteps: z.number().int().min(1),
-  workflowRunId: z.string().nullable().openapi({
-    description:
-      "Internal workflow run ID. Null until the analysis workflow has started.",
-  }),
-  error: z.string().nullable().openapi({
-    description: "Failure reason when status is failed.",
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  completedAt: z.string().nullable().openapi({
-    description:
-      "When the job completed or failed. Null while it is queued or running.",
-  }),
-});
+      "Website analysis job that fills in a brand identity's details.",
+  });
 
-export const createBrandIdentityResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  job: brandAnalysisJobSchema,
-});
+export const createBrandIdentityResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    job: brandAnalysisJobSchema,
+  })
+  .openapi({
+    description:
+      "The queued analysis job for the new brand identity, which you poll until its status is completed or failed.",
+  });
 
 export const getBrandAnalysisJobParamsSchema = z.object({
   jobId: resourceIdSchema("jobId").openapi({
@@ -777,10 +913,12 @@ export const getBrandAnalysisJobParamsSchema = z.object({
   }),
 });
 
-export const getBrandAnalysisJobResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  job: brandAnalysisJobSchema,
-});
+export const getBrandAnalysisJobResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    job: brandAnalysisJobSchema,
+  })
+  .openapi({ description: "Current state of the brand analysis job." });
 
 export const patchBrandIdentityRequestSchema = z
   .object({
@@ -877,10 +1015,14 @@ export const patchBrandIdentityRequestSchema = z
     }
   );
 
-export const patchBrandIdentityResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  brandIdentity: brandIdentityResponseSchema,
-});
+export const patchBrandIdentityResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    brandIdentity: brandIdentityResponseSchema.openapi({
+      description: "The brand identity after the update was saved.",
+    }),
+  })
+  .openapi({ description: "The updated brand identity." });
 
 const disabledTriggerSchema = z.object({
   id: z.string().openapi({ description: "Automation trigger ID." }),
@@ -900,39 +1042,60 @@ const disabledEventsSchema = z.array(disabledTriggerSchema).openapi({
     "Event triggers that targeted the deleted resource. They are kept but set to enabled: false and ignore GitHub events. IDs work with the /v1/event-triggers endpoints.",
 });
 
-export const deleteBrandIdentityResponseSchema = z.object({
-  id: z.string(),
-  organization: organizationResponseSchema,
-  disabledSchedules: disabledSchedulesSchema,
-  disabledEvents: disabledEventsSchema,
-});
-
-export const deletePostResponseSchema = z.object({
-  id: z.string(),
-  organization: organizationResponseSchema,
-});
-
-export const deleteIntegrationResponseSchema = z.object({
-  id: z.string(),
-  organization: organizationResponseSchema,
-  disabledSchedules: disabledSchedulesSchema,
-  disabledEvents: disabledEventsSchema,
-});
-
-export const getBrandIdentitiesResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  brandIdentities: z.array(brandIdentityResponseSchema).openapi({
-    description: "Every brand identity in the organization, default first.",
-  }),
-});
-
-export const getBrandIdentityResponseSchema = z.object({
-  brandIdentity: brandIdentityResponseSchema.nullable().openapi({
+export const deleteBrandIdentityResponseSchema = z
+  .object({
+    id: z
+      .string()
+      .openapi({ description: "ID of the deleted brand identity." }),
+    organization: organizationResponseSchema,
+    disabledSchedules: disabledSchedulesSchema,
+    disabledEvents: disabledEventsSchema,
+  })
+  .openapi({
     description:
-      "Null when no brand identity with this ID exists in the organization; the response is still 200.",
-  }),
-  organization: organizationResponseSchema,
-});
+      "The deleted brand identity and the automations that were disabled because they used it.",
+  });
+
+export const deletePostResponseSchema = z
+  .object({
+    id: z.string().openapi({ description: "ID of the deleted post." }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "Confirmation that the post was deleted." });
+
+export const deleteIntegrationResponseSchema = z
+  .object({
+    id: z.string().openapi({ description: "ID of the deleted integration." }),
+    organization: organizationResponseSchema,
+    disabledSchedules: disabledSchedulesSchema,
+    disabledEvents: disabledEventsSchema,
+  })
+  .openapi({
+    description:
+      "The deleted integration and the automations that were disabled because they used it.",
+  });
+
+export const getBrandIdentitiesResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    brandIdentities: z.array(brandIdentityResponseSchema).openapi({
+      description: "Every brand identity in the organization, default first.",
+    }),
+  })
+  .openapi({ description: "The organization's brand identities." });
+
+export const getBrandIdentityResponseSchema = z
+  .object({
+    brandIdentity: brandIdentityResponseSchema.nullable().openapi({
+      description:
+        "Null when no brand identity with this ID exists in the organization; the response is still 200.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({
+    description:
+      "The requested brand identity, or null when it does not exist.",
+  });
 
 export const GITHUB_ACTIVITY_TYPES = [
   "pull_requests",
@@ -993,42 +1156,60 @@ const githubActivityItemSchema = z.object({
   }),
 });
 
-export const getGitHubActivityResponseSchema = z.object({
-  integration: githubIntegrationResponseSchema,
-  type: z.enum(GITHUB_ACTIVITY_TYPES),
-  since: z.string().openapi({
-    description:
-      "Start of the window used (ISO 8601), after defaults are applied.",
-  }),
-  until: z.string().openapi({
-    description:
-      "End of the window used (ISO 8601), after defaults are applied.",
-  }),
-  items: z.array(githubActivityItemSchema),
-  pagination: z.object({
-    page: z.number().int(),
-    nextPage: z.number().int().nullable().openapi({
-      description:
-        "Next GitHub page to request, or null when there are no more items in the window. A page can hold fewer items than the page size while nextPage is set.",
+export const getGitHubActivityResponseSchema = z
+  .object({
+    integration: githubIntegrationResponseSchema.openapi({
+      description: "The repository the activity was read from.",
     }),
-  }),
-  organization: organizationResponseSchema,
-});
+    type: z.enum(GITHUB_ACTIVITY_TYPES).openapi({
+      description: "Kind of activity listed in items.",
+    }),
+    since: z.string().openapi({
+      description:
+        "Start of the window used (ISO 8601), after defaults are applied.",
+    }),
+    until: z.string().openapi({
+      description:
+        "End of the window used (ISO 8601), after defaults are applied.",
+    }),
+    items: z.array(githubActivityItemSchema).openapi({
+      description:
+        "Pull requests, commits or releases in the window on this page.",
+    }),
+    pagination: z
+      .object({
+        page: z
+          .number()
+          .int()
+          .openapi({ description: "Page returned, starting at 1." }),
+        nextPage: z.number().int().nullable().openapi({
+          description:
+            "Next GitHub page to request, or null when there are no more items in the window. A page can hold fewer items than the page size while nextPage is set.",
+        }),
+      })
+      .openapi({ description: "Page position in the activity list." }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({
+    description: "One page of GitHub activity for a connected repository.",
+  });
 
-export const getIntegrationsResponseSchema = z.object({
-  github: z.array(githubIntegrationResponseSchema).openapi({
-    description:
-      "Enabled GitHub integrations. One entry per connected repository.",
-  }),
-  slack: z.array(z.unknown()).openapi({
-    description:
-      "Always empty. Slack is connected from the dashboard and is not exposed through the API.",
-  }),
-  linear: z.array(linearIntegrationResponseSchema).openapi({
-    description: "Enabled Linear integrations.",
-  }),
-  organization: organizationResponseSchema,
-});
+export const getIntegrationsResponseSchema = z
+  .object({
+    github: z.array(githubIntegrationResponseSchema).openapi({
+      description:
+        "Enabled GitHub integrations. One entry per connected repository.",
+    }),
+    slack: z.array(z.unknown()).openapi({
+      description:
+        "Always empty. Slack is connected from the dashboard and is not exposed through the API.",
+    }),
+    linear: z.array(linearIntegrationResponseSchema).openapi({
+      description: "Enabled Linear integrations.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The organization's connected integrations." });
 
 export const generationQueueErrorResponseSchema = z.object({
   error: z.string(),
@@ -1293,78 +1474,104 @@ export const createPostGenerationRequestSchema = z
   );
 
 const contentGenerationJobEventSchema = z.object({
-  id: z.string(),
-  jobId: z.string(),
-  type: z.enum([
-    "queued",
-    "workflow_triggered",
-    "running",
-    "fetching_repositories",
-    "generating_content",
-    "post_created",
-    "completed",
-    "failed",
-    "skipped",
-  ]),
+  id: z.string().openapi({ description: "Event ID." }),
+  jobId: z.string().openapi({ description: "Job the event belongs to." }),
+  type: z
+    .enum([
+      "queued",
+      "workflow_triggered",
+      "running",
+      "fetching_repositories",
+      "generating_content",
+      "post_created",
+      "completed",
+      "failed",
+      "skipped",
+    ])
+    .openapi({
+      description: "Step of the job the event records.",
+    }),
   message: z.string().openapi({
     description: "Human-readable description of the event.",
   }),
-  createdAt: z.string(),
+  createdAt: z.string().openapi({
+    description: "When the event was recorded, as an ISO 8601 timestamp.",
+  }),
   metadata: z.record(z.string(), z.unknown()).nullable().openapi({
     description:
       "Event details that vary by type, such as postId on post_created and completed, or errorCode on failed and skipped.",
   }),
 });
 
-const contentGenerationJobSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  status: contentGenerationStatusSchema.openapi({
-    description:
-      "Job state. Terminal states are completed, failed, and skipped.",
-  }),
-  contentType: contentGenerationTypeSchema,
-  lookbackWindow: contentGenerationLookbackWindowSchema,
-  repositoryIds: z.array(z.string()).openapi({
-    description:
-      "Selected GitHub integration IDs. Empty when no GitHub source was selected. Every connected GitHub integration is used only when neither a GitHub nor a Linear source was selected.",
-  }),
-  brandVoiceId: z.string().nullable().openapi({
-    description:
-      "Brand identity the post is written in: the requested one, else the default, else the most recently updated. Null when the organization has none.",
-  }),
-  workflowRunId: z.string().nullable().openapi({
-    description:
-      "Internal workflow run ID. Null until the generation workflow has started.",
-  }),
-  postId: z.string().nullable().openapi({
-    description:
-      "ID of the generated post. Set once the job reaches completed.",
-  }),
-  error: z.string().nullable().openapi({
-    description:
-      "Failure reason when status is failed, or why generation was skipped (for example no meaningful source activity) when status is skipped.",
-  }),
-  errorCode: z.string().nullable().optional().openapi({
-    description:
-      "Stable machine-readable failure code when status is failed, such as NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES. Absent or null for other failures and for older jobs.",
-    example: "NO_AVAILABLE_SOURCES",
-  }),
-  source: z.enum(["api", "dashboard"]).openapi({
-    description: "Where the job was started.",
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-  completedAt: z.string().nullable().openapi({
-    description:
-      "When the job reached completed, failed or skipped. Null while it is queued or running.",
-  }),
-});
+const contentGenerationJobSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "ID of the job, which you poll with GET /v1/posts/generate/{jobId}.",
+    }),
+    organizationId: z.string().openapi({
+      description: "Workspace the job runs in.",
+    }),
+    status: contentGenerationStatusSchema.openapi({
+      description:
+        "Job state. Terminal states are completed, failed, and skipped.",
+    }),
+    contentType: contentGenerationTypeSchema.openapi({
+      description: "Type of content being generated.",
+    }),
+    lookbackWindow: contentGenerationLookbackWindowSchema.openapi({
+      description: "How far back source activity is collected.",
+    }),
+    repositoryIds: z.array(z.string()).openapi({
+      description:
+        "Selected GitHub integration IDs. Empty when no GitHub source was selected. Every connected GitHub integration is used only when neither a GitHub nor a Linear source was selected.",
+    }),
+    brandVoiceId: z.string().nullable().openapi({
+      description:
+        "Brand identity the post is written in: the requested one, else the default, else the most recently updated. Null when the organization has none.",
+    }),
+    workflowRunId: z.string().nullable().openapi({
+      description:
+        "Internal workflow run ID. Null until the generation workflow has started.",
+    }),
+    postId: z.string().nullable().openapi({
+      description:
+        "ID of the generated post. Set once the job reaches completed.",
+    }),
+    error: z.string().nullable().openapi({
+      description:
+        "Failure reason when status is failed, or why generation was skipped (for example no meaningful source activity) when status is skipped.",
+    }),
+    errorCode: z.string().nullable().optional().openapi({
+      description:
+        "Stable machine-readable failure code when status is failed, such as NO_ACTIVITY_TYPES_SELECTED or NO_AVAILABLE_SOURCES. Absent or null for other failures and for older jobs.",
+      example: "NO_AVAILABLE_SOURCES",
+    }),
+    source: z.enum(["api", "dashboard"]).openapi({
+      description: "Where the job was started.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the job was queued, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the job last changed, as an ISO 8601 timestamp.",
+    }),
+    completedAt: z.string().nullable().openapi({
+      description:
+        "When the job reached completed, failed or skipped. Null while it is queued or running.",
+    }),
+  })
+  .openapi({ description: "Asynchronous post generation job." });
 
-export const createPostGenerationResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  job: contentGenerationJobSchema,
-});
+export const createPostGenerationResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    job: contentGenerationJobSchema,
+  })
+  .openapi({
+    description:
+      "The queued generation job, which you poll until its status is completed, failed or skipped.",
+  });
 
 export const createPostPullRequestRequestSchema = z
   .object({
@@ -1394,23 +1601,31 @@ export const createPostPullRequestRequestSchema = z
       "Where to open the pull request. Omit both fields when the organization has exactly one connected GitHub repository.",
   });
 
-export const createPostPullRequestResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  pullRequest: z.object({
-    number: z.number().int().positive(),
-    url: z.url(),
-    branchName: z.string().openapi({
-      description: "Head branch of the pull request.",
-    }),
-    path: z.string().openapi({
-      description: "Repository path of the post file on the branch.",
-    }),
-    operation: z.enum(["created", "updated"]).openapi({
-      description:
-        "created for a new draft pull request, updated when the post's open pull request was refreshed instead.",
-    }),
-  }),
-});
+export const createPostPullRequestResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    pullRequest: z
+      .object({
+        number: z.number().int().positive().openapi({
+          description: "Pull request number on GitHub.",
+        }),
+        url: z.url().openapi({ description: "Pull request URL on GitHub." }),
+        branchName: z.string().openapi({
+          description: "Head branch of the pull request.",
+        }),
+        path: z.string().openapi({
+          description: "Repository path of the post file on the branch.",
+        }),
+        operation: z.enum(["created", "updated"]).openapi({
+          description:
+            "created for a new draft pull request, updated when the post's open pull request was refreshed instead.",
+        }),
+      })
+      .openapi({ description: "The draft pull request holding the post." }),
+  })
+  .openapi({
+    description: "The pull request that adds the post to the repository.",
+  });
 
 export const getPostGenerationParamsSchema = z.object({
   jobId: resourceIdSchema("jobId").openapi({
@@ -1423,10 +1638,14 @@ export const getPostGenerationParamsSchema = z.object({
   }),
 });
 
-export const getPostGenerationResponseSchema = z.object({
-  job: contentGenerationJobSchema,
-  events: z.array(contentGenerationJobEventSchema).openapi({
-    description:
-      "The job's event log, oldest first, up to the 100 most recent events.",
-  }),
-});
+export const getPostGenerationResponseSchema = z
+  .object({
+    job: contentGenerationJobSchema,
+    events: z.array(contentGenerationJobEventSchema).openapi({
+      description:
+        "The job's event log, oldest first, up to the 100 most recent events.",
+    }),
+  })
+  .openapi({
+    description: "Current state of the post generation job and its event log.",
+  });

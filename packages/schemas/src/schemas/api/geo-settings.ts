@@ -21,9 +21,13 @@ import { createGeoShortTextSchema } from "./geo-fields";
 
 const settingsSchema = z
   .object({
-    id: z.string(),
-    organizationId: z.string(),
-    projectId: z.string(),
+    id: z.string().openapi({ description: "Settings record id." }),
+    organizationId: z.string().openapi({
+      description: "Organization that owns the project.",
+    }),
+    projectId: z.string().openapi({
+      description: "Project these settings apply to.",
+    }),
     companyName: z.string().openapi({
       description: "Brand name that scans look for in AI answers.",
     }),
@@ -85,10 +89,16 @@ const settingsSchema = z
       description:
         "A scan started after the latest finished one and less than two hours ago.",
     }),
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    createdAt: z.string().openapi({
+      description:
+        "When the settings were first saved, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the settings last changed, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("GeoSettings");
+  .openapi("GeoSettings")
+  .openapi({ description: "The project's GEO tracking settings." });
 
 export const settingsResponseSchema = z
   .object({
@@ -102,7 +112,10 @@ export const settingsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoSettingsResponse");
+  .openapi("GeoSettingsResponse")
+  .openapi({
+    description: "The project's GEO settings and the workspace they belong to.",
+  });
 
 export const patchSettingsRequestSchema = z
   .object({
@@ -205,7 +218,8 @@ const geoEngineSchema = z
       description: "Currently always false for engines listed by the API.",
     }),
   })
-  .openapi("GeoEngine");
+  .openapi("GeoEngine")
+  .openapi({ description: "An AI engine that scans can run on." });
 
 export const engineListResponseSchema = z
   .object({
@@ -215,4 +229,8 @@ export const engineListResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoEngineListResponse");
+  .openapi("GeoEngineListResponse")
+  .openapi({
+    description:
+      "AI engines the organization can track and the workspace they belong to.",
+  });

@@ -24,8 +24,14 @@ export const cronAnchorDateSchema = z
   .regex(SCHEDULE_ANCHOR_DATE_PATTERN, "Expected YYYY-MM-DD");
 
 export const automationNotifySchema = z.object({
-  slack: z.boolean(),
-  email: z.boolean(),
+  slack: z
+    .boolean()
+    .describe(
+      "Post to the organization's Slack notification channel after a successful run."
+    ),
+  email: z
+    .boolean()
+    .describe("Email the workspace owners after a successful run."),
 });
 export type AutomationNotify = z.infer<typeof automationNotifySchema>;
 

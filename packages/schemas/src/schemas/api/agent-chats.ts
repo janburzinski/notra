@@ -16,10 +16,16 @@ export const createAgentSessionRequestSchema = z
 
 export const createAgentSessionResponseSchema = z
   .object({
-    ok: z.literal(true),
-    sessionId: z.string(),
+    ok: z.literal(true).openapi({
+      description: "Always true when the session was created.",
+    }),
+    sessionId: z.string().openapi({
+      description:
+        "ID of the agent session, used to send follow-up messages and stream events.",
+    }),
   })
-  .openapi("CreateAgentSessionResponse");
+  .openapi("CreateAgentSessionResponse")
+  .openapi({ description: "The newly started agent session." });
 
 const agentInputResponseSchema = z.object({
   requestId: z.string().min(1).openapi({
@@ -75,17 +81,39 @@ export const listAgentChatsQuerySchema = z.object({
 
 const agentSessionSummarySchema = z
   .object({
-    sessionId: z.string(),
-    chatId: z.string().nullable(),
-    surface: z.string(),
-    status: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    sessionId: z.string().openapi({
+      description:
+        "ID of the agent session, used with the /v2/eve/v1/session endpoints.",
+    }),
+    chatId: z.string().nullable().openapi({
+      description:
+        "Dashboard chat the session belongs to, or null for sessions not tied to a chat, such as those started through the API.",
+    }),
+    surface: z.string().openapi({
+      description:
+        "Where the session was started, such as standalone-chat for sessions started through the API or task for background content tasks.",
+    }),
+    status: z.string().openapi({
+      description:
+        "Session state. active for open sessions; background task sessions end as completed, failed or timed_out.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the session was started, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description:
+        "When the session was last updated, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("AgentSessionSummary");
+  .openapi("AgentSessionSummary")
+  .openapi({ description: "Summary of an agent session." });
 
 export const listAgentChatsResponseSchema = z
   .object({
-    sessions: z.array(agentSessionSummarySchema),
+    sessions: z.array(agentSessionSummarySchema).openapi({
+      description:
+        "Agent sessions visible to the caller, newest first. Organization API keys only see sessions not owned by a user.",
+    }),
   })
-  .openapi("ListAgentChatsResponse");
+  .openapi("ListAgentChatsResponse")
+  .openapi({ description: "Recent agent sessions in the workspace." });

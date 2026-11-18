@@ -7,47 +7,74 @@ import { createGeoShortTextSchema } from "./geo-fields";
 
 const scanSchema = z
   .object({
-    id: z.string(),
-    projectId: z.string(),
-    status: z.enum(["running", "completed", "failed"]),
-    startedAt: z.string(),
+    id: z.string().openapi({
+      description:
+        "Scan id, usable with `GET /v1/projects/{projectId}/geo/scans/{scanId}`.",
+    }),
+    projectId: z.string().openapi({
+      description: "Project the scan belongs to.",
+    }),
+    status: z.enum(["running", "completed", "failed"]).openapi({
+      description:
+        "`running` while answers are being collected, then `completed` or `failed`.",
+    }),
+    startedAt: z.string().openapi({
+      description: "When the scan started, as an ISO 8601 timestamp.",
+    }),
     finishedAt: z.string().nullable().openapi({
       description:
         "When the scan completed or failed, or `null` while running.",
     }),
-    createdAt: z.string(),
-    summary: z.object({
-      plannedChecks: z.number().int().min(0).nullable().openapi({
-        description:
-          "Answers the scan planned to collect, or `null` when the scan recorded no plan.",
-      }),
-      completedChecks: z.number().int().min(0).openapi({
-        description: "Answers stored for this scan so far.",
-      }),
-      mentionCount: z.number().int().min(0).openapi({
-        description: "Stored answers that mentioned the tracked brand.",
-      }),
-      failedChecks: z.number().int().min(0).openapi({
-        description: "Planned answers that failed and were not stored.",
-      }),
-      engines: z
-        .array(
-          z.object({
-            engine: z.string(),
-            plannedChecks: z.number().int().min(0).nullable().openapi({
-              description:
-                "Answers planned for this engine, or `null` when the plan has no per-engine breakdown.",
-            }),
-            completedChecks: z.number().int().min(0),
-            mentionCount: z.number().int().min(0),
-            failedChecks: z.number().int().min(0),
-          })
-        )
-        .openapi({
-          description:
-            "The same counts per engine, sorted by engine id. Covers planned engines and engines with stored answers.",
-        }),
+    createdAt: z.string().openapi({
+      description:
+        "When the scan record was created, as an ISO 8601 timestamp.",
     }),
+    summary: z
+      .object({
+        plannedChecks: z.number().int().min(0).nullable().openapi({
+          description:
+            "Answers the scan planned to collect, or `null` when the scan recorded no plan.",
+        }),
+        completedChecks: z.number().int().min(0).openapi({
+          description: "Answers stored for this scan so far.",
+        }),
+        mentionCount: z.number().int().min(0).openapi({
+          description: "Stored answers that mentioned the tracked brand.",
+        }),
+        failedChecks: z.number().int().min(0).openapi({
+          description: "Planned answers that failed and were not stored.",
+        }),
+        engines: z
+          .array(
+            z.object({
+              engine: z.string().openapi({
+                description: "Engine id, such as `openai/chatgpt`.",
+              }),
+              plannedChecks: z.number().int().min(0).nullable().openapi({
+                description:
+                  "Answers planned for this engine, or `null` when the plan has no per-engine breakdown.",
+              }),
+              completedChecks: z.number().int().min(0).openapi({
+                description: "Answers stored for this engine so far.",
+              }),
+              mentionCount: z.number().int().min(0).openapi({
+                description:
+                  "Stored answers from this engine that mentioned the tracked brand.",
+              }),
+              failedChecks: z.number().int().min(0).openapi({
+                description:
+                  "Planned answers for this engine that failed and were not stored.",
+              }),
+            })
+          )
+          .openapi({
+            description:
+              "The same counts per engine, sorted by engine id. Covers planned engines and engines with stored answers.",
+          }),
+      })
+      .openapi({
+        description: "Answer counts for the scan, overall and per engine.",
+      }),
     errorCode: z.string().nullable().openapi({
       description:
         "Machine-readable failure code such as `scan_handoff_failed` or `scan_stale`. `null` unless `status` is `failed`.",
@@ -65,7 +92,8 @@ const scanSchema = z
         "`true` when the failure was a timeout or a stale run, so starting a new scan is likely to work. `null` when unknown or the scan did not fail.",
     }),
   })
-  .openapi("GeoScan");
+  .openapi("GeoScan")
+  .openapi({ description: "A GEO scan run and its progress." });
 
 export const listScansQuerySchema = z.object({
   limit: z.coerce
@@ -83,22 +111,29 @@ export const listScansQuerySchema = z.object({
     .openapi({ param: { name: "page", in: "query" } }),
 });
 
-const scanPaginationSchema = z.object({
-  limit: z.number().int().min(1),
-  currentPage: z.number().int().min(1),
-  nextPage: z.number().int().min(1).nullable().openapi({
-    description: "Next page number, or `null` on the last page.",
-  }),
-  previousPage: z.number().int().min(1).nullable().openapi({
-    description: "Previous page number, or `null` on the first page.",
-  }),
-  totalPages: z.number().int().min(1).openapi({
-    description: "Total pages at this `limit`. At least 1, even with no scans.",
-  }),
-  totalItems: z.number().int().min(0).openapi({
-    description: "Total scans recorded for the project.",
-  }),
-});
+const scanPaginationSchema = z
+  .object({
+    limit: z.number().int().min(1).openapi({
+      description: "Scans per page, as requested.",
+    }),
+    currentPage: z.number().int().min(1).openapi({
+      description: "Page number returned, starting at 1.",
+    }),
+    nextPage: z.number().int().min(1).nullable().openapi({
+      description: "Next page number, or `null` on the last page.",
+    }),
+    previousPage: z.number().int().min(1).nullable().openapi({
+      description: "Previous page number, or `null` on the first page.",
+    }),
+    totalPages: z.number().int().min(1).openapi({
+      description:
+        "Total pages at this `limit`. At least 1, even with no scans.",
+    }),
+    totalItems: z.number().int().min(0).openapi({
+      description: "Total scans recorded for the project.",
+    }),
+  })
+  .openapi({ description: "Page position and totals for the scan list." });
 
 export const listScansResponseSchema = z
   .object({
@@ -108,14 +143,21 @@ export const listScansResponseSchema = z
     pagination: scanPaginationSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoScansResponse");
+  .openapi("ListGeoScansResponse")
+  .openapi({
+    description:
+      "One page of the project's scans and the workspace they belong to.",
+  });
 
 export const scanResponseSchema = z
   .object({
     scan: scanSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoScanResponse");
+  .openapi("GeoScanResponse")
+  .openapi({
+    description: "The requested scan and the workspace it belongs to.",
+  });
 
 export const createPromptScanRequestSchema = z
   .object({
@@ -163,4 +205,7 @@ export const createScanResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("CreateGeoScanResponse");
+  .openapi("CreateGeoScanResponse")
+  .openapi({
+    description: "The queued scan and where to poll its progress.",
+  });

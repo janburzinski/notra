@@ -223,22 +223,25 @@ export const trafficConfiguredField = z.boolean().openapi({
 export const trafficOverviewResponseSchema = z
   .object({
     configured: trafficConfiguredField,
-    totals: z.object({
-      crawler: z.number().int().openapi({
-        description: "Requests from AI crawlers in the window.",
-      }),
-      cited: z.number().int().openapi({
-        description:
-          "Crawler requests with category assistant-browse: assistants reading pages live while answering. Included in crawler.",
-      }),
-      aiReferral: z.number().int().openapi({
-        description: "Visits from people following a link in an AI assistant.",
-      }),
-      conversions: z.number().int().nullable().openapi({
-        description:
-          "AI referral visits that reached a configured conversion path. Null when no conversion paths are set.",
-      }),
-    }),
+    totals: z
+      .object({
+        crawler: z.number().int().openapi({
+          description: "Requests from AI crawlers in the window.",
+        }),
+        cited: z.number().int().openapi({
+          description:
+            "Crawler requests with category assistant-browse: assistants reading pages live while answering. Included in crawler.",
+        }),
+        aiReferral: z.number().int().openapi({
+          description:
+            "Visits from people following a link in an AI assistant.",
+        }),
+        conversions: z.number().int().nullable().openapi({
+          description:
+            "AI referral visits that reached a configured conversion path. Null when no conversion paths are set.",
+        }),
+      })
+      .openapi({ description: "Totals for the whole window." }),
     previousConversions: z.number().int().nullable().openapi({
       description:
         "Conversions in the previous window of the same length. Null when no conversion paths are set or no comparison data exists.",
@@ -252,7 +255,10 @@ export const trafficOverviewResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoTrafficOverviewResponse");
+  .openapi("GeoTrafficOverviewResponse", {
+    description:
+      "AI crawler and AI referral traffic totals, sources and daily counts for the window.",
+  });
 
 const trafficLogEntrySchema = z.object({
   capturedAt: utcTimestampField("the request"),
@@ -261,8 +267,10 @@ const trafficLogEntrySchema = z.object({
   agent: agentField,
   category: categoryField,
   confidence: confidenceField,
-  path: z.string(),
-  host: z.string(),
+  path: z.string().openapi({ description: "Requested URL path." }),
+  host: z
+    .string()
+    .openapi({ description: "Hostname the request was sent to." }),
   country: z.string().openapi({
     description: "Country from the request's geo data. Empty when unknown.",
   }),
@@ -291,7 +299,9 @@ export const trafficLogResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoTrafficLogResponse");
+  .openapi("GeoTrafficLogResponse", {
+    description: "Recent individual AI crawler and AI referral requests.",
+  });
 
 const journeySchema = z.object({
   journeyId: z.string().openapi({
@@ -325,12 +335,17 @@ export const trafficJourneysResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoTrafficJourneysResponse");
+  .openapi("GeoTrafficJourneysResponse", {
+    description:
+      "AI crawler and AI referral journeys, each a group of requests from one agent session.",
+  });
 
 const journeyEventSchema = z.object({
   capturedAt: utcTimestampField("the request"),
-  path: z.string(),
-  host: z.string(),
+  path: z.string().openapi({ description: "Requested URL path." }),
+  host: z
+    .string()
+    .openapi({ description: "Hostname the request was sent to." }),
   method: z.string().openapi({ description: "HTTP method, uppercase." }),
   referer: z.string().openapi({
     description:
@@ -352,11 +367,15 @@ export const journeyDetailResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoJourneyDetailResponse");
+  .openapi("GeoJourneyDetailResponse", {
+    description: "The individual requests that make up one traffic journey.",
+  });
 
 const trafficPageSchema = z.object({
-  path: z.string(),
-  host: z.string(),
+  path: z.string().openapi({ description: "Requested URL path." }),
+  host: z
+    .string()
+    .openapi({ description: "Hostname the request was sent to." }),
   source: sourceField,
   visitorType: visitorTypeField,
   visits: z.number().int().openapi({
@@ -385,7 +404,10 @@ export const trafficPagesResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoTrafficPagesResponse");
+  .openapi("GeoTrafficPagesResponse", {
+    description:
+      "AI crawler and AI referral requests per page, source and visitor type.",
+  });
 
 export const mcpToolParamsSchema = projectParamsSchema.extend({
   toolName: createGeoShortTextSchema().openapi({
@@ -405,7 +427,9 @@ const mcpIntentSchema = z.object({
     description: "Intent the agent stated when calling the tool.",
   }),
   tool: z.string().openapi({ description: "Tool the call went to." }),
-  calls: z.number().int(),
+  calls: z.number().int().openapi({
+    description: "Requests that stated this intent.",
+  }),
   errors: mcpErrorsField,
 });
 
@@ -419,9 +443,15 @@ export const mcpAnalyticsResponseSchema = z
     configured: trafficConfiguredField,
     server: z
       .object({
-        name: z.string(),
-        version: z.string(),
-        protocolVersion: z.string(),
+        name: z.string().openapi({
+          description: "Server name, or empty when not reported.",
+        }),
+        version: z.string().openapi({
+          description: "Server version, or empty when not reported.",
+        }),
+        protocolVersion: z.string().openapi({
+          description: "MCP protocol version, or empty when not reported.",
+        }),
       })
       .nullable()
       .openapi({
@@ -432,25 +462,38 @@ export const mcpAnalyticsResponseSchema = z
         requests: z.number().int().openapi({
           description: "All MCP requests in the window, of every method.",
         }),
-        previousRequests: z.number().int(),
+        previousRequests: z.number().int().openapi({
+          description: "All requests in the previous window.",
+        }),
         toolCalls: z.number().int().openapi({
           description: "tools/call requests.",
         }),
-        previousToolCalls: z.number().int(),
+        previousToolCalls: z.number().int().openapi({
+          description: "tools/call requests in the previous window.",
+        }),
         errors: mcpErrorsField,
-        previousErrors: z.number().int(),
+        previousErrors: z.number().int().openapi({
+          description: "Failed requests in the previous window.",
+        }),
         sessions: z.number().int().openapi({
           description: "Distinct MCP sessions.",
         }),
-        previousSessions: z.number().int(),
+        previousSessions: z.number().int().openapi({
+          description: "Distinct sessions in the previous window.",
+        }),
         users: z.number().int().openapi({
           description: "Distinct end-user IDs your server reported.",
         }),
-        previousUsers: z.number().int(),
+        previousUsers: z.number().int().openapi({
+          description: "Distinct end-user IDs in the previous window.",
+        }),
         p95Ms: z.number().int().openapi({
           description: "95th percentile request duration in milliseconds.",
         }),
-        previousP95Ms: z.number().int(),
+        previousP95Ms: z.number().int().openapi({
+          description:
+            "95th percentile request duration in milliseconds in the previous window.",
+        }),
       })
       .openapi({
         description:
@@ -460,9 +503,18 @@ export const mcpAnalyticsResponseSchema = z
       .array(
         z.object({
           day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
-          toolsCall: z.number().int(),
-          resourcesRead: z.number().int(),
-          promptsGet: z.number().int(),
+          toolsCall: z
+            .number()
+            .int()
+            .openapi({ description: "tools/call requests that day." }),
+          resourcesRead: z
+            .number()
+            .int()
+            .openapi({ description: "resources/read requests that day." }),
+          promptsGet: z
+            .number()
+            .int()
+            .openapi({ description: "prompts/get requests that day." }),
           other: z.number().int().openapi({
             description: "Requests of every other method.",
           }),
@@ -473,12 +525,15 @@ export const mcpAnalyticsResponseSchema = z
     tools: z
       .array(
         z.object({
-          name: z.string(),
+          name: z.string().openapi({ description: "Tool name." }),
           description: z.string().openapi({
             description:
               "Description from the latest tools/list. Empty when not listed.",
           }),
-          calls: z.number().int(),
+          calls: z
+            .number()
+            .int()
+            .openapi({ description: "tools/call requests for this tool." }),
           errors: mcpErrorsField,
           users: z.number().int().openapi({
             description: "Distinct end-user IDs that called the tool.",
@@ -502,9 +557,18 @@ export const mcpAnalyticsResponseSchema = z
     clients: z
       .array(
         z.object({
-          name: z.string(),
-          sessions: z.number().int(),
-          requests: z.number().int(),
+          name: z.string().openapi({
+            description:
+              "Name of the client, or empty when the client did not report one.",
+          }),
+          sessions: z
+            .number()
+            .int()
+            .openapi({ description: "Distinct sessions from this client." }),
+          requests: z
+            .number()
+            .int()
+            .openapi({ description: "Requests from this client." }),
           errors: mcpErrorsField,
           lastSeenAt: z.string().openapi({
             description: "ISO timestamp of the client's newest request.",
@@ -516,8 +580,12 @@ export const mcpAnalyticsResponseSchema = z
       .array(
         z.object({
           capturedAt: z.string().openapi({ description: "ISO timestamp." }),
-          clientName: z.string(),
-          clientVersion: z.string(),
+          clientName: z.string().openapi({
+            description: "Client name, or empty when not reported.",
+          }),
+          clientVersion: z.string().openapi({
+            description: "Client version, or empty when not reported.",
+          }),
           method: z.string().openapi({
             description: "JSON-RPC method, such as tools/call.",
           }),
@@ -525,10 +593,20 @@ export const mcpAnalyticsResponseSchema = z
             description:
               "Tool name, resource URI or prompt name the request targeted.",
           }),
-          status: mcpStatusSchema,
-          errorCode: z.number().int(),
-          errorMessage: z.string(),
-          durationMs: z.number().int(),
+          status: mcpStatusSchema.openapi({
+            description:
+              "Kind of failure, where tool_error means the tool returned an error result and rpc_error means the JSON-RPC request failed.",
+          }),
+          errorCode: z.number().int().openapi({
+            description: "Error code your server reported; 0 when none.",
+          }),
+          errorMessage: z.string().openapi({
+            description: "Error message, or empty when not reported.",
+          }),
+          durationMs: z
+            .number()
+            .int()
+            .openapi({ description: "Request duration in milliseconds." }),
           model: z.string().openapi({
             description:
               "Model the agent reported via the optional _model parameter. Empty when not reported.",
@@ -541,9 +619,14 @@ export const mcpAnalyticsResponseSchema = z
     models: z
       .array(
         z.object({
-          name: z.string(),
-          sessions: z.number().int(),
-          calls: z.number().int(),
+          name: z.string().openapi({ description: "Model name." }),
+          sessions: z.number().int().openapi({
+            description: "Distinct sessions that reported this model.",
+          }),
+          calls: z
+            .number()
+            .int()
+            .openapi({ description: "Requests that reported this model." }),
           errors: mcpErrorsField,
         })
       )
@@ -564,10 +647,21 @@ export const mcpAnalyticsResponseSchema = z
           tool: z.string().openapi({
             description: "Tool that triggered the request.",
           }),
-          requests: z.number().int(),
-          accepted: z.number().int(),
-          declined: z.number().int(),
-          cancelled: z.number().int(),
+          requests: z
+            .number()
+            .int()
+            .openapi({ description: "Requests sent to clients." }),
+          accepted: z
+            .number()
+            .int()
+            .openapi({ description: "Requests the user accepted." }),
+          declined: z
+            .number()
+            .int()
+            .openapi({ description: "Requests the user declined." }),
+          cancelled: z.number().int().openapi({
+            description: "Requests the user dismissed without answering.",
+          }),
           errors: mcpErrorsField,
         })
       )
@@ -599,9 +693,19 @@ export const mcpAnalyticsResponseSchema = z
         listedAt: z.string().openapi({
           description: "ISO timestamp of the latest tools/list response.",
         }),
-        unusedTools: z.array(
-          z.object({ name: z.string(), description: z.string() })
-        ),
+        unusedTools: z
+          .array(
+            z.object({
+              name: z.string().openapi({ description: "Tool name." }),
+              description: z.string().openapi({
+                description:
+                  "Description from the latest tools/list response, or empty when there is none.",
+              }),
+            })
+          )
+          .openapi({
+            description: "Listed tools with no calls in the window.",
+          }),
       })
       .nullable()
       .openapi({
@@ -610,10 +714,13 @@ export const mcpAnalyticsResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoMcpAnalyticsResponse");
+  .openapi("GeoMcpAnalyticsResponse", {
+    description:
+      "Usage, errors, clients and tools of your MCP server for the window.",
+  });
 
 const mcpToolNeighborSchema = z.object({
-  tool: z.string(),
+  tool: z.string().openapi({ description: "Neighboring tool name." }),
   calls: z.number().int().openapi({
     description: "Times this neighbor was adjacent to the tool.",
   }),
@@ -636,10 +743,20 @@ export const mcpToolDetailResponseSchema = z
           message: z.string().openapi({
             description: "First 300 characters of the error message.",
           }),
-          clientName: z.string(),
-          status: mcpStatusSchema,
-          errorCode: z.number().int(),
-          calls: z.number().int(),
+          clientName: z.string().openapi({
+            description: "Client name, or empty when not reported.",
+          }),
+          status: mcpStatusSchema.openapi({
+            description:
+              "Kind of failure, where tool_error means the tool returned an error result and rpc_error means the JSON-RPC request failed.",
+          }),
+          errorCode: z.number().int().openapi({
+            description: "Error code your server reported; 0 when none.",
+          }),
+          calls: z
+            .number()
+            .int()
+            .openapi({ description: "Failed calls with this message." }),
           lastSeenAt: z.string().openapi({
             description: "ISO timestamp of the newest failure.",
           }),
@@ -651,7 +768,10 @@ export const mcpToolDetailResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoMcpToolDetailResponse");
+  .openapi("GeoMcpToolDetailResponse", {
+    description:
+      "Call sequences, failures and intents for one MCP server tool.",
+  });
 
 export const ingestTokenQuerySchema = z.object({
   projectId: resourceIdSchema("projectId")
@@ -685,19 +805,36 @@ const ingestSetupFieldsSchema = z.object({
   snippet: z.string().openapi({
     description: "Install snippet for the default framework (Next.js).",
   }),
-  snippets: z.object({
-    next: z.string(),
-    nuxt: z.string(),
-    netlify: z.string(),
-    tanstack: z.string(),
-    astro: z.string(),
-    sveltekit: z.string(),
-    reactRouter: z.string(),
-  }),
+  snippets: z
+    .object({
+      next: z.string().openapi({ description: "Next.js proxy snippet." }),
+      nuxt: z
+        .string()
+        .openapi({ description: "Nuxt server middleware snippet." }),
+      netlify: z
+        .string()
+        .openapi({ description: "Netlify Edge Function snippet." }),
+      tanstack: z
+        .string()
+        .openapi({ description: "TanStack Start middleware snippet." }),
+      astro: z.string().openapi({ description: "Astro middleware snippet." }),
+      sveltekit: z
+        .string()
+        .openapi({ description: "SvelteKit hooks snippet." }),
+      reactRouter: z
+        .string()
+        .openapi({ description: "React Router middleware snippet." }),
+    })
+    .openapi({
+      description:
+        "Install snippets per framework, each of which reads the token from an environment variable instead of embedding it.",
+    }),
   drainUrls: z
     .object({
-      vercel: z.string(),
-      cloudflare: z.string(),
+      vercel: z.string().openapi({ description: "Vercel log drain endpoint." }),
+      cloudflare: z
+        .string()
+        .openapi({ description: "Cloudflare Logpush endpoint." }),
     })
     .openapi({
       description:
@@ -749,7 +886,9 @@ const webSetupFields = {
 
 export const ingestSetupResponseSchema = ingestSetupFieldsSchema
   .extend(webSetupFields)
-  .openapi("GeoIngestSetupResponse");
+  .openapi("GeoIngestSetupResponse", {
+    description: "Tracking install instructions without the secret token.",
+  });
 
 export const ingestTokenResponseSchema = ingestSetupFieldsSchema
   .extend({
@@ -759,4 +898,6 @@ export const ingestTokenResponseSchema = ingestSetupFieldsSchema
     }),
     ...webSetupFields,
   })
-  .openapi("GeoIngestTokenResponse");
+  .openapi("GeoIngestTokenResponse", {
+    description: "A newly issued tracking token with its install instructions.",
+  });

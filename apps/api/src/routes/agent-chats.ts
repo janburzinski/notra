@@ -203,7 +203,13 @@ agentChatsRoutes.openAPIRegistry.registerPath(
         description:
           "Upstream eve response with the next continuation token for this session.",
         content: {
-          "application/json": { schema: { type: "object" as const } },
+          "application/json": {
+            schema: {
+              type: "object" as const,
+              description:
+                "The agent service's response to the message, passed through unchanged.",
+            },
+          },
         },
       },
       400: errorResponse("Invalid request body"),

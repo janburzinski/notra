@@ -27,6 +27,11 @@ const GEO_BRIEF_TOPIC_MIN_LENGTH = 3;
 const GEO_BRIEF_TOPIC_MAX_LENGTH = 200;
 const GEO_BRIEF_MAX_BRAND_VOICES = 8;
 
+const briefStatusSchema = z.enum(GEO_CONTENT_BRIEF_STATUSES).openapi({
+  description:
+    "`draft` until approved, `approved` or `writing` while the writer drafts the post, `completed` once the draft post is written, `failed` when the last writer run failed.",
+});
+
 const gapBriefBaselineSchema = z.object({
   mentionedEngines: z.number().openapi({
     description: "Engines that mentioned the brand when the brief was planned.",
@@ -41,12 +46,14 @@ const gapBriefRefSchema = z
     briefId: z.string().openapi({
       description: "Use with getGeoContentBrief and approveGeoContentBrief.",
     }),
-    status: z.enum(GEO_CONTENT_BRIEF_STATUSES),
+    status: briefStatusSchema,
     postId: z.string().nullable().openapi({
       description:
         "Draft post created for the brief. Null when none is linked.",
     }),
-    workingTitle: z.string().nullable(),
+    workingTitle: z.string().nullable().openapi({
+      description: "Planned article title, or `null` when the brief has none.",
+    }),
     publishedAt: z.string().nullable().openapi({
       description:
         "ISO timestamp of when the brief's post was published. Null until then.",
@@ -73,8 +80,11 @@ const searchGapTargetSchema = z.object({
     description:
       "Sitemap page id or post id. For a Google-ranked page Notra has not crawled, the page URL.",
   }),
-  url: z.string().nullable(),
-  title: z.string(),
+  url: z.string().nullable().openapi({
+    description:
+      "URL of the page or post, or `null` when the post has no public URL.",
+  }),
+  title: z.string().openapi({ description: "Title of the page or post." }),
   score: z.number().openapi({
     description:
       "How much of the gap's terms this page already covers, from 0 to 1.",
@@ -85,27 +95,37 @@ const searchGapTargetSchema = z.object({
   }),
 });
 
-const searchGapRecommendationSchema = z.object({
-  action: z.enum(["create", "update", "merge", "ignore"]).openapi({
+const searchGapRecommendationSchema = z
+  .object({
+    action: z.enum(["create", "update", "merge", "ignore"]).openapi({
+      description:
+        "What to do with this query cluster: create a new page, update the page Google already ranks or the strongest existing page, merge overlapping pages, or ignore thin demand.",
+    }),
+    reason: z.string().openapi({
+      description: "Plain-language explanation of the recommended action.",
+    }),
+    targets: z.array(searchGapTargetSchema).openapi({
+      description:
+        "Existing pages to update or merge, best match first. For create, the closest existing page when there is one; empty for ignore.",
+    }),
+  })
+  .openapi({
     description:
-      "What to do with this query cluster: create a new page, update the page Google already ranks or the strongest existing page, merge overlapping pages, or ignore thin demand.",
-  }),
-  reason: z.string().openapi({
-    description: "Plain-language explanation of the recommended action.",
-  }),
-  targets: z.array(searchGapTargetSchema).openapi({
-    description:
-      "Existing pages to update or merge, best match first. For create, the closest existing page when there is one; empty for ignore.",
-  }),
-});
+      "Whether to create a page or work on existing ones, from how well the brand's sitemap pages and posts already cover the gap.",
+  });
 
 const promptGapSchema = z.object({
   id: z.string().openapi({
     description:
       "Tracked prompt id, or the scan prompt id for prompts that are not tracked. Use as promptId with updateGeoContentGap, or as sourceId with sourceKind gap when planning a brief.",
   }),
-  prompt: z.string(),
-  title: z.string().nullable(),
+  prompt: z.string().openapi({
+    description: "Prompt text the engines answered.",
+  }),
+  title: z.string().nullable().openapi({
+    description:
+      "Suggested headline for an article that could win this prompt, or `null`.",
+  }),
   engines: z.array(z.string()).openapi({
     description:
       "Engines whose latest answer from the last 30 days did not mention the brand.",
@@ -153,7 +173,10 @@ const searchGapSchema = z.object({
       "Search Console prompt suggestion id. Use as sourceId with sourceKind search_console when planning a brief.",
   }),
   prompt: z.string().openapi({ description: "Suggested prompt." }),
-  title: z.string().nullable(),
+  title: z.string().nullable().openapi({
+    description:
+      "Suggested headline for an article that could win this prompt, or `null`.",
+  }),
   impressions: z.number().nullable().openapi({
     description:
       "Google impressions summed across the queries. Null when no query data is stored.",
@@ -166,23 +189,35 @@ const searchGapSchema = z.object({
     description:
       "Impression-weighted average Google position across the queries, rounded to one decimal. Null when no query data is stored.",
   }),
-  queries: z.array(
-    z.object({
-      query: z.string(),
-      clicks: z.number(),
-      impressions: z.number(),
-      position: z.number(),
-      page: z.string().optional().openapi({
-        description: "Page Google showed most for this query.",
-      }),
-      pagePosition: z.number().optional().openapi({
-        description: "Google position of that page for this query.",
-      }),
-      pageImpressions: z.number().optional().openapi({
-        description: "Impressions of that page for this query.",
-      }),
-    })
-  ),
+  queries: z
+    .array(
+      z.object({
+        query: z.string().openapi({
+          description: "Google search query from Search Console.",
+        }),
+        clicks: z.number().openapi({
+          description: "Google clicks for this query.",
+        }),
+        impressions: z.number().openapi({
+          description: "Google impressions for this query.",
+        }),
+        position: z.number().openapi({
+          description: "Average Google position for this query.",
+        }),
+        page: z.string().optional().openapi({
+          description: "Page Google showed most for this query.",
+        }),
+        pagePosition: z.number().optional().openapi({
+          description: "Google position of that page for this query.",
+        }),
+        pageImpressions: z.number().optional().openapi({
+          description: "Impressions of that page for this query.",
+        }),
+      })
+    )
+    .openapi({
+      description: "Search Console queries the suggestion was derived from.",
+    }),
   brief: gapBriefRefSchema.nullable(),
   recommendation: searchGapRecommendationSchema,
 });
@@ -251,7 +286,11 @@ export const contentGapsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoContentGapsResponse");
+  .openapi("GeoContentGapsResponse")
+  .openapi({
+    description:
+      "The project's content gaps from scan answers, Search Console and AI web searches, and the workspace they belong to.",
+  });
 
 export const updateGapRequestSchema = z
   .object({
@@ -264,11 +303,20 @@ export const updateGapRequestSchema = z
 
 export const updateGapResponseSchema = z
   .object({
-    promptId: z.string(),
-    ignored: z.boolean(),
+    promptId: z.string().openapi({
+      description: "Id of the prompt gap that was updated.",
+    }),
+    ignored: z.boolean().openapi({
+      description:
+        "Whether the gap is now hidden from content gaps and brief planning.",
+    }),
     organization: organizationResponseSchema,
   })
-  .openapi("UpdateGeoContentGapResponse");
+  .openapi("UpdateGeoContentGapResponse")
+  .openapi({
+    description:
+      "The prompt gap's new ignored state and the workspace it belongs to.",
+  });
 
 export const briefParamsSchema = projectParamsSchema.extend({
   briefId: resourceIdSchema("briefId").openapi({
@@ -357,8 +405,10 @@ const briefDocumentSchema = z
         engines: z
           .array(
             z.object({
-              engine: z.string(),
-              mentioned: z.boolean(),
+              engine: z.string().openapi({ description: "Engine id." }),
+              mentioned: z.boolean().openapi({
+                description: "Whether the answer mentioned the brand.",
+              }),
               position: z.number().nullable().openapi({
                 description:
                   "Position of the brand in the answer. Null when the answer gave it none.",
@@ -367,13 +417,27 @@ const briefDocumentSchema = z
           )
           .openapi({ description: "Latest answer per engine." }),
         competitorMentions: z
-          .array(z.object({ name: z.string(), engines: z.number() }))
+          .array(
+            z.object({
+              name: z.string().openapi({ description: "Competitor name." }),
+              engines: z.number().openapi({
+                description: "Engines whose answer named this competitor.",
+              }),
+            })
+          )
           .openapi({
             description:
               "Competitors named in the answers, with the number of engines naming each.",
           }),
         citedDomains: z
-          .array(z.object({ domain: z.string(), engines: z.number() }))
+          .array(
+            z.object({
+              domain: z.string().openapi({ description: "Cited domain." }),
+              engines: z.number().openapi({
+                description: "Engines whose answer cited this domain.",
+              }),
+            })
+          )
           .openapi({
             description:
               "Domains cited in the answers, with the number of engines citing each.",
@@ -396,17 +460,25 @@ const briefDocumentSchema = z
 
 const briefSummarySchema = z
   .object({
-    id: z.string(),
-    topic: z.string(),
-    workingTitle: z.string(),
-    status: z.enum(GEO_CONTENT_BRIEF_STATUSES),
+    id: z.string().openapi({
+      description: "Brief id for the brief endpoints.",
+    }),
+    topic: z.string().openapi({
+      description:
+        "What the article targets, which is the source prompt when the brief was planned from a gap, prompt or Search Console suggestion.",
+    }),
+    workingTitle: z.string().openapi({ description: "Planned article title." }),
+    status: briefStatusSchema,
     postId: z.string().nullable().openapi({
       description:
         "Post the brief writes into. Null when no post is linked, for example after it was deleted.",
     }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the brief was planned, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("GeoContentBriefSummary");
+  .openapi("GeoContentBriefSummary")
+  .openapi({ description: "Overview of a content brief." });
 
 export const listBriefsResponseSchema = z
   .object({
@@ -416,14 +488,23 @@ export const listBriefsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoContentBriefsResponse");
+  .openapi("ListGeoContentBriefsResponse")
+  .openapi({
+    description:
+      "The project's recent content briefs and the workspace they belong to.",
+  });
 
 const briefDetailSchema = z
   .object({
-    id: z.string(),
-    topic: z.string(),
+    id: z.string().openapi({
+      description: "Brief id for the brief endpoints.",
+    }),
+    topic: z.string().openapi({
+      description:
+        "What the article targets, which is the source prompt when the brief was planned from a gap, prompt or Search Console suggestion.",
+    }),
     brief: briefDocumentSchema,
-    status: z.enum(GEO_CONTENT_BRIEF_STATUSES),
+    status: briefStatusSchema,
     autoApproved: z.boolean().openapi({
       description:
         "True when writing started automatically at planning time instead of through approval.",
@@ -442,7 +523,9 @@ const briefDetailSchema = z
     error: z.string().nullable().openapi({
       description: "Why the last writer run failed. Null otherwise.",
     }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the brief was planned, as an ISO 8601 timestamp.",
+    }),
     updatedAt: z.string().openapi({
       description:
         "Pass as expectedUpdatedAt to updateGeoContentBrief to avoid overwriting newer changes.",
@@ -452,14 +535,20 @@ const briefDetailSchema = z
         "ISO timestamp of when the last writer run finished or failed. Null while writing or before approval.",
     }),
   })
-  .openapi("GeoContentBriefDetail");
+  .openapi("GeoContentBriefDetail")
+  .openapi({
+    description: "A content brief with its article plan and writer state.",
+  });
 
 export const briefResponseSchema = z
   .object({
     brief: briefDetailSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoContentBriefResponse");
+  .openapi("GeoContentBriefResponse")
+  .openapi({
+    description: "The content brief and the workspace it belongs to.",
+  });
 
 export const planBriefRequestSchema = z
   .object({
@@ -574,7 +663,7 @@ export const planBriefResponseSchema = z
         "New brief id, or the id of an open brief reused for the same source.",
     }),
     brief: briefDocumentSchema,
-    status: z.enum(GEO_CONTENT_BRIEF_STATUSES),
+    status: briefStatusSchema,
     runId: z.string().nullable().openapi({
       description:
         "Writer run id. Null when no writer run has started for the brief.",
@@ -584,7 +673,11 @@ export const planBriefResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("PlanGeoContentBriefResponse");
+  .openapi("PlanGeoContentBriefResponse")
+  .openapi({
+    description:
+      "The planned or reused brief, its writer state and the workspace it belongs to.",
+  });
 
 export const approveBriefResponseSchema = z
   .object({
@@ -594,4 +687,7 @@ export const approveBriefResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ApproveGeoContentBriefResponse");
+  .openapi("ApproveGeoContentBriefResponse")
+  .openapi({
+    description: "The writer run started for the approved brief.",
+  });

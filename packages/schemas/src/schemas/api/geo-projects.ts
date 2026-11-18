@@ -11,14 +11,17 @@ const projectSchema = z
       description:
         "Use as projectId in the endpoints under /v1/projects/{projectId}.",
     }),
-    name: z.string(),
+    name: z.string().openapi({ description: "Project display name." }),
     brandSettingsId: z.string().openapi({
       description:
         "ID of the brand identity linked to the project, as listed by GET /v1/brand-identities.",
     }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the project was created, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("GeoProject");
+  .openapi("GeoProject")
+  .openapi({ description: "A GEO project tracking one brand identity." });
 
 export const listProjectsResponseSchema = z
   .object({
@@ -27,14 +30,21 @@ export const listProjectsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoProjectsResponse");
+  .openapi("ListGeoProjectsResponse")
+  .openapi({
+    description:
+      "The organization's GEO projects and the workspace they belong to.",
+  });
 
 export const projectResponseSchema = z
   .object({
     project: projectSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoProjectResponse");
+  .openapi("GeoProjectResponse")
+  .openapi({
+    description: "The GEO project and the workspace it belongs to.",
+  });
 
 export const createProjectRequestSchema = z
   .object({
@@ -63,7 +73,11 @@ export const patchProjectRequestSchema = z
 
 export const deleteProjectResponseSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({ description: "Id of the deleted project." }),
     organization: organizationResponseSchema,
   })
-  .openapi("DeleteGeoProjectResponse");
+  .openapi("DeleteGeoProjectResponse")
+  .openapi({
+    description:
+      "Confirmation of the deleted GEO project and the workspace it belonged to.",
+  });

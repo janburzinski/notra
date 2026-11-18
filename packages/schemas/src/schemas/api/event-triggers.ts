@@ -34,28 +34,33 @@ export const getEventTriggersQuerySchema = z.object({
 const sharedSourceConfigShape = sharedEventTriggerSourceConfigSchema.shape;
 
 export const eventTriggerSourceConfigSchema =
-  sharedEventTriggerSourceConfigSchema.extend({
-    eventTypes: sharedSourceConfigShape.eventTypes.openapi({
-      description:
-        "GitHub webhook events that start a run: published releases, pushes, or both.",
-    }),
-    includePreReleases: sharedSourceConfigShape.includePreReleases.openapi({
-      description:
-        "Whether releases marked as pre-releases on GitHub also start a run.",
-    }),
-    ignoreCommitPatterns: sharedSourceConfigShape.ignoreCommitPatterns.openapi({
-      description:
-        "Case-insensitive JavaScript regular expressions tested against each commit message of a push, matching anywhere unless anchored. A push is skipped only when every commit matches at least one pattern. Releases are not filtered.",
-      example: ["^chore(\\(|:)", "\\[skip ci\\]"],
-    }),
-  });
+  sharedEventTriggerSourceConfigSchema
+    .extend({
+      eventTypes: sharedSourceConfigShape.eventTypes.openapi({
+        description:
+          "GitHub webhook events that start a run: published releases, pushes, or both.",
+      }),
+      includePreReleases: sharedSourceConfigShape.includePreReleases.openapi({
+        description:
+          "Whether releases marked as pre-releases on GitHub also start a run.",
+      }),
+      ignoreCommitPatterns:
+        sharedSourceConfigShape.ignoreCommitPatterns.openapi({
+          description:
+            "Case-insensitive JavaScript regular expressions tested against each commit message of a push, matching anywhere unless anchored. A push is skipped only when every commit matches at least one pattern. Releases are not filtered.",
+          example: ["^chore(\\(|:)", "\\[skip ci\\]"],
+        }),
+    })
+    .openapi({ description: "Which GitHub events start a run." });
 
-export const eventTriggerTargetsSchema = z.object({
-  repositoryIds: z.array(z.string().trim().min(1)).min(1).openapi({
-    description:
-      "GitHub integration IDs whose webhook events start the trigger, as returned in the github array of GET /v1/integrations.",
-  }),
-});
+export const eventTriggerTargetsSchema = z
+  .object({
+    repositoryIds: z.array(z.string().trim().min(1)).min(1).openapi({
+      description:
+        "GitHub integration IDs whose webhook events start the trigger, as returned in the github array of GET /v1/integrations.",
+    }),
+  })
+  .openapi({ description: "Repositories the trigger listens to." });
 
 export const eventTriggerOutputConfigSchema = z
   .object({
@@ -76,7 +81,11 @@ export const eventTriggerOutputConfigSchema = z
         "Where to announce new content after a successful run: Slack posts to the organization's notification channel, email goes to the workspace owners.",
     }),
   })
-  .optional();
+  .optional()
+  .openapi({
+    description:
+      "Writing and notification settings for generated content, or null or absent when none are set.",
+  });
 
 export const createEventTriggerRequestSchema = z.object({
   sourceType: z.literal("github_webhook"),
@@ -94,48 +103,76 @@ export const createEventTriggerRequestSchema = z.object({
 export const patchEventTriggerRequestSchema =
   createEventTriggerRequestSchema.openapi("PatchEventTriggerRequest");
 
-const eventTriggerSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
-  name: z.string().openapi({
+const eventTriggerSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "The event trigger's ID, used as triggerId in /v1/event-triggers/{triggerId}.",
+    }),
+    organizationId: z.string().openapi({
+      description: "ID of the organization that owns the trigger.",
+    }),
+    name: z.string().openapi({
+      description:
+        'Event triggers cannot be named through the API or the dashboard, so this is the default "Untitled Schedule".',
+      example: "Untitled Schedule",
+    }),
+    sourceType: z.literal("github_webhook").openapi({
+      description: "Always github_webhook for event triggers.",
+    }),
+    sourceConfig: eventTriggerSourceConfigSchema,
+    targets: eventTriggerTargetsSchema,
+    outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES).openapi({
+      description: "Type of content each run generates.",
+    }),
+    outputConfig: eventTriggerOutputConfigSchema.nullable().optional(),
+    enabled: z.boolean().openapi({
+      description:
+        "Whether matching GitHub events start runs. Disabled triggers are stored but ignored.",
+    }),
+    autoPublish: z.boolean().openapi({
+      description:
+        "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
+    }),
+    createdAt: z.string().openapi({
+      description: "When the trigger was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description:
+        "When the trigger was last changed, as an ISO 8601 timestamp.",
+    }),
+  })
+  .openapi({
     description:
-      'Event triggers cannot be named through the API or the dashboard, so this is the default "Untitled Schedule".',
-    example: "Untitled Schedule",
-  }),
-  sourceType: z.literal("github_webhook"),
-  sourceConfig: eventTriggerSourceConfigSchema,
-  targets: eventTriggerTargetsSchema,
-  outputType: z.enum(SUPPORTED_CONTENT_GENERATION_TYPES),
-  outputConfig: eventTriggerOutputConfigSchema.nullable().optional(),
-  enabled: z.boolean().openapi({
-    description:
-      "Whether matching GitHub events start runs. Disabled triggers are stored but ignored.",
-  }),
-  autoPublish: z.boolean().openapi({
-    description:
-      "Save generated changelogs and blog posts with status published instead of draft. This only marks them published in Notra; nothing is pushed to GitHub or a Notra site. Other output types always stay drafts.",
-  }),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+      "An automation that generates content when GitHub events arrive.",
+  });
 
-export const getEventTriggersResponseSchema = z.object({
-  eventTriggers: z.array(eventTriggerSchema).openapi({
-    description: "Event triggers, newest first.",
-  }),
-  repositoryMap: z.record(z.string(), z.string()).openapi({
+export const getEventTriggersResponseSchema = z
+  .object({
+    eventTriggers: z.array(eventTriggerSchema).openapi({
+      description: "Event triggers, newest first.",
+    }),
+    repositoryMap: z.record(z.string(), z.string()).openapi({
+      description:
+        "Maps each targeted GitHub integration ID to an owner/repo label, followed by the default branch when one is known. Integrations without an owner and repo are left out.",
+    }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({
     description:
-      "Maps each targeted GitHub integration ID to an owner/repo label, followed by the default branch when one is known. Integrations without an owner and repo are left out.",
-  }),
-  organization: organizationResponseSchema,
-});
+      "The workspace's event triggers with labels for the repositories they target.",
+  });
 
-export const eventTriggerResponseSchema = z.object({
-  eventTrigger: eventTriggerSchema,
-  organization: organizationResponseSchema,
-});
+export const eventTriggerResponseSchema = z
+  .object({
+    eventTrigger: eventTriggerSchema,
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "The event trigger." });
 
-export const deleteEventTriggerResponseSchema = z.object({
-  id: z.string(),
-  organization: organizationResponseSchema,
-});
+export const deleteEventTriggerResponseSchema = z
+  .object({
+    id: z.string().openapi({ description: "ID of the deleted event trigger." }),
+    organization: organizationResponseSchema,
+  })
+  .openapi({ description: "Confirms which event trigger was deleted." });

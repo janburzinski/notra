@@ -7,8 +7,10 @@ import { createGeoShortTextSchema, geoPromptTextSchema } from "./geo-fields";
 
 const sequenceSchema = z
   .object({
-    id: z.string(),
-    name: z.string(),
+    id: z.string().openapi({
+      description: "Sequence id for the update, delete and run endpoints.",
+    }),
+    name: z.string().openapi({ description: "Display name of the sequence." }),
     steps: z.array(z.string()).openapi({
       description:
         "Messages sent in order as one conversation with each engine.",
@@ -16,9 +18,15 @@ const sequenceSchema = z
     enabled: z.boolean().openapi({
       description: "Whether project scans play this conversation.",
     }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the sequence was created, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("GeoSequence");
+  .openapi("GeoSequence")
+  .openapi({
+    description:
+      "A multi-turn conversation played against each engine in project scans.",
+  });
 
 const sequenceStepsSchema = z
   .array(geoPromptTextSchema)
@@ -32,14 +40,22 @@ export const listSequencesResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoSequencesResponse");
+  .openapi("ListGeoSequencesResponse")
+  .openapi({
+    description:
+      "The project's multi-turn sequences and the workspace they belong to.",
+  });
 
 export const sequenceResponseSchema = z
   .object({
     sequence: sequenceSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoSequenceResponse");
+  .openapi("GeoSequenceResponse")
+  .openapi({
+    description:
+      "The created or updated sequence and the workspace it belongs to.",
+  });
 
 export const createSequenceRequestSchema = z
   .object({
@@ -68,7 +84,11 @@ export const deleteSequenceResponseSchema = z
     id: z.string().openapi({ description: "Id of the deleted sequence." }),
     organization: organizationResponseSchema,
   })
-  .openapi("DeleteGeoSequenceResponse");
+  .openapi("DeleteGeoSequenceResponse")
+  .openapi({
+    description:
+      "Confirmation of the deleted sequence and the workspace it belonged to.",
+  });
 
 export const runSequenceResponseSchema = z
   .object({
@@ -95,4 +115,8 @@ export const runSequenceResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("RunGeoSequenceResponse");
+  .openapi("RunGeoSequenceResponse")
+  .openapi({
+    description:
+      "Outcome of playing the sequence once against the project's engines, plus any scan queued for consumer apps.",
+  });

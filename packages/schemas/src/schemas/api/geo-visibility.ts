@@ -103,7 +103,10 @@ export const competitorDetailQuerySchema = createGeoWindowQuerySchema(
 
 const sparklinePointSchema = z.object({
   day: z.string().openapi({ description: "UTC day (YYYY-MM-DD)." }),
-  value: z.number(),
+  value: z.number().openapi({
+    description:
+      "Value for that day; the parent `trend` field says what it measures.",
+  }),
 });
 
 const configuredField = z.boolean().openapi({
@@ -174,7 +177,10 @@ export const visibilityOverviewResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityOverviewResponse");
+  .openapi("GeoVisibilityOverviewResponse", {
+    description:
+      "Brand visibility per answer engine for the selected window or scan.",
+  });
 
 const timeseriesPointSchema = z.object({
   day: dayField,
@@ -195,13 +201,16 @@ export const visibilityTimeseriesResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityTimeseriesResponse");
+  .openapi("GeoVisibilityTimeseriesResponse", {
+    description:
+      "Daily brand visibility per answer engine for the selected window.",
+  });
 
 const answerSourceSchema = z.object({
   title: z.string().openapi({
     description: "Source title, falling back to its domain or URL.",
   }),
-  url: z.string(),
+  url: z.string().openapi({ description: "Source page URL." }),
   domain: z.string().openapi({
     description: "Source domain; empty when it cannot be derived from the URL.",
   }),
@@ -268,7 +277,9 @@ const promptResultSummarySchema = promptResultSchema
     checkId: z.string().openapi({
       description: "Id of this answer; pass it to getGeoPromptResultDetail.",
     }),
-    scanId: z.string(),
+    scanId: z.string().openapi({
+      description: "Id of the scan that captured this answer.",
+    }),
     answerExcerpt: z.string().openapi({
       description: "Up to 300 characters of the stored answer excerpt.",
     }),
@@ -302,7 +313,10 @@ export const visibilityPromptResultSummariesResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityPromptResultSummariesResponse");
+  .openapi("GeoVisibilityPromptResultSummariesResponse", {
+    description:
+      "A page of compact latest answers per tracked prompt and engine.",
+  });
 
 export const promptResultDetailParamsSchema = projectParamsSchema.extend({
   checkId: z.string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
@@ -310,31 +324,39 @@ export const promptResultDetailParamsSchema = projectParamsSchema.extend({
 
 export const visibilityPromptResultDetailResponseSchema = z
   .object({
-    result: promptResultSchema.extend({
-      finishReason: z.string().nullable().openapi({
+    result: promptResultSchema
+      .extend({
+        finishReason: z.string().nullable().openapi({
+          description:
+            "Why the engine stopped generating, as reported by its API. Null when not reported.",
+        }),
+        promptTokens: z.number().int().nullable().openapi({
+          description:
+            "Input tokens the engine reported. Null when not reported.",
+        }),
+        outputTokens: z.number().int().nullable().openapi({
+          description:
+            "Output tokens the engine reported. Null when not reported.",
+        }),
+        reasoningTokens: z.number().int().nullable().openapi({
+          description:
+            "Reasoning tokens the engine reported. Null when not reported.",
+        }),
+        truncated: z.boolean().nullable().openapi({
+          description:
+            "True when the answer hit the output length limit (finishReason is length). Null when finishReason is unknown.",
+        }),
+      })
+      .openapi({
         description:
-          "Why the engine stopped generating, as reported by its API. Null when not reported.",
+          "The stored answer with its sources and the engine's generation metadata.",
       }),
-      promptTokens: z.number().int().nullable().openapi({
-        description:
-          "Input tokens the engine reported. Null when not reported.",
-      }),
-      outputTokens: z.number().int().nullable().openapi({
-        description:
-          "Output tokens the engine reported. Null when not reported.",
-      }),
-      reasoningTokens: z.number().int().nullable().openapi({
-        description:
-          "Reasoning tokens the engine reported. Null when not reported.",
-      }),
-      truncated: z.boolean().nullable().openapi({
-        description:
-          "True when the answer hit the output length limit (finishReason is length). Null when finishReason is unknown.",
-      }),
-    }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityPromptResultDetailResponse");
+  .openapi("GeoVisibilityPromptResultDetailResponse", {
+    description:
+      "One stored answer engine result with its full answer text and sources.",
+  });
 
 export const visibilityPromptResultsResponseSchema = z
   .object({
@@ -345,7 +367,10 @@ export const visibilityPromptResultsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityPromptResultsResponse");
+  .openapi("GeoVisibilityPromptResultsResponse", {
+    description:
+      "Latest full answers per tracked prompt and engine for the selected window.",
+  });
 
 const brandField = z.string().openapi({
   description:
@@ -384,7 +409,10 @@ export const visibilityCompetitorShareResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityCompetitorShareResponse");
+  .openapi("GeoVisibilityCompetitorShareResponse", {
+    description:
+      "How often answers named each brand, including yours, in the selected window.",
+  });
 
 export const competitorDetailParamsSchema = projectParamsSchema.extend({
   brand: z
@@ -409,8 +437,12 @@ const competitorTimeseriesPointSchema = z.object({
 });
 
 const competitorPromptRowSchema = z.object({
-  promptId: z.string(),
-  prompt: z.string(),
+  promptId: z.string().openapi({
+    description: "Prompt id; use it with getGeoPromptHistory.",
+  }),
+  prompt: z
+    .string()
+    .openapi({ description: "Prompt text sent to the engine." }),
   engine: engineField,
   capturedAt: z.string().openapi({
     description:
@@ -437,7 +469,10 @@ export const visibilityCompetitorDetailResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityCompetitorDetailResponse");
+  .openapi("GeoVisibilityCompetitorDetailResponse", {
+    description:
+      "Daily mentions of one competitor brand and the prompts whose answers named it.",
+  });
 
 const languageSharePointSchema = z.object({
   language: z.string().openapi({
@@ -463,4 +498,7 @@ export const visibilityLanguageShareResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoVisibilityLanguageShareResponse");
+  .openapi("GeoVisibilityLanguageShareResponse", {
+    description:
+      "Brand visibility per tracked language for the selected window.",
+  });

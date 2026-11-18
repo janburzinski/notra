@@ -30,8 +30,14 @@ const publicExternalChannelIdSchema = z
 
 const externalChannelIdSchema = z
   .object({
-    source: externalChannelSourceSchema,
-    id: z.string().max(200).optional(),
+    source: externalChannelSourceSchema.openapi({
+      description:
+        "Where the chat is linked, which is a Discord or Slack channel, a dashboard id or an agent.",
+    }),
+    id: z.string().max(200).optional().openapi({
+      description:
+        "Channel ID on that platform or the id the chat was tagged with, which is always set for discord and slack and optional for other sources.",
+    }),
   })
   .refine(
     (value) =>
@@ -40,18 +46,39 @@ const externalChannelIdSchema = z
       (typeof value.id === "string" && value.id.length > 0),
     { message: "id is required for discord and slack sources" }
   )
-  .openapi("ExternalChannelId");
+  .openapi("ExternalChannelId", {
+    description:
+      "The external channel the chat is linked to, used by GET /v1/chats/by-external.",
+  });
 
 export const chatSessionSummarySchema = z
   .object({
-    chatId: z.string(),
-    title: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-    pinnedAt: z.string().nullable(),
-    externalChannelId: externalChannelIdSchema.nullable().optional(),
+    chatId: z.string().openapi({
+      description: "The chat's ID, used as chatId in /v1/chats/{chatId}.",
+    }),
+    title: z.string().openapi({
+      description:
+        'Title of the chat, written from its first user message, or "New chat" before there is one.',
+    }),
+    createdAt: z.string().openapi({
+      description: "When the chat was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description:
+        "When the chat last changed, such as a new message, as an ISO 8601 timestamp.",
+    }),
+    pinnedAt: z.string().nullable().openapi({
+      description:
+        "When the chat was pinned, as an ISO 8601 timestamp, or null when it isn't pinned.",
+    }),
+    externalChannelId: externalChannelIdSchema.nullable().optional().openapi({
+      description:
+        "The external channel the chat is linked to, or null or absent when it isn't linked.",
+    }),
   })
-  .openapi("ChatSessionSummary");
+  .openapi("ChatSessionSummary", {
+    description: "A chat session without its messages.",
+  });
 
 const uiMessageSchema = z.unknown().openapi("ChatMessage");
 
@@ -149,13 +176,23 @@ export const sendChatParamsSchema = z.object({
 
 export const getChatsResponseSchema = z
   .object({
-    chats: z.array(chatSessionSummarySchema),
+    chats: z.array(chatSessionSummarySchema).openapi({
+      description:
+        "Chats with pinned ones first, most recently pinned first, then the rest by most recent activity.",
+    }),
   })
-  .openapi("GetChatsResponse");
+  .openapi("GetChatsResponse", {
+    description: "The organization's chat sessions, without their messages.",
+  });
 
 export const getChatResponseSchema = z
   .object({
     chat: chatSessionSummarySchema,
-    messages: z.array(uiMessageSchema),
+    messages: z.array(uiMessageSchema).openapi({
+      description:
+        "The full conversation in AI SDK UI message format, oldest first.",
+    }),
   })
-  .openapi("GetChatResponse");
+  .openapi("GetChatResponse", {
+    description: "A chat session with its full message history.",
+  });

@@ -49,8 +49,12 @@ export const webhookDeliveryQuerySchema = z.object({
   }),
 });
 const webhookEndpointSchema = z.object({
-  id: z.string(),
-  organizationId: z.string(),
+  id: z.string().openapi({
+    description: "The endpoint's ID, used as endpointId in endpoint routes.",
+  }),
+  organizationId: z.string().openapi({
+    description: "ID of the organization that owns the endpoint.",
+  }),
   url: z.string().openapi({
     description: "HTTPS URL that receives signed POST requests.",
   }),
@@ -60,9 +64,18 @@ const webhookEndpointSchema = z.object({
   enabled: z.boolean().openapi({
     description: "Disabled endpoints receive no deliveries.",
   }),
-  createdAt: z.string(),
+  createdAt: z.string().openapi({
+    description: "When the endpoint was created, as an ISO 8601 timestamp.",
+  }),
 });
-export const webhookIdentifierSchema = z.object({ id: z.string() });
+export const webhookIdentifierSchema = z
+  .object({
+    id: z.string().openapi({
+      description:
+        "ID of the endpoint that was deleted or the delivery that was queued for retry.",
+    }),
+  })
+  .openapi({ description: "Confirms which resource the request acted on." });
 const webhookDeliverySchema = z.object({
   id: z.string().openapi({
     description: "Sent to the endpoint in the x-notra-delivery-id header.",
@@ -71,11 +84,15 @@ const webhookDeliverySchema = z.object({
     description:
       "The event this delivery carries, sent in the x-notra-event-id header. Each subscribed endpoint gets its own delivery of the same event.",
   }),
-  endpointId: z.string(),
+  endpointId: z.string().openapi({
+    description: "ID of the endpoint the delivery is sent to.",
+  }),
   url: z.string().openapi({
     description: "URL the delivery is sent to.",
   }),
-  eventType: webhookEventTypeSchema,
+  eventType: webhookEventTypeSchema.openapi({
+    description: "Type of event the delivery carries.",
+  }),
   status: z
     .enum([
       "pending",
@@ -97,7 +114,9 @@ const webhookDeliverySchema = z.object({
     description:
       "When the next attempt is due. Only meaningful while pending or retrying.",
   }),
-  createdAt: z.string(),
+  createdAt: z.string().openapi({
+    description: "When the delivery was created, as an ISO 8601 timestamp.",
+  }),
   statusCode: z.number().nullable().openapi({
     description:
       "HTTP status of the latest attempt. Null before the first attempt finishes or when no response came back.",
@@ -108,12 +127,16 @@ const webhookDeliverySchema = z.object({
   }),
 });
 const webhookAttemptSchema = z.object({
-  id: z.string(),
-  deliveryId: z.string(),
+  id: z.string().openapi({ description: "The attempt's ID." }),
+  deliveryId: z.string().openapi({
+    description: "ID of the delivery the attempt belongs to.",
+  }),
   attemptNumber: z.number().openapi({
     description: "Position of the attempt, starting at 1.",
   }),
-  startedAt: z.string(),
+  startedAt: z.string().openapi({
+    description: "When the attempt started, as an ISO 8601 timestamp.",
+  }),
   finishedAt: z.string().nullable().openapi({
     description: "Null while the attempt is in flight.",
   }),
@@ -129,32 +152,49 @@ const webhookAttemptSchema = z.object({
     description: "Request duration in milliseconds.",
   }),
 });
-export const webhookListResponseSchema = z.object({
-  endpoints: z.array(webhookEndpointSchema),
-});
-export const webhookCreateResponseSchema = z.object({
-  endpoint: webhookEndpointSchema,
-  secret: z.string().openapi({
-    description:
-      "Signing secret, starting with whsec_. Returned only here; use it to verify the x-notra-signature header on each request.",
-  }),
-});
-export const webhookDeliveriesResponseSchema = z.object({
-  deliveries: z.array(webhookDeliverySchema).openapi({
-    description: "Up to 25 deliveries, newest first.",
-  }),
-  hasMore: z.boolean().openapi({
-    description:
-      "More deliveries follow. Request the next page with offset + 25.",
-  }),
-});
-export const webhookDetailResponseSchema = z.object({
-  delivery: webhookDeliverySchema.extend({
-    payload: z.string().openapi({
-      description: "The JSON request body sent to the endpoint, as a string.",
+export const webhookListResponseSchema = z
+  .object({
+    endpoints: z.array(webhookEndpointSchema).openapi({
+      description: "Every webhook endpoint in the workspace.",
     }),
-  }),
-  attempts: z.array(webhookAttemptSchema).openapi({
-    description: "Every attempt, oldest first.",
-  }),
-});
+  })
+  .openapi({ description: "The workspace's webhook endpoints." });
+export const webhookCreateResponseSchema = z
+  .object({
+    endpoint: webhookEndpointSchema.openapi({
+      description: "The endpoint that was created.",
+    }),
+    secret: z.string().openapi({
+      description:
+        "Signing secret, starting with whsec_. Returned only here; use it to verify the x-notra-signature header on each request.",
+    }),
+  })
+  .openapi({
+    description: "The new webhook endpoint and its signing secret.",
+  });
+export const webhookDeliveriesResponseSchema = z
+  .object({
+    deliveries: z.array(webhookDeliverySchema).openapi({
+      description: "Up to 25 deliveries, newest first.",
+    }),
+    hasMore: z.boolean().openapi({
+      description:
+        "More deliveries follow. Request the next page with offset + 25.",
+    }),
+  })
+  .openapi({ description: "A page of webhook deliveries." });
+export const webhookDetailResponseSchema = z
+  .object({
+    delivery: webhookDeliverySchema
+      .extend({
+        payload: z.string().openapi({
+          description:
+            "The JSON request body sent to the endpoint, as a string.",
+        }),
+      })
+      .openapi({ description: "The delivery with its request body." }),
+    attempts: z.array(webhookAttemptSchema).openapi({
+      description: "Every attempt, oldest first.",
+    }),
+  })
+  .openapi({ description: "A webhook delivery and its attempts." });

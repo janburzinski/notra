@@ -24,13 +24,30 @@ export const scheduleDestinationSchema = z.discriminatedUnion("destination", [
 export const scheduledPublicationConfigSchema = z.discriminatedUnion(
   "destination",
   [
-    z.object({ destination: z.literal("notra") }),
     z.object({
-      destination: z.literal("github"),
-      repositoryId: z.string(),
-      merge: z.boolean(),
+      destination: z
+        .literal("notra")
+        .describe("Marks the post as published in Notra."),
     }),
-    z.object({ destination: z.literal("social"), accountId: z.string() }),
+    z.object({
+      destination: z
+        .literal("github")
+        .describe("Opens, and optionally merges, a pull request."),
+      repositoryId: z
+        .string()
+        .describe("GitHub integration ID the pull request goes to."),
+      merge: z
+        .boolean()
+        .describe(
+          "Whether the pull request is merged at the scheduled time. When false, it is only opened or updated."
+        ),
+    }),
+    z.object({
+      destination: z
+        .literal("social")
+        .describe("Posts to a connected X or LinkedIn account."),
+      accountId: z.string().describe("Connected social account ID."),
+    }),
   ]
 ) satisfies z.ZodType<ScheduledPublicationDestinationConfig>;
 

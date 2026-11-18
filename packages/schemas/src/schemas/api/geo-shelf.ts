@@ -21,4 +21,7 @@ export const geoShelfListResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoShelfListResponse");
+  .openapi("GeoShelfListResponse", {
+    description:
+      "A page of the project's shelf sources, which are the pages AI answers cite, with their brand placements and listing tickets.",
+  });

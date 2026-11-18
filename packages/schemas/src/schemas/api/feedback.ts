@@ -187,7 +187,10 @@ export const updateFeedbackRequestSchema = z
 
 const feedbackSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({
+      description:
+        "The feedback's ID, used as feedbackId in /v1/feedback/{feedbackId}.",
+    }),
     projectId: z.string().nullable().openapi({
       description: "Project the feedback is filed under, or null for none.",
     }),
@@ -205,14 +208,34 @@ const feedbackSchema = z
       description:
         "Short summary, as submitted or written by Notra. Null when none could be written.",
     }),
-    message: z.string(),
-    agentClient: z.string().nullable(),
-    agentModel: z.string().nullable(),
-    toolVersion: z.string().nullable(),
-    userAgent: z.string().nullable(),
-    contextUrl: z.string().nullable(),
-    externalId: z.string().nullable(),
-    idempotencyKey: z.string().nullable(),
+    message: z.string().openapi({ description: "The feedback itself." }),
+    agentClient: z.string().nullable().openapi({
+      description:
+        "The agent or client that submitted the feedback, or null when not given.",
+    }),
+    agentModel: z.string().nullable().openapi({
+      description: "Model the agent ran on, or null when not given.",
+    }),
+    toolVersion: z.string().nullable().openapi({
+      description:
+        "Version of the tool or client that submitted it, or null when not given.",
+    }),
+    userAgent: z.string().nullable().openapi({
+      description:
+        "User agent as submitted, falling back to the request's User-Agent header, or null when neither was present.",
+    }),
+    contextUrl: z.string().nullable().openapi({
+      description:
+        "Page or resource the feedback is about, or null when not given.",
+    }),
+    externalId: z.string().nullable().openapi({
+      description:
+        "The submitter's own identifier for the user or session, or null when not given.",
+    }),
+    idempotencyKey: z.string().nullable().openapi({
+      description:
+        "Idempotency key sent with the submission, or null when none was sent.",
+    }),
     metadata: z.record(z.string(), z.unknown()).nullable().openapi({
       description: "JSON submitted with the feedback, or null.",
     }),
@@ -220,10 +243,16 @@ const feedbackSchema = z
       description:
         "When the status was last set to resolved. Cleared when it changes to another status.",
     }),
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the feedback was submitted, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the feedback last changed, as an ISO 8601 timestamp.",
+    }),
   })
-  .openapi("Feedback");
+  .openapi("Feedback", {
+    description: "A piece of feedback submitted by an agent, app or person.",
+  });
 
 export const submitFeedbackResponseSchema = z
   .object({
@@ -233,16 +262,34 @@ export const submitFeedbackResponseSchema = z
         "True when an existing feedback was returned instead of a new one: same idempotencyKey, or without one, an identical submission within 10 minutes.",
     }),
   })
-  .openapi("SubmitFeedbackResponse");
+  .openapi("SubmitFeedbackResponse", {
+    description:
+      "The stored feedback and whether it matched an earlier submission.",
+  });
 
-const feedbackPaginationSchema = z.object({
-  limit: z.number().int().min(1),
-  currentPage: z.number().int().min(1),
-  nextPage: z.number().int().min(1).nullable(),
-  previousPage: z.number().int().min(1).nullable(),
-  totalPages: z.number().int().min(1),
-  totalItems: z.number().int().min(0),
-});
+const feedbackPaginationSchema = z
+  .object({
+    limit: z.number().int().min(1).openapi({
+      description: "Items per page.",
+    }),
+    currentPage: z.number().int().min(1).openapi({
+      description: "The page returned, starting at 1.",
+    }),
+    nextPage: z.number().int().min(1).nullable().openapi({
+      description: "Next page number, or null on the last page.",
+    }),
+    previousPage: z.number().int().min(1).nullable().openapi({
+      description: "Previous page number, or null on the first page.",
+    }),
+    totalPages: z.number().int().min(1).openapi({
+      description:
+        "Total pages for the filters, at least 1 even with no results.",
+    }),
+    totalItems: z.number().int().min(0).openapi({
+      description: "Total feedback items matching the filters.",
+    }),
+  })
+  .openapi({ description: "Page position and totals for the list." });
 
 export const listFeedbackResponseSchema = z
   .object({
@@ -251,10 +298,12 @@ export const listFeedbackResponseSchema = z
     }),
     pagination: feedbackPaginationSchema,
   })
-  .openapi("ListFeedbackResponse");
+  .openapi("ListFeedbackResponse", {
+    description: "A page of the workspace's feedback.",
+  });
 
 export const feedbackResponseSchema = z
   .object({
     feedback: feedbackSchema,
   })
-  .openapi("FeedbackResponse");
+  .openapi("FeedbackResponse", { description: "The feedback item." });

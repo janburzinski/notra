@@ -17,18 +17,27 @@ const workspaceMembershipSchema = organizationResponseSchema.extend({
   }),
 });
 
-const workspaceAuthenticationSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("apiKey") }),
-  z.object({
-    type: z.literal("oauth"),
-    accountId: z.string().openapi({
-      description: "Notra user ID of the signed-in account.",
+const workspaceAuthenticationSchema = z
+  .discriminatedUnion("type", [
+    z.object({
+      type: z.literal("apiKey").openapi({
+        description: "The request was authenticated with an API key.",
+      }),
     }),
-    scopes: z.array(z.string()).openapi({
-      description: "OAuth scopes granted to the token.",
+    z.object({
+      type: z.literal("oauth").openapi({
+        description:
+          "The request was authenticated with an OAuth access token.",
+      }),
+      accountId: z.string().openapi({
+        description: "Notra user ID of the signed-in account.",
+      }),
+      scopes: z.array(z.string()).openapi({
+        description: "OAuth scopes granted to the token.",
+      }),
     }),
-  }),
-]);
+  ])
+  .openapi({ description: "How the request was authenticated." });
 
 export const getWorkspacesQuerySchema = z.object({
   includePending: z.literal("true").optional().openapi({
@@ -46,4 +55,8 @@ export const getWorkspacesResponseSchema = z
     }),
     authentication: workspaceAuthenticationSchema,
   })
-  .openapi("GetWorkspacesResponse");
+  .openapi("GetWorkspacesResponse")
+  .openapi({
+    description:
+      "The workspaces the caller can act on and how the request was authenticated.",
+  });

@@ -18,31 +18,39 @@ const brandColorRoleSchema = z
     "neutral",
     "custom",
   ])
-  .openapi({ example: "primary" });
+  .openapi({
+    description:
+      "Role of the color in the palette. custom is for colors outside the standard roles.",
+    example: "primary",
+  });
 
 const hexColorSchema = z
   .string()
   .trim()
   .regex(BRAND_GUIDELINE_HEX_COLOR_REGEX, "Must be a hex color like #13A0DC");
 
-const brandColorSchema = z.object({
-  id: z.string().openapi({
-    description: "Pass as colorId to update or delete the color.",
-  }),
-  role: brandColorRoleSchema,
-  name: z.string().nullable(),
-  lightValue: z.string().openapi({
-    description: "Hex color for light mode.",
-    example: "#13A0DC",
-  }),
-  darkValue: z.string().nullable().openapi({
-    description:
-      "Hex color for dark mode. Null when the color has no dark variant.",
-  }),
-  usage: z.string().nullable().openapi({
-    description: "Free-text note on where the color should be used.",
-  }),
-});
+const brandColorSchema = z
+  .object({
+    id: z.string().openapi({
+      description: "Pass as colorId to update or delete the color.",
+    }),
+    role: brandColorRoleSchema,
+    name: z.string().nullable().openapi({
+      description: "Display name of the color, or null when not set.",
+    }),
+    lightValue: z.string().openapi({
+      description: "Hex color for light mode.",
+      example: "#13A0DC",
+    }),
+    darkValue: z.string().nullable().openapi({
+      description:
+        "Hex color for dark mode. Null when the color has no dark variant.",
+    }),
+    usage: z.string().nullable().openapi({
+      description: "Free-text note on where the color should be used.",
+    }),
+  })
+  .openapi({ description: "A color in a brand identity's palette." });
 
 export const brandColorParamsSchema = getBrandIdentityParamsSchema.extend({
   colorId: resourceIdSchema("colorId").openapi({
@@ -68,19 +76,25 @@ export const patchBrandColorRequestSchema = createBrandColorRequestSchema
     message: "Provide at least one field to update",
   });
 
-export const listBrandColorsResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  colors: z.array(brandColorSchema).openapi({
-    description: "Colors of the brand identity in display order.",
-  }),
-});
+export const listBrandColorsResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    colors: z.array(brandColorSchema).openapi({
+      description: "Colors of the brand identity in display order.",
+    }),
+  })
+  .openapi({ description: "The brand identity's color palette." });
 
-export const brandColorResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  color: brandColorSchema,
-});
+export const brandColorResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    color: brandColorSchema,
+  })
+  .openapi({ description: "The created or updated brand color." });
 
-export const deleteBrandColorResponseSchema = z.object({
-  organization: organizationResponseSchema,
-  id: z.string(),
-});
+export const deleteBrandColorResponseSchema = z
+  .object({
+    organization: organizationResponseSchema,
+    id: z.string().openapi({ description: "ID of the deleted color." }),
+  })
+  .openapi({ description: "Confirmation that the brand color was deleted." });

@@ -145,7 +145,7 @@ export const geoShelfOpportunityWriteSchema = z.object({
 });
 
 export const geoShelfOpportunitySchema = geoShelfOpportunityWriteSchema.extend({
-  id: z.string().min(1),
+  id: z.string().min(1).meta({ description: "Ticket id." }),
   createdByUserId: z.string().min(1).nullable().meta({
     description: "User who opened the ticket.",
   }),
@@ -153,12 +153,16 @@ export const geoShelfOpportunitySchema = geoShelfOpportunityWriteSchema.extend({
     description:
       "When the ticket was closed (won, lost or dismissed). Kept when it moves between closed statuses; `null` while open.",
   }),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  createdAt: z.iso.datetime().meta({
+    description: "When the ticket was opened.",
+  }),
+  updatedAt: z.iso.datetime().meta({
+    description: "When the ticket last changed.",
+  }),
 });
 
 export const geoShelfSourceSchema = z.object({
-  id: z.string().min(1),
+  id: z.string().min(1).meta({ description: "Shelf source id." }),
   url: z.url().max(GEO_SHELF_URL_MAX_LENGTH).meta({
     description: "Page URL.",
   }),

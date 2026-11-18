@@ -13,17 +13,31 @@ import {
 import { organizationResponseSchema } from "./content";
 import { createGeoWindowQuerySchema } from "./geo-visibility";
 
-const profileSchema = z.object({
-  goals: z.array(z.string()),
-  painPoints: z.array(z.string()),
-  currentStack: z.array(z.string()),
-  buyingTriggers: z.array(z.string()),
-  objections: z.array(z.string()),
-});
+const profileSchema = z
+  .object({
+    goals: z.array(z.string()).openapi({
+      description: "What the persona wants to achieve.",
+    }),
+    painPoints: z.array(z.string()).openapi({
+      description: "Problems the persona is trying to solve.",
+    }),
+    currentStack: z.array(z.string()).openapi({
+      description: "Tools and vendors the persona uses today.",
+    }),
+    buyingTriggers: z.array(z.string()).openapi({
+      description: "Events that push the persona to look for a new solution.",
+    }),
+    objections: z.array(z.string()).openapi({
+      description: "Concerns that make the persona hesitate to buy.",
+    }),
+  })
+  .openapi({ description: "Structured buyer profile of the persona." });
 
 const personaSchema = z
   .object({
-    id: z.string(),
+    id: z.string().openapi({
+      description: "Persona id for the persona endpoints.",
+    }),
     name: z.string().openapi({
       description: "Buyer archetype label, such as Budgeter.",
     }),
@@ -51,17 +65,23 @@ const personaSchema = z
     archivedAt: z.string().nullable().openapi({
       description: "When the persona was archived, or `null` when active.",
     }),
-    createdAt: z.string(),
-    updatedAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "When the persona was created, as an ISO 8601 timestamp.",
+    }),
+    updatedAt: z.string().openapi({
+      description: "When the persona last changed, as an ISO 8601 timestamp.",
+    }),
     memories: z
       .array(
         z.object({
-          id: z.string(),
+          id: z.string().openapi({ description: "Memory id." }),
           kind: z.enum(GEO_PERSONA_MEMORY_KINDS).openapi({
             description:
               "`background` for career and company facts, `experience` for past events with tools or vendors, `preference` for how they like to work and buy, `constraint` for budget, compliance or team limits.",
           }),
-          content: z.string(),
+          content: z.string().openapi({
+            description: "The fact, written in the first person.",
+          }),
         })
       )
       .openapi({
@@ -69,7 +89,11 @@ const personaSchema = z
           "First-person facts included in the persona's context when it is played.",
       }),
   })
-  .openapi("GeoPersona");
+  .openapi("GeoPersona")
+  .openapi({
+    description:
+      "A simulated buyer persona that plays conversations against AI engines.",
+  });
 
 export const listPersonasResponseSchema = z
   .object({
@@ -81,21 +105,32 @@ export const listPersonasResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("ListGeoPersonasResponse");
+  .openapi("ListGeoPersonasResponse")
+  .openapi({
+    description: "The project's personas and the workspace they belong to.",
+  });
 
 export const personaResponseSchema = z
   .object({
     persona: personaSchema,
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPersonaResponse");
+  .openapi("GeoPersonaResponse")
+  .openapi({
+    description:
+      "The updated or restored persona and the workspace it belongs to.",
+  });
 
 export const archivePersonaResponseSchema = z
   .object({
     id: z.string().openapi({ description: "Id of the archived persona." }),
     organization: organizationResponseSchema,
   })
-  .openapi("ArchiveGeoPersonaResponse");
+  .openapi("ArchiveGeoPersonaResponse")
+  .openapi({
+    description:
+      "Confirmation of the archived persona and the workspace it belongs to.",
+  });
 
 const editableText = (max: number) => z.string().trim().min(1).max(max);
 const editableList = z
@@ -143,9 +178,14 @@ export const personaResultsQuerySchema = z.object({
 });
 
 const personaSourceSchema = z.object({
-  title: z.string(),
-  url: z.string(),
-  domain: z.string(),
+  title: z.string().openapi({
+    description:
+      "Title of the cited page, or its URL when no title was recorded.",
+  }),
+  url: z.string().openapi({ description: "URL of the cited page." }),
+  domain: z.string().openapi({
+    description: "Domain of the cited page, or empty for older answers.",
+  }),
 });
 
 export const personaResultsResponseSchema = z
@@ -153,15 +193,21 @@ export const personaResultsResponseSchema = z
     results: z
       .array(
         z.object({
-          scanId: z.string(),
+          scanId: z.string().openapi({
+            description: "Scan that captured this answer.",
+          }),
           turn: z.number().int().openapi({
             description: "Conversation turn, starting at 1.",
           }),
-          engine: z.string(),
+          engine: z.string().openapi({
+            description: "Engine id that answered, such as `openai/chatgpt`.",
+          }),
           prompt: z.string().openapi({
             description: "Message the persona sent on this turn.",
           }),
-          answer: z.string(),
+          answer: z.string().openapi({
+            description: "Full answer text the engine returned.",
+          }),
           mentioned: z.boolean().openapi({
             description:
               "Whether the answer named the tracked brand or one of its aliases.",
@@ -201,7 +247,7 @@ export const personaResultsResponseSchema = z
     scans: z
       .array(
         z.object({
-          id: z.string(),
+          id: z.string().openapi({ description: "Scan id." }),
           capturedAt: z.string().openapi({
             description: "When the last answer of that scan was captured.",
           }),
@@ -217,7 +263,11 @@ export const personaResultsResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPersonaResultsResponse");
+  .openapi("GeoPersonaResultsResponse")
+  .openapi({
+    description:
+      "A persona's conversation answers from one scan, the scans available to pick from and the workspace.",
+  });
 
 export const personaActivityQuerySchema = createGeoWindowQuerySchema(
   GEO_PERSONA_ACTIVITY_DAYS,
@@ -236,7 +286,9 @@ export const personaActivityResponseSchema = z
     points: z
       .array(
         z.object({
-          personaId: z.string(),
+          personaId: z.string().openapi({
+            description: "Persona the answers belong to.",
+          }),
           snapshotVersion: z.string().openapi({
             description:
               "Hash of the persona context the answers were played with. Changes when the persona is edited.",
@@ -260,7 +312,11 @@ export const personaActivityResponseSchema = z
       }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPersonaActivityResponse");
+  .openapi("GeoPersonaActivityResponse")
+  .openapi({
+    description:
+      "Daily persona answer and mention counts over the requested window.",
+  });
 
 export const generatePersonasRequestSchema = z
   .object({
@@ -294,8 +350,11 @@ export const generatePersonasRequestSchema = z
 
 const personaGenerationJobSchema = z
   .object({
-    id: z.string(),
-    status: z.enum(["queued", "running", "completed", "failed"]),
+    id: z.string().openapi({ description: "Generation job id." }),
+    status: z.enum(["queued", "running", "completed", "failed"]).openapi({
+      description:
+        "State of the job, which you poll until it is `completed` or `failed`.",
+    }),
     personaId: z.string().nullable().openapi({
       description:
         "Persona being regenerated, or `null` when the job creates new personas.",
@@ -306,7 +365,8 @@ const personaGenerationJobSchema = z
         "Failure message when `status` is `failed`, otherwise `null`.",
     }),
   })
-  .openapi("GeoPersonaGenerationJob");
+  .openapi("GeoPersonaGenerationJob")
+  .openapi({ description: "A background job that generates personas." });
 
 export const personaGenerationResponseSchema = z
   .object({
@@ -316,7 +376,11 @@ export const personaGenerationResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoPersonaGenerationResponse");
+  .openapi("GeoPersonaGenerationResponse")
+  .openapi({
+    description:
+      "The project's persona generation job and the workspace it belongs to.",
+  });
 
 export const runPersonaResponseSchema = z
   .object({
@@ -341,4 +405,8 @@ export const runPersonaResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("RunGeoPersonaResponse");
+  .openapi("RunGeoPersonaResponse")
+  .openapi({
+    description:
+      "Outcome of playing the persona once against the project's engines, plus any scan queued for consumer apps.",
+  });

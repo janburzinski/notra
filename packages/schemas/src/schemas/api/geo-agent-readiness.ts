@@ -19,16 +19,24 @@ const readinessTierSchema = z.object({
 });
 
 const readinessScoreBreakdownSchema = z.object({
-  essential: readinessTierSchema,
-  recommended: readinessTierSchema,
-  bonus: z.object({
-    points: z.number().openapi({
-      description: "Extra score points earned from bonus signals.",
-    }),
-    positiveSignals: z.number().openapi({
-      description: "Number of bonus signals detected.",
-    }),
+  essential: readinessTierSchema.openapi({
+    description: "Points and checks in the essential tier.",
   }),
+  recommended: readinessTierSchema.openapi({
+    description: "Points and checks in the recommended tier.",
+  }),
+  bonus: z
+    .object({
+      points: z.number().openapi({
+        description: "Extra score points earned from bonus signals.",
+      }),
+      positiveSignals: z.number().openapi({
+        description: "Number of bonus signals detected.",
+      }),
+    })
+    .openapi({
+      description: "Bonus signals that add points on top of the tiers.",
+    }),
 });
 
 const readinessIssueSchema = z.object({
@@ -36,9 +44,14 @@ const readinessIssueSchema = z.object({
     description:
       "Stable check identifier, used to match the same check across scans.",
   }),
-  name: z.string(),
-  tier: z.enum(["essential", "recommended", "bonus"]),
-  result: z.enum(["failed", "partial"]),
+  name: z.string().openapi({ description: "Human-readable check name." }),
+  tier: z.enum(["essential", "recommended", "bonus"]).openapi({
+    description: "Score tier the scanner assigns the check to.",
+  }),
+  result: z.enum(["failed", "partial"]).openapi({
+    description:
+      "A failed check did not pass, and a partial check only partly passed.",
+  }),
   details: z.string().nullable().openapi({
     description: "What the check found. Null when the scanner gave no details.",
   }),
@@ -49,8 +62,10 @@ const readinessIssueSchema = z.object({
 
 const readinessReportSchema = z
   .object({
-    id: z.string(),
-    status: z.enum(["running", "completed", "failed"]),
+    id: z.string().openapi({ description: "Report id." }),
+    status: z.enum(["running", "completed", "failed"]).openapi({
+      description: "Scan state of this report.",
+    }),
     targetUrl: z
       .string()
       .openapi({ description: "Website URL that was scanned." }),
@@ -81,12 +96,17 @@ const readinessReportSchema = z
       description:
         "ISO timestamp of when the website was scanned. Null until the scan completes.",
     }),
-    createdAt: z.string(),
+    createdAt: z.string().openapi({
+      description: "ISO timestamp when the scan was requested.",
+    }),
   })
-  .openapi("GeoAgentReadinessReport");
+  .openapi("GeoAgentReadinessReport", {
+    description:
+      "One agent readiness scan of the project's website. As `report` it is the latest completed scan; as `scan` it is a newer run that is still running or failed. Either is null when there is none.",
+  });
 
 const readinessHistoryPointSchema = z.object({
-  id: z.string(),
+  id: z.string().openapi({ description: "Report id." }),
   score: z.number().nullable().openapi({
     description: "Score from 0 to 100, or null when the scanner returned none.",
   }),
@@ -103,9 +123,14 @@ const readinessHistoryPointSchema = z.object({
 });
 
 const readinessChangedCheckSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  tier: z.enum(["essential", "recommended", "bonus"]),
+  id: z.string().openapi({
+    description:
+      "Stable check identifier, used to match the same check across scans.",
+  }),
+  name: z.string().openapi({ description: "Human-readable check name." }),
+  tier: z.enum(["essential", "recommended", "bonus"]).openapi({
+    description: "Score tier the scanner assigns the check to.",
+  }),
   previousResult: z.enum(["failed", "partial"]).nullable().openapi({
     description: "Result on the previous scan; null when the check passed.",
   }),
@@ -142,12 +167,8 @@ export const agentReadinessResponseSchema = z
       description:
         "Website URL from the project's brand identity that scans run against.",
     }),
-    report: readinessReportSchema.nullable().openapi({
-      description: "Latest completed report, if any.",
-    }),
-    scan: readinessReportSchema.nullable().openapi({
-      description: "Latest run newer than the completed report, if any.",
-    }),
+    report: readinessReportSchema.nullable(),
+    scan: readinessReportSchema.nullable(),
     history: z.array(readinessHistoryPointSchema).openapi({
       description: "Up to the 60 most recent completed scans, oldest first.",
     }),
@@ -157,7 +178,10 @@ export const agentReadinessResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoAgentReadinessResponse");
+  .openapi("GeoAgentReadinessResponse", {
+    description:
+      "The project's agent readiness reports, with the latest result, any running scan, the score history and the checks that changed.",
+  });
 
 export const agentReadinessScanResponseSchema = z
   .object({
@@ -171,4 +195,6 @@ export const agentReadinessScanResponseSchema = z
     }),
     organization: organizationResponseSchema,
   })
-  .openapi("GeoAgentReadinessScanResponse");
+  .openapi("GeoAgentReadinessScanResponse", {
+    description: "The agent readiness scan that was started or reused.",
+  });

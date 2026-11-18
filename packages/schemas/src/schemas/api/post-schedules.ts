@@ -73,6 +73,9 @@ export const schedulePostRequestSchema = z
 
 const postScheduleSchema = postScheduleViewSchema
   .extend({
+    postId: postScheduleViewSchema.shape.postId.openapi({
+      description: "ID of the scheduled post.",
+    }),
     scheduledAt: postScheduleViewSchema.shape.scheduledAt.openapi({
       description: "When the post publishes (ISO 8601, UTC).",
     }),
@@ -84,6 +87,22 @@ const postScheduleSchema = postScheduleViewSchema
       .array(
         scheduledPublicationViewSchema
           .extend({
+            id: scheduledPublicationViewSchema.shape.id.openapi({
+              description: "ID of this destination's publication.",
+            }),
+            config: scheduledPublicationViewSchema.shape.config.openapi({
+              description:
+                "Settings for the destination, which are the GitHub integration and merge choice or the social account, and none for notra.",
+            }),
+            scheduledAt:
+              scheduledPublicationViewSchema.shape.scheduledAt.openapi({
+                description:
+                  "When this destination publishes as an ISO 8601 UTC timestamp, which matches the schedule's scheduledAt.",
+              }),
+            timeZone: scheduledPublicationViewSchema.shape.timeZone.openapi({
+              description:
+                "IANA time zone the schedule was picked in, for display only.",
+            }),
             destination:
               scheduledPublicationViewSchema.shape.destination.openapi({
                 description:
@@ -113,7 +132,10 @@ const postScheduleSchema = postScheduleViewSchema
         description: "One entry per destination of the schedule.",
       }),
   })
-  .openapi("PostSchedule");
+  .openapi("PostSchedule")
+  .openapi({
+    description: "When a post publishes and where it goes out.",
+  });
 
 export const postScheduleResponseSchema = z
   .object({
@@ -123,7 +145,8 @@ export const postScheduleResponseSchema = z
         "The post's latest schedule with destinations that were not canceled, listing only those destinations. It stays after they published or failed, and destinations that already published remain after a cancel. Null when the post was never scheduled or all its destinations were canceled.",
     }),
   })
-  .openapi("PostScheduleResponse");
+  .openapi("PostScheduleResponse")
+  .openapi({ description: "The post's current schedule, if any." });
 
 export const cancelPostScheduleResponseSchema = z
   .object({
@@ -136,4 +159,5 @@ export const cancelPostScheduleResponseSchema = z
         "True when a destination was already publishing; it cannot be stopped and finishes on its own.",
     }),
   })
-  .openapi("CancelPostScheduleResponse");
+  .openapi("CancelPostScheduleResponse")
+  .openapi({ description: "Result of canceling the post's schedule." });
