@@ -1,0 +1,81 @@
+apps/api/src/utils/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 1-3,16,25-62
+packages/schemas/src/schemas/api/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 233
+apps/api/src/types/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 21,44-45,48-51,83
+packages/geo-core/src/geo/errors.ts
+  s_51485dc008574a::t_e944082e73c664 5,252-262,337
+packages/db/migrations/meta/0173_snapshot.json
+  ai_agent 1-18497
+apps/api/src/programs/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 4,8,18,27,50-57,60,64-74,78-96,235-251,258,260-284,320-323,339,342-343,346,357,359,363-366
+apps/api/src/constants/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 17-18
+apps/dashboard/src/lib/orpc/utils/geo-errors.ts
+  s_51485dc008574a::t_e944082e73c664 72-73
+apps/api/src/routes/feedback.ts
+  s_51485dc008574a::t_e944082e73c664 205
+packages/geo-core/src/geo/persona-scan.ts
+  s_51485dc008574a::t_e944082e73c664 36,509-516
+apps/console/src/lib/auth/disposable-email.ts
+  s_51485dc008574a::t_e944082e73c664 1-7
+packages/geo-core/src/constants/geo-conversations.ts
+  s_51485dc008574a::t_e944082e73c664 2-7
+packages/db/migrations/0172_agent_feedback_content_key.sql
+  ai_agent 1-2
+packages/geo-core/src/utils/geo-conversation-run-claim.ts
+  s_51485dc008574a::t_e944082e73c664 1-64
+apps/api/src/runtime/geo.ts
+  s_51485dc008574a::t_e944082e73c664 60-65
+apps/console/src/lib/auth/sync.ts
+  s_51485dc008574a::t_e944082e73c664 8
+apps/dashboard/src/lib/onboarding/company-domain.ts
+  s_51485dc008574a::t_e944082e73c664 7
+apps/dashboard/src/lib/auth/sync.ts
+  s_51485dc008574a::t_e944082e73c664 246-247
+apps/docs/feedback/send-feedback.mdx
+  s_51485dc008574a::t_e944082e73c664 134
+apps/console/src/constants/disposable-email.ts
+  s_51485dc008574a::t_e944082e73c664 1-4
+packages/db/migrations/meta/_journal.json
+  ai_agent 1212-1220
+apps/dashboard/src/lib/auth/disposable-email.ts
+  s_51485dc008574a::t_e944082e73c664 1-7
+packages/db/migrations/meta/0172_snapshot.json
+  ai_agent 2,249-254,360-371
+apps/dashboard/src/constants/disposable-email.ts
+  s_51485dc008574a::t_e944082e73c664 1-4
+packages/geo-core/tests/geo-conversation-run-claim.test.ts
+  s_51485dc008574a::t_e944082e73c664 1-148
+apps/api/tests/feedback-program.test.ts
+  s_51485dc008574a::t_e944082e73c664 12,44,125-230
+packages/geo-core/src/types/geo.ts
+  s_51485dc008574a::t_e944082e73c664 71-73
+packages/db/src/schema.ts
+  s_51485dc008574a::t_e944082e73c664 1815,1838-1840
+apps/dashboard/src/lib/organizations/actions.ts
+  s_51485dc008574a::t_e944082e73c664 46
+apps/dashboard/messages/de.json
+  s_51485dc008574a::t_e944082e73c664 1056
+packages/geo-core/src/geo/scan.ts
+  s_51485dc008574a::t_e944082e73c664 91,2262-2269
+apps/dashboard/messages/en.json
+  s_51485dc008574a::t_e944082e73c664 1056
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "118bc2d3ea443afa0068bc975495f58153bd57fa",
+  "prompts": {},
+  "sessions": {
+    "s_51485dc008574a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a92c9619-515f-4397-b2d8-f36b36bf95f4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
