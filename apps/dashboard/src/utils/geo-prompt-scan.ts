@@ -20,35 +20,45 @@ function choices(prompts: readonly GeoTrackedPrompt[]) {
 }
 
 /**
- * Finds the enabled tracked prompt the agent means: by id, by its exact
- * wording, or by a part of it that only one prompt contains. Anything else
- * hands back prompts to pick from instead of guessing.
+ * Finds the tracked prompt the agent means: by id, by its exact wording, or
+ * by a part of it that only one prompt contains. Anything else hands back
+ * prompts to pick from instead of guessing.
  */
-export function matchGeoScanPrompt(
+export function matchTrackedPrompt(
   prompts: readonly GeoTrackedPrompt[],
   query: string
 ): GeoPromptScanMatch {
-  const enabled = prompts.filter((prompt) => prompt.enabled);
-  const byId = enabled.find(
+  const byId = prompts.find(
     (prompt) => prompt.id === query || customPromptScanId(prompt.id) === query
   );
   if (byId) {
     return { status: "match", prompt: byId };
   }
   const wanted = normalize(query);
-  const exact = enabled.filter((prompt) => normalize(prompt.prompt) === wanted);
+  const exact = prompts.filter((prompt) => normalize(prompt.prompt) === wanted);
   if (exact.length === 1 && exact[0]) {
     return { status: "match", prompt: exact[0] };
   }
   const partial = wanted
-    ? enabled.filter((prompt) => normalize(prompt.prompt).includes(wanted))
+    ? prompts.filter((prompt) => normalize(prompt.prompt).includes(wanted))
     : [];
   if (partial.length === 1 && partial[0]) {
     return { status: "match", prompt: partial[0] };
   }
   return partial.length > 1
     ? { status: "choose", prompts: choices(partial) }
-    : { status: "not_found", prompts: choices(enabled) };
+    : { status: "not_found", prompts: choices(prompts) };
+}
+
+/** Like `matchTrackedPrompt`, but only enabled prompts can be scanned. */
+export function matchGeoScanPrompt(
+  prompts: readonly GeoTrackedPrompt[],
+  query: string
+): GeoPromptScanMatch {
+  return matchTrackedPrompt(
+    prompts.filter((prompt) => prompt.enabled),
+    query
+  );
 }
 
 function promptsForQuery(

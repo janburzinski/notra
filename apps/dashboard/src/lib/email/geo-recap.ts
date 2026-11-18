@@ -3,6 +3,7 @@ import { logError, logWarn } from "@notra/ai/utils/server-log";
 import { db } from "@notra/db/drizzle";
 import {
   geoContentGapSnapshots,
+  geoProducts,
   members,
   organizationNotificationSettings,
   organizations,
@@ -25,7 +26,7 @@ import {
   engineFamilyLabel,
   engineFamilyOf,
 } from "@notra/geo-core/utils/geo-engine-family";
-import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
+import { and, asc, count, eq, gte, inArray, isNull, lt, or } from "drizzle-orm";
 
 import {
   GEO_ALERT_COOLDOWN_SECONDS,
@@ -49,6 +50,7 @@ import type {
 import {
   aggregateRates,
   buildComparablePairs,
+  buildNewProductsHeadline,
   buildWeeklyHeadline,
   collectPairChanges,
   competitorShares,
@@ -176,6 +178,44 @@ function periodInput(
   return { organizationId, ...window };
 }
 
+/** Products added this week, found by the site check, the agent or by hand. */
+async function loadNewProducts(
+  organizationId: string,
+  window: GeoRecapWindow
+): Promise<{ items: GeoRecapItem[]; total: number }> {
+  const added = and(
+    eq(geoProducts.organizationId, organizationId),
+    gte(geoProducts.createdAt, window.splitAt),
+    lt(geoProducts.createdAt, window.toExclusive)
+  );
+  const [rows, [counted]] = await Promise.all([
+    db
+      .select({
+        id: geoProducts.id,
+        name: geoProducts.name,
+        niche: geoProducts.niche,
+      })
+      .from(geoProducts)
+      .where(added)
+      .orderBy(asc(geoProducts.createdAt))
+      .limit(GEO_RECAP_MAX_ITEMS),
+    // The list shows a few; the headline and "more" line need the total.
+    db.select({ total: count() }).from(geoProducts).where(added),
+  ]);
+  const items: GeoRecapItem[] = rows.map((row) => ({
+    id: row.id,
+    title: row.name,
+    changes: [
+      {
+        id: `${row.id}:added`,
+        detail: row.niche ?? "Now tracked as a product",
+        tone: "neutral",
+      },
+    ],
+  }));
+  return { items, total: counted?.total ?? items.length };
+}
+
 async function loadProjectNames(pairs: readonly GeoRecapPair[]) {
   const projectIds = [...new Set(pairs.map((pair) => pair.projectId))];
   if (projectIds.length < 2) {
@@ -259,15 +299,44 @@ async function sendWeeklyRecap({
   window: GeoRecapWindow;
 }): Promise<GeoRecapOrganizationResult> {
   const input = periodInput(organizationId, window);
-  const promptRows = await queryGeoCheckPeriodPrompts(input);
+  const [promptRows, newProducts] = await Promise.all([
+    queryGeoCheckPeriodPrompts(input),
+    loadNewProducts(organizationId, window),
+  ]);
   const pairs = buildComparablePairs(promptRows);
-  if (pairs.length === 0) {
+  if (pairs.length === 0 && newProducts.total === 0) {
     return "quiet";
   }
 
   const recipients = await loadRecipients(organizationId);
   if (!recipients) {
     return "quiet";
+  }
+  const weekKey = utcDateKey(window.toExclusive);
+  const appUrl = EMAIL_CONFIG.getAppUrl();
+
+  // New products still go out when there are no two weeks of scans to compare.
+  if (pairs.length === 0) {
+    return sendToRecipients(recipients.emails, (recipientEmail) =>
+      sendWeeklySummaryEmail({
+        recipientEmail,
+        weekKey,
+        organizationName: recipients.name,
+        organizationSlug: recipients.slug,
+        weekLabel: formatWeekLabel(window),
+        headline: buildNewProductsHeadline(newProducts.total),
+        quiet: true,
+        visibilityLabel: "—",
+        visibilityDeltaLabel: "—",
+        answersChecked: 0,
+        items: [],
+        remainingCount: 0,
+        competitors: [],
+        newProducts: newProducts.items,
+        newProductsRemaining: newProducts.total - newProducts.items.length,
+        dashboardLink: `${appUrl}/${recipients.slug}/geo`,
+      })
+    );
   }
 
   const competitorRows = await queryGeoCheckPeriodCompetitors(input);
@@ -289,7 +358,7 @@ async function sendWeeklyRecap({
 
   const quiet =
     changes.length === 0 && !isNewsworthyShift(visibilityPoints) && !topMover;
-  if (quiet && !shouldSendQuietWeek(window)) {
+  if (quiet && newProducts.total === 0 && !shouldSendQuietWeek(window)) {
     return "quiet";
   }
 
@@ -310,9 +379,6 @@ async function sendWeeklyRecap({
   });
   const gained = changes.filter((change) => change.kind === "gained").length;
   const lost = changes.filter((change) => change.kind === "lost").length;
-  const weekKey = utcDateKey(window.toExclusive);
-  const appUrl = EMAIL_CONFIG.getAppUrl();
-
   return sendToRecipients(recipients.emails, (recipientEmail) =>
     sendWeeklySummaryEmail({
       recipientEmail,
@@ -334,6 +400,8 @@ async function sendWeeklyRecap({
       items: visibleItems,
       remainingCount: items.length - visibleItems.length,
       competitors: quiet ? [] : competitors,
+      newProducts: newProducts.items,
+      newProductsRemaining: newProducts.total - newProducts.items.length,
       action,
       dashboardLink: `${appUrl}/${recipients.slug}/geo`,
     })

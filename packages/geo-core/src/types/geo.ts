@@ -623,10 +623,34 @@ export interface GeoPromptUpdateChanges {
   productId?: string | null;
 }
 
+export interface GeoProductUpdateInput extends GeoScopeInput {
+  productId: string;
+  name?: string;
+  /** Who the product is for; null clears it. */
+  niche?: string | null;
+}
+
+export interface GeoProductDeleteInput extends GeoScopeInput {
+  productId: string;
+}
+
+export interface GeoProductDeleteResult {
+  /** Prompts that lost their product. */
+  unfiledPrompts: number;
+  /** Of those, how many were filed into another product right away. */
+  refiledPrompts: number;
+}
+
 export interface GeoProductCreateInput extends GeoScopeInput {
   name: string;
   /** Who the product is for and the job it does; optional. */
   niche?: string | null;
+}
+
+export interface GeoProductCreateResult {
+  product: GeoProduct;
+  /** Prompts without a product that were filed into the new one. */
+  sortedPrompts: number;
 }
 
 export interface GeoProductsResponse {

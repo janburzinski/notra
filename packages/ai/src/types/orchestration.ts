@@ -6,6 +6,12 @@ import type {
 } from "@notra/ai/types/agents";
 import type { DiagramSpec } from "@notra/ai/types/excalidraw-diagram";
 import type {
+  GeoProductCreator,
+  GeoProductDeleter,
+  GeoProductUpdater,
+  GeoPromptMover,
+} from "@notra/ai/types/geo-products";
+import type {
   GeoPromptFinder,
   GeoPromptScanStarter,
 } from "@notra/ai/types/geo-prompt-scan";
@@ -222,6 +228,10 @@ export interface BuildStandaloneToolSetDeps {
   loadPostAgentReach?: PostAgentReachLoader;
   startGeoPromptScan?: GeoPromptScanStarter;
   findGeoPrompts?: GeoPromptFinder;
+  createGeoProduct?: GeoProductCreator;
+  moveGeoPrompts?: GeoPromptMover;
+  updateGeoProduct?: GeoProductUpdater;
+  deleteGeoProduct?: GeoProductDeleter;
 }
 
 export interface GitHubIntegrationData {

@@ -7,6 +7,9 @@ import { Effect } from "effect";
 
 import {
   GEO_DISCOVERY_SYSTEM_PROMPT,
+  GEO_PRODUCT_SORT_BATCH_CONCURRENCY,
+  GEO_PRODUCT_SORT_MAX_BATCHES,
+  GEO_PRODUCT_SORT_INLINE_TIMEOUT_MS,
   GEO_PRODUCT_SORT_MAX_PROMPTS,
   GEO_PRODUCT_SORT_MAX_TOKENS,
   GEO_PRODUCT_SORT_MODEL,
@@ -15,6 +18,14 @@ import {
 import { geoProductSortResultSchema } from "../schemas/geo";
 import { geoDb, geoSkip } from "./effect";
 import { GeoDiscoveryError } from "./errors";
+
+interface SortOptions {
+  /** Only these prompts; otherwise every prompt without a product. */
+  promptIds?: readonly string[];
+  /** Only file prompts into this product; the others stay where they are. */
+  intoProductId?: string;
+  timeoutMs?: number;
+}
 
 interface SortProduct {
   id: string;
@@ -47,7 +58,21 @@ Prompts:
 ${promptList}`;
 }
 
-const loadSortInput = (projectId: string) =>
+/** The project's prompts without a product, oldest first, up to the batch cap. */
+const loadUnfiledPromptIds = (projectId: string) =>
+  geoDb("load unfiled prompts", async () => {
+    const rows = await db
+      .select({ id: geoPrompts.id })
+      .from(geoPrompts)
+      .where(
+        and(eq(geoPrompts.projectId, projectId), isNull(geoPrompts.productId))
+      )
+      .orderBy(asc(geoPrompts.createdAt))
+      .limit(GEO_PRODUCT_SORT_MAX_PROMPTS * GEO_PRODUCT_SORT_MAX_BATCHES);
+    return rows.map((row) => row.id);
+  });
+
+const loadSortInput = (projectId: string, promptIds?: readonly string[]) =>
   geoDb("load prompts to sort", async () => {
     const [products, prompts] = await Promise.all([
       db
@@ -67,7 +92,11 @@ const loadSortInput = (projectId: string) =>
         })
         .from(geoPrompts)
         .where(
-          and(eq(geoPrompts.projectId, projectId), isNull(geoPrompts.productId))
+          and(
+            eq(geoPrompts.projectId, projectId),
+            isNull(geoPrompts.productId),
+            promptIds ? inArray(geoPrompts.id, [...promptIds]) : undefined
+          )
         )
         .orderBy(asc(geoPrompts.createdAt))
         .limit(GEO_PRODUCT_SORT_MAX_PROMPTS),
@@ -77,36 +106,45 @@ const loadSortInput = (projectId: string) =>
 
 /**
  * Files prompts without a product into the project's products with one cheap
- * call, so prompts saved before products existed don't all land in "Other".
+ * call: after setup, whenever prompts are added and when a product is created.
  * Prompts that fit no product stay where they are; values already set are kept.
  */
 const sortPromptsIntoProducts = Effect.fn("geo.sortPromptsIntoProducts")(
-  function* (organizationId: string, projectId: string) {
-    const { products, prompts } = yield* loadSortInput(projectId);
+  function* (organizationId: string, projectId: string, options: SortOptions) {
+    if (options.promptIds?.length === 0) {
+      return 0;
+    }
+    const { products, prompts } = yield* loadSortInput(
+      projectId,
+      options.promptIds
+    );
     if (products.length === 0 || prompts.length === 0) {
       return 0;
     }
 
     const result = yield* Effect.tryPromise({
-      try: (signal) =>
-        generateText({
-          model: gateway(GEO_PRODUCT_SORT_MODEL, { organizationId }),
-          providerOptions: { gateway: { tags: ["geo-product-sort"] } },
-          output: Output.object({ schema: geoProductSortResultSchema }),
-          prompt: buildProductSortPrompt(
-            products,
-            prompts.map((row) => row.prompt)
-          ),
-          instructions: GEO_DISCOVERY_SYSTEM_PROMPT,
-          maxOutputTokens: GEO_PRODUCT_SORT_MAX_TOKENS,
-          abortSignal: signal,
-        }),
+      // Reading output throws when the model returned none, so it stays in here.
+      try: async (signal) =>
+        (
+          await generateText({
+            model: gateway(GEO_PRODUCT_SORT_MODEL, { organizationId }),
+            providerOptions: { gateway: { tags: ["geo-product-sort"] } },
+            output: Output.object({ schema: geoProductSortResultSchema }),
+            prompt: buildProductSortPrompt(
+              products,
+              prompts.map((row) => row.prompt)
+            ),
+            instructions: GEO_DISCOVERY_SYSTEM_PROMPT,
+            maxOutputTokens: GEO_PRODUCT_SORT_MAX_TOKENS,
+            abortSignal: signal,
+          })
+        ).output,
       catch: (cause) =>
         new GeoDiscoveryError({ message: "Failed to sort prompts", cause }),
     }).pipe(
       // Setup waits for this call, so a stuck provider must not hold it up.
       Effect.timeoutOrElse({
-        duration: GEO_PRODUCT_SORT_TIMEOUT_MS,
+        duration: options.timeoutMs ?? GEO_PRODUCT_SORT_TIMEOUT_MS,
         orElse: () =>
           Effect.fail(
             new GeoDiscoveryError({ message: "Sorting prompts timed out" })
@@ -119,7 +157,7 @@ const sortPromptsIntoProducts = Effect.fn("geo.sortPromptsIntoProducts")(
     );
     const byProduct = new Map<string, string[]>();
     const byIntent = new Map<string, string[]>();
-    for (const entry of result.output.prompts) {
+    for (const entry of result.prompts) {
       const row = prompts[entry.index];
       if (!row) {
         continue;
@@ -127,7 +165,10 @@ const sortPromptsIntoProducts = Effect.fn("geo.sortPromptsIntoProducts")(
       const productId = entry.product
         ? productIdByName.get(entry.product.trim().toLowerCase())
         : undefined;
-      if (!productId) {
+      if (
+        !productId ||
+        (options.intoProductId && productId !== options.intoProductId)
+      ) {
         continue;
       }
       byProduct.set(productId, [...(byProduct.get(productId) ?? []), row.id]);
@@ -165,11 +206,81 @@ const sortPromptsIntoProducts = Effect.fn("geo.sortPromptsIntoProducts")(
   }
 );
 
-/** Sorting is a nicety: a failure leaves prompts in "Other" and never fails setup. */
-export const sortPromptsIntoProductsQuietly = (
+/**
+ * Sorting is a nicety: a failure leaves prompts without a product and never
+ * fails the save that triggered it. Resolves to how many prompts were filed.
+ */
+export const sortPromptsIntoProductsQuietly = Effect.fn(
+  "geo.sortPromptsIntoProductsQuietly"
+)(function* (
   organizationId: string,
-  projectId: string
-) =>
-  sortPromptsIntoProducts(organizationId, projectId).pipe(
-    geoSkip("prompt product sort failed", { projectId })
+  projectId: string,
+  options: SortOptions = {}
+) {
+  const ids =
+    options.promptIds ??
+    (yield* loadUnfiledPromptIds(projectId).pipe(
+      geoSkip("unfiled prompts lookup failed", { projectId })
+    )) ??
+    [];
+  // One call reads GEO_PRODUCT_SORT_MAX_PROMPTS prompts, so larger sets go in
+  // batches; one failed batch leaves only its own prompts unsorted.
+  const batches: string[][] = [];
+  for (
+    let start = 0;
+    start < ids.length && batches.length < GEO_PRODUCT_SORT_MAX_BATCHES;
+    start += GEO_PRODUCT_SORT_MAX_PROMPTS
+  ) {
+    batches.push(ids.slice(start, start + GEO_PRODUCT_SORT_MAX_PROMPTS));
+  }
+  // One time limit for the whole pass, not per batch, so a save never waits
+  // longer than it; batches that would start past it are left unsorted.
+  const deadline =
+    Date.now() + (options.timeoutMs ?? GEO_PRODUCT_SORT_TIMEOUT_MS);
+  const sorted = yield* Effect.forEach(
+    batches,
+    (promptIds) => {
+      const timeoutMs = deadline - Date.now();
+      return timeoutMs <= 0
+        ? Effect.succeed(0)
+        : sortPromptsIntoProducts(organizationId, projectId, {
+            ...options,
+            promptIds,
+            timeoutMs,
+          }).pipe(geoSkip("prompt product sort failed", { projectId }));
+    },
+    { concurrency: GEO_PRODUCT_SORT_BATCH_CONCURRENCY }
   );
+  return sorted.reduce<number>((sum, count) => sum + (count ?? 0), 0);
+});
+
+/** Files prompts that were just saved, without holding the save up for long. */
+export const sortNewPromptsIntoProducts = (
+  organizationId: string,
+  projectId: string,
+  promptIds: readonly string[]
+) =>
+  sortPromptsIntoProductsQuietly(organizationId, projectId, {
+    promptIds,
+    timeoutMs: GEO_PRODUCT_SORT_INLINE_TIMEOUT_MS,
+  });
+
+/** Files prompts without a product into a product that was just created. */
+export const sortPromptsIntoNewProduct = (
+  organizationId: string,
+  projectId: string,
+  productId: string
+) =>
+  sortPromptsIntoProductsQuietly(organizationId, projectId, {
+    intoProductId: productId,
+    timeoutMs: GEO_PRODUCT_SORT_INLINE_TIMEOUT_MS,
+  });
+
+/**
+ * Re-reads one prompt after sorting may have given it a product. Best effort:
+ * the prompt is already saved, so a failed read must not fail the save.
+ */
+export const reloadSortedPrompt = (promptId: string) =>
+  geoDb("reload sorted prompt", () =>
+    db.query.geoPrompts.findFirst({ where: eq(geoPrompts.id, promptId) })
+  ).pipe(geoSkip("sorted prompt reload failed", { promptId }));

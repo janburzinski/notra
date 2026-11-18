@@ -1,8 +1,11 @@
 import { GEO_CHART_KINDS } from "@notra/ai/constants/chart-tools";
 import {
+  GEO_PRODUCT_TOOL_NAME_MAX_LENGTH,
+  GEO_PRODUCT_TOOL_NICHE_MAX_LENGTH,
   GEO_PROMPT_SCAN_ID_MAX_LENGTH,
   GEO_PROMPT_SCAN_INPUT_MAX_LENGTH,
   GEO_PROMPT_SCAN_MAX_ENGINES,
+  GEO_PROMPTS_MOVE_MAX,
   GEO_TOOL_DEFAULT_COMPETITOR_LIMIT,
   GEO_TOOL_DEFAULT_DAYS,
   GEO_TOOL_DEFAULT_PROMPT_RESULT_LIMIT,
@@ -156,4 +159,104 @@ export const findGeoPromptsInputSchema = z.object({
     .describe(
       "Words from the prompt the user means, such as 'jira alternative'. Omit to list the tracked prompts."
     ),
+});
+
+export const createGeoProductInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PRODUCT_TOOL_NAME_MAX_LENGTH)
+    .describe(
+      "The product's name as the company's site uses it, such as 'Raycast Pro'."
+    ),
+  niche: z
+    .string()
+    .trim()
+    .max(GEO_PRODUCT_TOOL_NICHE_MAX_LENGTH)
+    .optional()
+    .describe(
+      "Optional: who the product is for and the job it does, in one short sentence. Helps file prompts and suggest new ones."
+    ),
+});
+
+export const moveGeoPromptsInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  prompts: z
+    .array(z.string().trim().min(1).max(GEO_PROMPT_SCAN_INPUT_MAX_LENGTH))
+    .min(1)
+    .max(GEO_PROMPTS_MOVE_MAX)
+    .describe(
+      "The tracked prompts to move: ids from findGeoPrompts, or their exact wording."
+    ),
+  product: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PRODUCT_TOOL_NAME_MAX_LENGTH)
+    .nullable()
+    .describe(
+      "Name of the product to move them into, or null to take them out of their product."
+    ),
+});
+
+export const updateGeoProductInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  product: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PRODUCT_TOOL_NAME_MAX_LENGTH)
+    .describe("The product's current name."),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PRODUCT_TOOL_NAME_MAX_LENGTH)
+    .optional()
+    .describe("The new name, when renaming."),
+  niche: z
+    .string()
+    .trim()
+    .max(GEO_PRODUCT_TOOL_NICHE_MAX_LENGTH)
+    .nullable()
+    .optional()
+    .describe(
+      "Who the product is for and the job it does, in one short sentence; null clears it."
+    ),
+});
+
+export const deleteGeoProductInputSchema = z.object({
+  projectId: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      "GEO project ID from the project-listing tool. Omit for the default project."
+    ),
+  product: z
+    .string()
+    .trim()
+    .min(1)
+    .max(GEO_PRODUCT_TOOL_NAME_MAX_LENGTH)
+    .describe("The name of the product to delete."),
 });

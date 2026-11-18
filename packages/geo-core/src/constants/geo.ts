@@ -584,6 +584,46 @@ export const GEO_PRODUCT_SORT_MAX_PROMPTS = 200;
 export const GEO_PRODUCT_SORT_MAX_TOKENS = 8000;
 /** Healthy sort calls took up to ~19 s in testing; one stuck call took 6 minutes. */
 export const GEO_PRODUCT_SORT_TIMEOUT_MS = 30_000;
+/** Sorting a few prompts right after a save; a slow call leaves them unsorted. */
+export const GEO_PRODUCT_SORT_INLINE_TIMEOUT_MS = 10_000;
+/**
+ * Prompts one sort pass covers: up to this many batches of
+ * GEO_PRODUCT_SORT_MAX_PROMPTS, a few at a time, so a 500-row import is sorted
+ * whole. Prompts past the cap stay without a product.
+ */
+export const GEO_PRODUCT_SORT_MAX_BATCHES = 5;
+export const GEO_PRODUCT_SORT_BATCH_CONCURRENCY = 3;
+/** Prompts Notra's agent may move in one call; matches GEO_PROMPTS_MOVE_MAX in @notra/ai. */
+export const GEO_AGENT_PROMPTS_MOVE_MAX = 50;
+/**
+ * Weekly check of each project's website for products it launched. Same
+ * model as the prompt sort; about $0.002 per changed site in testing.
+ */
+export const GEO_PRODUCT_SITE_CHECK_MODEL = "openai/gpt-6-luna";
+export const GEO_PRODUCT_SITE_CHECK_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+/**
+ * Projects one hourly run takes, checked GEO_PRODUCT_SITE_CHECK_CONCURRENCY at
+ * a time; about 4,000 projects a week. Every step of a check fits the run's
+ * budget, which leaves a minute of the 300 s function limit; a check that
+ * runs out of time stays due for the next hour.
+ */
+export const GEO_PRODUCT_SITE_CHECK_BATCH_SIZE = 24;
+export const GEO_PRODUCT_SITE_CHECK_CONCURRENCY = 8;
+export const GEO_PRODUCT_SITE_CHECK_RUN_BUDGET_MS = 240_000;
+/** No check starts later than this into a run. */
+export const GEO_PRODUCT_SITE_CHECK_START_DEADLINE_MS = 150_000;
+/** Time a check needs left to read the site (two fetches, about 50 s at worst). */
+export const GEO_PRODUCT_SITE_CHECK_MIN_READ_MS = 90_000;
+/** Time a check needs left to ask the model. */
+export const GEO_PRODUCT_SITE_CHECK_MIN_MODEL_MS = 45_000;
+/** Time a check keeps back for creating one product and sorting its prompts. */
+export const GEO_PRODUCT_SITE_CHECK_CREATE_RESERVE_MS = 25_000;
+export const GEO_PRODUCT_SITE_CHECK_MAX_TOKENS = 2000;
+export const GEO_PRODUCT_SITE_CHECK_TIMEOUT_MS = 60_000;
+/** New products one check may add, so a misread site can't flood a project. */
+export const GEO_PRODUCT_SITE_CHECK_MAX_NEW = 2;
+/** A project's first check may add as many products as setup does. */
+export const GEO_PRODUCT_SITE_CHECK_FIRST_MAX_NEW = GEO_DISCOVERY_MAX_PRODUCTS;
 /** Writes new prompts for one product at a time, shown as suggestions to track. */
 export const GEO_PRODUCT_SUGGEST_MODEL = "openai/gpt-6-luna";
 export const GEO_PRODUCT_SUGGEST_COUNT = 5;

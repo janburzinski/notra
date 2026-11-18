@@ -1943,14 +1943,105 @@ export function useGeoProductCreate(organizationId: string) {
           ...input,
         })
       ),
-    onSuccess: () =>
+    onSuccess: async ({ product, sortedPrompts }) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: dashboardOrpc.geo.productsList.queryKey({
+            input: { organizationId, projectId },
+          }),
+        }),
+        // Prompts without a product that fit the new one were filed into it.
+        sortedPrompts > 0
+          ? queryClient.invalidateQueries({
+              queryKey: geoDbQueryKey("prompts", { organizationId, projectId }),
+            })
+          : null,
+      ]);
+      if (sortedPrompts > 0) {
+        toast.success(
+          tToast("productPickedUpPrompts", {
+            count: sortedPrompts,
+            name: product.name,
+          })
+        );
+      }
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("createProductFailed")));
+    },
+  });
+}
+
+/** Refetches the product list and everything that shows product names. */
+function useInvalidateGeoProducts(organizationId: string) {
+  const { projectId } = useGeoProjectScope();
+  const queryClient = useQueryClient();
+  return () =>
+    Promise.all([
       queryClient.invalidateQueries({
         queryKey: dashboardOrpc.geo.productsList.queryKey({
           input: { organizationId, projectId },
         }),
       }),
+      queryClient.invalidateQueries({
+        queryKey: geoDbQueryKey("prompts", { organizationId, projectId }),
+      }),
+      // Suggestions carry product names and go away with a deleted product.
+      queryClient.invalidateQueries({
+        queryKey: dashboardOrpc.geo.productSuggestionsList.queryKey({
+          input: { organizationId, projectId },
+        }),
+      }),
+    ]);
+}
+
+export function useGeoProductUpdate(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const invalidate = useInvalidateGeoProducts(organizationId);
+  return useMutation({
+    mutationFn: (input: {
+      productId: string;
+      name?: string;
+      niche?: string | null;
+    }) =>
+      withMinLoading(
+        dashboardOrpc.geo.productsUpdate.call({
+          organizationId,
+          projectId,
+          ...input,
+        })
+      ),
+    onSuccess: () => invalidate(),
     onError: (error) => {
-      toast.error(toErrorMessage(error, tToast("createProductFailed")));
+      toast.error(toErrorMessage(error, tToast("updateProductFailed")));
+    },
+  });
+}
+
+export function useGeoProductDelete(organizationId: string) {
+  const tToast = useTranslations("geo.toasts");
+  const { projectId } = useGeoProjectScope();
+  const invalidate = useInvalidateGeoProducts(organizationId);
+  return useMutation({
+    mutationFn: (productId: string) =>
+      withMinLoading(
+        dashboardOrpc.geo.productsDelete.call({
+          organizationId,
+          projectId,
+          productId,
+        })
+      ),
+    onSuccess: async ({ refiledPrompts }) => {
+      await invalidate();
+      if (refiledPrompts > 0) {
+        toast.success(
+          tToast("productDeletedRefiled", { count: refiledPrompts })
+        );
+      }
+    },
+    onError: (error) => {
+      toast.error(toErrorMessage(error, tToast("deleteProductFailed")));
     },
   });
 }

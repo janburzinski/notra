@@ -9,7 +9,17 @@ import {
   getGeoTimeseriesInputSchema,
   listGeoProjectsInputSchema,
   scanGeoPromptInputSchema,
+  createGeoProductInputSchema,
+  deleteGeoProductInputSchema,
+  moveGeoPromptsInputSchema,
+  updateGeoProductInputSchema,
 } from "@notra/ai/schemas/geo-tools";
+import type {
+  GeoProductCreator,
+  GeoProductDeleter,
+  GeoProductUpdater,
+  GeoPromptMover,
+} from "@notra/ai/types/geo-products";
 import type {
   GeoPromptFinder,
   GeoPromptScanStarter,
@@ -218,6 +228,101 @@ export function createFindGeoPromptsTool(
         organizationId: config.organizationId,
         projectId,
         query,
+      }),
+  });
+}
+
+export function createCreateGeoProductTool(
+  config: OrganizationToolConfig & { createGeoProduct: GeoProductCreator }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "createGeoProduct",
+      intro:
+        "Adds a product to a GEO project. Tracked prompts without a product that fit it are filed into it right away, and prompts added later are filed automatically too.",
+      whenToUse:
+        "Use when the user asks to add a product, or names a product or product line the company sells that the project doesn't have yet.",
+      usageNotes:
+        "Name it the way the company's site does, never a customer segment, plan tier or single feature. Returns status created with sortedPrompts, the number of prompts it picked up, or status exists with the product that already has the name. To move specific prompts into it, call moveGeoPrompts next.",
+    }),
+    inputSchema: createGeoProductInputSchema,
+    execute: ({ projectId, name, niche }) =>
+      config.createGeoProduct({
+        organizationId: config.organizationId,
+        projectId,
+        name,
+        niche,
+      }),
+  });
+}
+
+export function createMoveGeoPromptsTool(
+  config: OrganizationToolConfig & { moveGeoPrompts: GeoPromptMover }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "moveGeoPrompts",
+      intro:
+        "Moves tracked custom GEO prompts into one of the project's products, or out of their product with product null.",
+      whenToUse:
+        "Use when the user wants prompts filed under a different product, or after createGeoProduct to file the prompts they named.",
+      usageNotes:
+        "Find the prompts with findGeoPrompts first and pass their ids. Auto prompts from the brand settings can't belong to a product. unmatched lists prompts that weren't moved and why; when one lists choices, ask the user which one. An unknown product name returns the project's products. Moving prompts does not change how new prompts are filed.",
+    }),
+    inputSchema: moveGeoPromptsInputSchema,
+    execute: ({ projectId, prompts, product }) =>
+      config.moveGeoPrompts({
+        organizationId: config.organizationId,
+        projectId,
+        prompts,
+        product,
+      }),
+  });
+}
+
+export function createUpdateGeoProductTool(
+  config: OrganizationToolConfig & { updateGeoProduct: GeoProductUpdater }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "updateGeoProduct",
+      intro:
+        "Renames one of the project's GEO products or changes who it is for. Its prompts stay with it.",
+      whenToUse:
+        "Use when the user asks to rename a product or describe it differently.",
+      usageNotes:
+        "Pass the product's current name. An unknown name returns the project's products.",
+    }),
+    inputSchema: updateGeoProductInputSchema,
+    execute: ({ projectId, product, name, niche }) =>
+      config.updateGeoProduct({
+        organizationId: config.organizationId,
+        projectId,
+        product,
+        name,
+        niche,
+      }),
+  });
+}
+
+export function createDeleteGeoProductTool(
+  config: OrganizationToolConfig & { deleteGeoProduct: GeoProductDeleter }
+): Tool {
+  return tool({
+    description: toolDescription({
+      toolName: "deleteGeoProduct",
+      intro:
+        "Deletes one of the project's GEO products. Its prompts stay tracked and move into another product when one fits; the weekly website check never adds it back.",
+      whenToUse: "Use only when the user asks to delete or remove a product.",
+      usageNotes:
+        "The user approves each call. Pass the product's name. Returns how many prompts lost the product and how many moved into another one.",
+    }),
+    inputSchema: deleteGeoProductInputSchema,
+    execute: ({ projectId, product }) =>
+      config.deleteGeoProduct({
+        organizationId: config.organizationId,
+        projectId,
+        product,
       }),
   });
 }

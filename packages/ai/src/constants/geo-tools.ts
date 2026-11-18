@@ -25,3 +25,18 @@ export const GEO_PROMPT_SCAN_ID_MAX_LENGTH = 128;
 export const GEO_PROMPT_SCAN_MAX_ENGINES = 64;
 /** Dashboard route that finds tracked prompts for Notra's agent. */
 export const GEO_PROMPT_FIND_INTERNAL_PATH = "/api/internal/geo/prompt-find";
+/** Dashboard route that creates a GEO product for Notra's agent. */
+export const GEO_PRODUCT_CREATE_INTERNAL_PATH =
+  "/api/internal/geo/product-create";
+/** Dashboard route that moves tracked prompts into a product for Notra's agent. */
+export const GEO_PROMPTS_MOVE_INTERNAL_PATH = "/api/internal/geo/prompts-move";
+/** Prompts one move call takes, so a mistaken call can't refile everything. */
+export const GEO_PROMPTS_MOVE_MAX = 50;
+/** Loose bounds for the product tools; geo-core checks its own limits again. */
+export const GEO_PRODUCT_TOOL_NAME_MAX_LENGTH = 200;
+export const GEO_PRODUCT_TOOL_NICHE_MAX_LENGTH = 1000;
+/** Dashboard routes that rename or delete a GEO product for Notra's agent. */
+export const GEO_PRODUCT_UPDATE_INTERNAL_PATH =
+  "/api/internal/geo/product-update";
+export const GEO_PRODUCT_DELETE_INTERNAL_PATH =
+  "/api/internal/geo/product-delete";

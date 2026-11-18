@@ -3157,6 +3157,24 @@
       "default": "Standard"
     },
     "geoSettingsForm": {
+      "products": {
+        "title": "Produkte",
+        "description": "Jeder Prompt kann zu einem Produkt gehören. Neue Prompts werden automatisch zugeordnet, und Notra prüft deine Website jede Woche auf neue Produkte.",
+        "empty": "Noch keine Produkte. Notra übernimmt sie von deiner Website, oder du fügst selbst eins hinzu.",
+        "loadFailed": "Produkte konnten nicht geladen werden.",
+        "name": "Produktname",
+        "namePlaceholder": "z. B. Raycast Pro",
+        "niche": "Für wen",
+        "nichePlaceholder": "Für wen es ist und wobei es hilft (optional)",
+        "add": "Produkt hinzufügen",
+        "editAria": "{name} bearbeiten",
+        "deleteAria": "{name} löschen",
+        "deleteTitle": "{name} löschen?",
+        "deleteDescription": "Die Prompts bleiben getrackt und wandern in ein anderes Produkt, wenn eins passt. Notra fügt dieses Produkt nicht wieder von deiner Website hinzu.",
+        "deleteConfirm": "Produkt löschen",
+        "noun": "Produkt",
+        "nounPlural": "Produkte"
+      },
       "description": "Wie deine Marke erkannt wird und wo Prompts gescannt werden.",
       "brand": {
         "companyNameHint": "Der Hauptname, nach dem wir in Antworten suchen.",
@@ -4458,6 +4476,10 @@
       "removePromptFailed": "Prompt konnte nicht entfernt werden",
       "moveToProductFailed": "Prompt konnte nicht verschoben werden",
       "createProductFailed": "Produkt konnte nicht erstellt werden",
+      "updateProductFailed": "Produkt konnte nicht aktualisiert werden",
+      "deleteProductFailed": "Produkt konnte nicht gelöscht werden",
+      "productDeletedRefiled": "{count, plural, one {# Prompt} other {# Prompts}} in ein anderes Produkt verschoben",
+      "productPickedUpPrompts": "{count, plural, one {# weiterer Prompt} other {# weitere Prompts}} nach {name} verschoben",
       "updateProjectBrandIdentityFailed": "Markenidentität des Projekts konnte nicht aktualisiert werden",
       "deleteProjectFailed": "Projekt konnte nicht gelöscht werden",
       "saveCompetitorFailed": "Wettbewerber konnte nicht gespeichert werden",

@@ -115,16 +115,19 @@ const loadSuggestContext = (projectId: string) =>
 
 const suggestForProduct = (organizationId: string, context: ProductContext) =>
   Effect.tryPromise({
-    try: (signal) =>
-      generateText({
-        model: gateway(GEO_PRODUCT_SUGGEST_MODEL, { organizationId }),
-        providerOptions: { gateway: { tags: ["geo-product-suggest"] } },
-        output: Output.object({ schema: geoProductSuggestResultSchema }),
-        instructions: GEO_DISCOVERY_SYSTEM_PROMPT,
-        prompt: buildProductSuggestPrompt(context),
-        maxOutputTokens: GEO_PRODUCT_SUGGEST_MAX_TOKENS,
-        abortSignal: signal,
-      }),
+    // Reading output throws when the model returned none, so it stays in here.
+    try: async (signal) =>
+      (
+        await generateText({
+          model: gateway(GEO_PRODUCT_SUGGEST_MODEL, { organizationId }),
+          providerOptions: { gateway: { tags: ["geo-product-suggest"] } },
+          output: Output.object({ schema: geoProductSuggestResultSchema }),
+          instructions: GEO_DISCOVERY_SYSTEM_PROMPT,
+          prompt: buildProductSuggestPrompt(context),
+          maxOutputTokens: GEO_PRODUCT_SUGGEST_MAX_TOKENS,
+          abortSignal: signal,
+        })
+      ).output,
     catch: (cause) =>
       new GeoDiscoveryError({ message: "Failed to suggest prompts", cause }),
   }).pipe(
@@ -135,7 +138,7 @@ const suggestForProduct = (organizationId: string, context: ProductContext) =>
           new GeoDiscoveryError({ message: "Suggesting prompts timed out" })
         ),
     }),
-    Effect.map((result) => result.output.suggestions),
+    Effect.map((result) => result.suggestions),
     // One product failing leaves its old suggestions; the others still update.
     geoSkip("product prompt suggestions failed", {
       productId: context.product.id,

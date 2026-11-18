@@ -5,6 +5,7 @@ import type { GeoTrackedPrompt } from "@notra/geo-core/types/geo";
 import {
   findGeoScanPrompts,
   matchGeoScanPrompt,
+  matchTrackedPrompt,
 } from "@/utils/geo-prompt-scan";
 
 function tracked(id: string, prompt: string, enabled = true): GeoTrackedPrompt {
@@ -79,5 +80,15 @@ describe("finding prompts for the agent", () => {
     expect(ids("track")).toEqual(["p2", "p3"]);
     expect(ids("startups tracker")).toEqual(["p3"]);
     expect(ids("pricing")).toEqual([]);
+  });
+});
+
+describe("matching a prompt to move", () => {
+  test("finds a paused prompt that a scan can't use", () => {
+    const paused = matchTrackedPrompt(prompts, "p4");
+    expect(paused.status === "match" ? paused.prompt.id : paused.status).toBe(
+      "p4"
+    );
+    expect(matchedId("p4")).toBe("not_found");
   });
 });

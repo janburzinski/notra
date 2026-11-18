@@ -25,6 +25,10 @@
       "schedule": "0 * * * *"
     },
     {
+      "path": "/api/cron/geo-products",
+      "schedule": "30 * * * *"
+    },
+    {
       "path": "/api/cron/sites",
       "schedule": "* * * * *"
     },

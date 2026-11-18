@@ -1894,6 +1894,15 @@ export const geoSettings = pgTable(
       .array()
       .notNull()
       .default(sql`ARRAY[]::text[]`),
+    /** Names the weekly site check never adds: deleted products and old names of renamed ones. */
+    removedProductNames: text("removed_product_names")
+      .array()
+      .notNull()
+      .default(sql`ARRAY[]::text[]`),
+    /** Last weekly check of the website for new products. */
+    productsCheckedAt: timestamp("products_checked_at"),
+    /** Hash of the site content that check read; unchanged content skips the model. */
+    productsSiteHash: text("products_site_hash"),
     enabled: boolean("enabled").notNull().default(true),
     scanIntervalHours: integer("scan_interval_hours").notNull().default(24),
     sentimentAttemptedAt: timestamp("sentiment_attempted_at"),

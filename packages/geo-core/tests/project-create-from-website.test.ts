@@ -299,3 +299,38 @@ test("running setup again never takes a project past the product limit", async (
   expect(names).toHaveLength(GEO_PRODUCTS_MAX);
   expect(names.map((row) => row.name)).not.toContain("Acme SMS");
 });
+
+test("running setup again does not bring back a product someone deleted", async () => {
+  const project = await create(false);
+  const [product] = await testDb
+    .select({ id: geoProducts.id })
+    .from(geoProducts)
+    .where(eq(geoProducts.projectId, project.id));
+  const { deleteGeoProduct } = await import("../src/geo/programs");
+  await Effect.runPromise(
+    deleteGeoProduct({
+      organizationId: ORGANIZATION_ID,
+      projectId: project.id,
+      productId: product?.id ?? "",
+    })
+  );
+
+  await Effect.runPromise(
+    generateGeoFromWebsite(
+      { organizationId: ORGANIZATION_ID, projectId: project.id },
+      "https://acme.dev"
+    ).pipe(
+      Effect.provideService(GeoWorkflowService, workflows),
+      Effect.provideService(GeoEntitlementService, entitlements),
+      Effect.provideService(GeoCodingAgentAccessService, {
+        hasPaidPlanForOrganization: () => Effect.succeed(true),
+      })
+    )
+  );
+
+  const names = await testDb
+    .select({ name: geoProducts.name })
+    .from(geoProducts)
+    .where(eq(geoProducts.projectId, project.id));
+  expect(names).toEqual([]);
+});

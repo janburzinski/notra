@@ -140,6 +140,10 @@ export async function orchestrateStandaloneChat(
       loadPostAgentReach: deps?.loadPostAgentReach,
       startGeoPromptScan: deps?.startGeoPromptScan,
       findGeoPrompts: deps?.findGeoPrompts,
+      createGeoProduct: deps?.createGeoProduct,
+      moveGeoPrompts: deps?.moveGeoPrompts,
+      updateGeoProduct: deps?.updateGeoProduct,
+      deleteGeoProduct: deps?.deleteGeoProduct,
     }
   );
   Object.assign(baseToolSet.tools, deps?.extraTools?.tools);

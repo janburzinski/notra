@@ -70,6 +70,12 @@ import { buildChatExtraTools } from "@/lib/chat/extra-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
 import { afterResponse } from "@/lib/framework/after-response";
 import {
+  createGeoProductForChat,
+  deleteGeoProductForChat,
+  moveGeoPromptsForChat,
+  updateGeoProductForChat,
+} from "@/lib/geo/agent-products";
+import {
   findGeoPromptsForChat,
   startGeoPromptScanForChat,
 } from "@/lib/geo/agent-prompt-scan";
@@ -509,6 +515,10 @@ async function createDirectStandaloneChatResponse({
         loadPostAgentReach: loadPostAgentReachSummary,
         startGeoPromptScan: startGeoPromptScanForChat,
         findGeoPrompts: findGeoPromptsForChat,
+        createGeoProduct: createGeoProductForChat,
+        moveGeoPrompts: moveGeoPromptsForChat,
+        updateGeoProduct: updateGeoProductForChat,
+        deleteGeoProduct: deleteGeoProductForChat,
         onFirstChunk() {
           if (firstChunkAt === null) {
             firstChunkAt = Date.now();

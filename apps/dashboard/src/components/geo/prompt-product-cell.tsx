@@ -19,30 +19,13 @@ import {
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 
-import { GEO_PRODUCT_DOT_CLASSES } from "@/constants/geo-prompts";
+import { ProductDot } from "@/components/geo/product-dot";
 import { cn } from "@/lib/utils";
 import type { PromptProductCellProps } from "@/types/components/geo";
 import { geoProductBadgeVariant } from "@/utils/geo-prompts";
 
 const NO_PRODUCT = "none";
 const CREATE_PREFIX = "create:";
-
-function ProductDot({ position }: { position: number | null }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={cn(
-        "size-2.5 shrink-0 rounded-full",
-        position === null
-          ? "border-muted-foreground/50 border border-dashed"
-          : cn(
-              "ring-1 ring-inset",
-              GEO_PRODUCT_DOT_CLASSES[geoProductBadgeVariant(position)]
-            )
-      )}
-    />
-  );
-}
 
 /**
  * The prompt's product as a status badge. Clicking it opens a search over the

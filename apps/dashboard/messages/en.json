@@ -3157,6 +3157,24 @@
       "default": "default"
     },
     "geoSettingsForm": {
+      "products": {
+        "title": "Products",
+        "description": "Each prompt can belong to one product. New prompts are filed automatically, and Notra checks your website every week for products you launch.",
+        "empty": "No products yet. Notra adds them from your website, or add one yourself.",
+        "loadFailed": "Products couldn't be loaded.",
+        "name": "Product name",
+        "namePlaceholder": "e.g. Raycast Pro",
+        "niche": "Who it's for",
+        "nichePlaceholder": "Who it's for and the job it does (optional)",
+        "add": "Add product",
+        "editAria": "Edit {name}",
+        "deleteAria": "Delete {name}",
+        "deleteTitle": "Delete {name}?",
+        "deleteDescription": "Its prompts stay tracked and move into another product when one fits. Notra won't add this product back from your website.",
+        "deleteConfirm": "Delete product",
+        "noun": "product",
+        "nounPlural": "products"
+      },
       "description": "How your brand is identified and where prompts are scanned.",
       "brand": {
         "companyNameHint": "The main name we look for in answers.",
@@ -4458,6 +4476,10 @@
       "removePromptFailed": "Failed to remove prompt",
       "moveToProductFailed": "Failed to move prompt",
       "createProductFailed": "Could not create product",
+      "updateProductFailed": "Could not update product",
+      "deleteProductFailed": "Could not delete product",
+      "productDeletedRefiled": "{count, plural, one {# prompt} other {# prompts}} moved into another product",
+      "productPickedUpPrompts": "{count, plural, one {# other prompt} other {# other prompts}} moved into {name}",
       "updateProjectBrandIdentityFailed": "Failed to update project brand identity",
       "deleteProjectFailed": "Failed to delete project",
       "saveCompetitorFailed": "Failed to save competitor",

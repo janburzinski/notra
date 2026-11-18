@@ -148,18 +148,31 @@ async function upsertDiscoveredProducts(
   if (products.length === 0) {
     return ids;
   }
-  const existing = await tx
-    .select({ name: geoProducts.name })
-    .from(geoProducts)
-    .where(eq(geoProducts.projectId, projectId));
+  const [existing, settings] = await Promise.all([
+    tx
+      .select({ name: geoProducts.name })
+      .from(geoProducts)
+      .where(eq(geoProducts.projectId, projectId)),
+    tx
+      .select({ removed: geoSettings.removedProductNames })
+      .from(geoSettings)
+      .where(eq(geoSettings.projectId, projectId)),
+  ]);
   const existingNames = new Map(
     existing.map((row) => [row.name.toLowerCase(), row.name])
+  );
+  // Products someone deleted or renamed away stay gone, as the delete promises.
+  const removed = new Set(
+    (settings[0]?.removed ?? []).map((name) => name.toLowerCase())
   );
   // Existing products are always reused; new ones only fill the room left
   // under GEO_PRODUCTS_MAX, like products added by hand.
   let room = GEO_PRODUCTS_MAX - existing.length;
   const kept = products.flatMap((product, position) => {
     const known = existingNames.get(product.name.toLowerCase());
+    if (!known && removed.has(product.name.toLowerCase())) {
+      return [];
+    }
     if (!known) {
       if (room <= 0) {
         return [];
@@ -294,7 +307,9 @@ const prepareGeoWebsiteGeneration = Effect.fn(
   return { aliases, companyName, products, entries, conversations };
 });
 
-const scrapeWebsite = Effect.fn("geo.discover.scrape")(function* (url: string) {
+export const scrapeWebsite = Effect.fn("geo.discover.scrape")(function* (
+  url: string
+) {
   const result = yield* Effect.tryPromise({
     try: () => scrapeWebsiteForBrandAnalysis(url),
     catch: (cause) =>

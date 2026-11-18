@@ -84,6 +84,7 @@ import {
   importGeoCompetitors,
   importGeoPrompts,
   createGeoProduct,
+  deleteGeoProduct,
   listGeoProducts,
   listGeoPrompts,
   loadAiTraffic,
@@ -108,6 +109,7 @@ import {
   startGeoScan,
   toggleGeoAutoPrompt,
   toggleGeoPrompt,
+  updateGeoProduct,
   updateGeoPrompt,
   upsertGeoCompetitor,
   upsertGeoSettings,
@@ -221,6 +223,8 @@ import {
   geoPromptDeleteInputSchema,
   geoPromptToggleInputSchema,
   geoProductCreateInputSchema,
+  geoProductDeleteInputSchema,
+  geoProductUpdateInputSchema,
   geoPromptUpdateInputSchema,
   geoAutoPromptToggleInputSchema,
   geoSequenceCreateInputSchema,
@@ -1436,6 +1440,18 @@ export const geoRouter = {
   productsCreate: authorizedProcedure
     .input(geoProductCreateInputSchema)
     .handler(geoHandler((input) => createGeoProduct(input))),
+  productsUpdate: authorizedProcedure
+    .input(geoProductUpdateInputSchema)
+    .handler(geoHandler((input) => updateGeoProduct(input))),
+  productsDelete: authorizedProcedure
+    .input(geoProductDeleteInputSchema)
+    .handler(
+      geoHandler((input) =>
+        deleteGeoProduct(input).pipe(
+          Effect.tap(() => refreshGeoContentGapsBestEffort(input))
+        )
+      )
+    ),
   promptsCreate: authorizedProcedure.input(geoPromptCreateInputSchema).handler(
     geoHandler(
       (input) =>

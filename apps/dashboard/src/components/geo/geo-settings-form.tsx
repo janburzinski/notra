@@ -30,6 +30,7 @@ import { useTranslations } from "use-intl";
 
 import { GeoEnginePicker } from "@/components/geo/geo-engine-picker";
 import { GeoLanguagePicker } from "@/components/geo/geo-language-picker";
+import { GeoProductsSection } from "@/components/geo/geo-products-section";
 import { GeoScanFrequencyMenu } from "@/components/geo/geo-scan-schedule";
 import { GeoTagList } from "@/components/geo/geo-tag-list";
 import { GeoProjectBrandSection } from "@/components/geo/project-brand-section";
@@ -169,6 +170,9 @@ export function GeoSettingsForm({
             }
             savedAt={savedAt}
           />
+        ) : null}
+        {showBrand ? (
+          <GeoProductsSection organizationId={organizationId} />
         ) : null}
         {showBrand ? (
           <GeoLanguagesSection

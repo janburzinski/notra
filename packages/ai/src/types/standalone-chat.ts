@@ -1,6 +1,12 @@
 import type { AILogTarget } from "@notra/ai/observability";
 import type { StandaloneChatContextItem } from "@notra/ai/schemas/standalone-chat";
 import type {
+  GeoProductCreator,
+  GeoProductDeleter,
+  GeoProductUpdater,
+  GeoPromptMover,
+} from "@notra/ai/types/geo-products";
+import type {
   GeoPromptFinder,
   GeoPromptScanStarter,
 } from "@notra/ai/types/geo-prompt-scan";
@@ -50,6 +56,10 @@ export interface StandaloneChatDeps {
   loadPostAgentReach?: PostAgentReachLoader;
   startGeoPromptScan?: GeoPromptScanStarter;
   findGeoPrompts?: GeoPromptFinder;
+  createGeoProduct?: GeoProductCreator;
+  moveGeoPrompts?: GeoPromptMover;
+  updateGeoProduct?: GeoProductUpdater;
+  deleteGeoProduct?: GeoProductDeleter;
   onUsage?: (
     usage: LanguageModelUsage,
     modelId: string,

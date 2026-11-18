@@ -103,6 +103,10 @@ import type {
   GeoTrackedPrompt,
   GeoProduct,
   GeoProductCreateInput,
+  GeoProductCreateResult,
+  GeoProductDeleteInput,
+  GeoProductDeleteResult,
+  GeoProductUpdateInput,
   GeoProductsResponse,
   GeoTrackedPromptsResponse,
   GeoJourneyDailyPoint,
@@ -192,6 +196,11 @@ import {
   toTrackedPrompt,
 } from "./mappers";
 import { loadGeoModelCatalog } from "./model-catalog";
+import {
+  reloadSortedPrompt,
+  sortNewPromptsIntoProducts,
+  sortPromptsIntoNewProduct,
+} from "./product-sort";
 import {
   ensureGeoProject,
   geoCheckScope,
@@ -1773,8 +1782,9 @@ export const listGeoProducts = Effect.fn("geo.productsList")(function* (
 });
 
 /**
- * Adds a product by hand after the discovered ones. Names are unique per
- * project regardless of case, matching how website discovery reuses them.
+ * Adds a product by hand after the discovered ones, then files prompts without
+ * a product that fit it. Names are unique per project regardless of case,
+ * matching how website discovery reuses them.
  */
 export const createGeoProduct = Effect.fn("geo.productsCreate")(function* (
   input: GeoProductCreateInput
@@ -1782,7 +1792,7 @@ export const createGeoProduct = Effect.fn("geo.productsCreate")(function* (
   const scope = yield* requireGeoProject(input);
   const name = input.name.trim();
   const niche = input.niche?.trim() || null;
-  return yield* geoTransaction("product create failed", (tx) =>
+  const product = yield* geoTransaction("product create failed", (tx) =>
     Effect.gen(function* () {
       yield* lockGeoProject(tx, scope.projectId);
       const existing = yield* geoDb("products lookup failed", () =>
@@ -1832,10 +1842,166 @@ export const createGeoProduct = Effect.fn("geo.productsCreate")(function* (
           })
         );
       }
+      // Adding a deleted product back by hand lets the site check keep it.
+      yield* geoDb("removed product clear failed", () =>
+        tx
+          .update(geoSettings)
+          .set({
+            removedProductNames: sql`array_remove(${geoSettings.removedProductNames}, ${product.name})`,
+          })
+          .where(eq(geoSettings.projectId, scope.projectId))
+      );
       const created: GeoProduct = product;
       return created;
     })
   );
+  const sortedPrompts = yield* sortPromptsIntoNewProduct(
+    scope.organizationId,
+    scope.projectId,
+    product.id
+  );
+  const result: GeoProductCreateResult = { product, sortedPrompts };
+  return result;
+});
+
+/**
+ * Renames a product or changes its niche. Its prompts stay with it; a name
+ * another product of the project uses, ignoring case, is rejected. The old
+ * name is excluded from the weekly site check.
+ */
+export const updateGeoProduct = Effect.fn("geo.productsUpdate")(function* (
+  input: GeoProductUpdateInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const name = input.name?.trim();
+  const niche =
+    input.niche === undefined ? undefined : input.niche?.trim() || null;
+  return yield* geoTransaction("product update failed", (tx) =>
+    Effect.gen(function* () {
+      yield* lockGeoProject(tx, scope.projectId);
+      const existing = yield* geoDb("products lookup failed", () =>
+        tx
+          .select({ id: geoProducts.id, name: geoProducts.name })
+          .from(geoProducts)
+          .where(eq(geoProducts.projectId, scope.projectId))
+      );
+      const current = existing.find((row) => row.id === input.productId);
+      if (!current) {
+        return yield* Effect.fail(
+          new GeoProductNotFoundError({ productId: input.productId })
+        );
+      }
+      const taken = name
+        ? existing.find(
+            (row) =>
+              row.id !== input.productId &&
+              row.name.toLowerCase() === name.toLowerCase()
+          )
+        : undefined;
+      if (taken) {
+        return yield* Effect.fail(
+          new GeoProductDuplicateError({ name: taken.name })
+        );
+      }
+      const [product] = yield* geoDb("product update failed", () =>
+        tx
+          .update(geoProducts)
+          .set({
+            ...(name ? { name } : {}),
+            ...(niche === undefined ? {} : { niche }),
+            updatedAt: new Date(),
+          })
+          .where(eq(geoProducts.id, input.productId))
+          .returning({
+            id: geoProducts.id,
+            name: geoProducts.name,
+            niche: geoProducts.niche,
+            position: geoProducts.position,
+          })
+      );
+      if (!product) {
+        return yield* Effect.fail(
+          new GeoProductNotFoundError({ productId: input.productId })
+        );
+      }
+      // The site may still use the old name; the check must not add it back
+      // as a second product. A name chosen again is no longer excluded.
+      if (name && name !== current.name) {
+        yield* geoDb("renamed product record failed", () =>
+          tx
+            .update(geoSettings)
+            .set({
+              removedProductNames: sql`array_append(array_remove(array_remove(${geoSettings.removedProductNames}, ${current.name}), ${name}), ${current.name})`,
+            })
+            .where(eq(geoSettings.projectId, scope.projectId))
+        );
+      }
+      const updated: GeoProduct = product;
+      return updated;
+    })
+  );
+});
+
+/**
+ * Deletes a product. Its prompts are kept without a product and filed into
+ * another product when one fits; its pending suggestions go with it.
+ */
+export const deleteGeoProduct = Effect.fn("geo.productsDelete")(function* (
+  input: GeoProductDeleteInput
+) {
+  const scope = yield* requireGeoProject(input);
+  const unfiled = yield* geoTransaction("product delete failed", (tx) =>
+    Effect.gen(function* () {
+      yield* lockGeoProject(tx, scope.projectId);
+      const prompts = yield* geoDb("product prompts lookup failed", () =>
+        tx
+          .select({ id: geoPrompts.id })
+          .from(geoPrompts)
+          .where(
+            and(
+              eq(geoPrompts.projectId, scope.projectId),
+              eq(geoPrompts.productId, input.productId)
+            )
+          )
+      );
+      const [deleted] = yield* geoDb("product delete failed", () =>
+        tx
+          .delete(geoProducts)
+          .where(
+            and(
+              eq(geoProducts.id, input.productId),
+              eq(geoProducts.projectId, scope.projectId)
+            )
+          )
+          .returning({ name: geoProducts.name })
+      );
+      if (!deleted) {
+        return yield* Effect.fail(
+          new GeoProductNotFoundError({ productId: input.productId })
+        );
+      }
+      // The weekly site check must not add a deleted product back.
+      yield* geoDb("removed product record failed", () =>
+        tx
+          .update(geoSettings)
+          .set({
+            removedProductNames: sql`array_append(array_remove(${geoSettings.removedProductNames}, ${deleted.name}), ${deleted.name})`,
+          })
+          .where(eq(geoSettings.projectId, scope.projectId))
+      );
+      return prompts.map((row) => row.id);
+    })
+  );
+  const refiledPrompts = yield* sortNewPromptsIntoProducts(
+    scope.organizationId,
+    scope.projectId,
+    unfiled
+  );
+  const result: GeoProductDeleteResult = {
+    unfiledPrompts: unfiled.length,
+    refiledPrompts,
+  };
+  return result;
 });
 
 export const listGeoPrompts = Effect.fn("geo.promptsList")(function* (
@@ -1957,7 +2123,13 @@ export const createGeoPrompt = Effect.fn("geo.promptsCreate")(function* (
   yield* pickNewGeoPrompts(input, [customPromptScanId(row.id)]).pipe(
     geoSkip("prompt translation pick failed")
   );
-  return toTrackedPrompt(row);
+  const sorted = yield* sortNewPromptsIntoProducts(
+    scope.organizationId,
+    scope.projectId,
+    [row.id]
+  );
+  const saved = sorted > 0 ? yield* reloadSortedPrompt(row.id) : undefined;
+  return toTrackedPrompt(saved ?? row);
 });
 
 const insertPromptsInTransaction = Effect.fn("geo.promptsInsertTx")(function* (
@@ -2061,6 +2233,12 @@ export const importGeoPrompts = Effect.fn("geo.promptsImport")(function* (
   rows: readonly GeoPromptImportRow[]
 ) {
   const inserted = yield* insertGeoPrompts(input, rows);
+  const scope = yield* requireGeoProject(input);
+  yield* sortNewPromptsIntoProducts(
+    scope.organizationId,
+    scope.projectId,
+    inserted.map((row) => row.id)
+  );
   yield* pickNewGeoPrompts(
     input,
     inserted.map((row) => customPromptScanId(row.id))

@@ -19,7 +19,11 @@ import {
   createGetGeoScanTool,
   createGetGeoTimeseriesTool,
   createListGeoProjectsTool,
+  createCreateGeoProductTool,
+  createDeleteGeoProductTool,
   createFindGeoPromptsTool,
+  createMoveGeoPromptsTool,
+  createUpdateGeoProductTool,
   createScanGeoPromptTool,
 } from "@notra/ai/tools/geo";
 import { buildGitHubDataTools } from "@notra/ai/tools/github";
@@ -95,6 +99,7 @@ export function getStandaloneApprovalToolNames(): Set<string> {
     "schedulePost",
     "cancelPostSchedule",
     "scanGeoPrompt",
+    "deleteGeoProduct",
   ]);
   for (const contentType of contentTypeSchema.options) {
     if (contentType !== "image") {
@@ -213,6 +218,31 @@ export function buildStandaloneToolSet(
     tools.getGeoScan = createGetGeoScanTool({ organizationId });
     descriptions.push(
       '**GEO Prompt Scans**: When the user wants a tracked prompt asked again now, on all engines or specific ones ("check that prompt on ChatGPT again"), find the exact prompt with findGeoPrompts first and ask which one when the request fits several, then call scanGeoPrompt with its id and engine ids such as openai/chatgpt. The user approves each call because it uses AI answers. Say the scan is running, then read it with getGeoScan once it had time and report only the answers it returned.'
+    );
+  }
+  if (deps?.createGeoProduct && deps.moveGeoPrompts) {
+    tools.createGeoProduct = createCreateGeoProductTool({
+      organizationId,
+      createGeoProduct: deps.createGeoProduct,
+    });
+    tools.moveGeoPrompts = createMoveGeoPromptsTool({
+      organizationId,
+      moveGeoPrompts: deps.moveGeoPrompts,
+    });
+    if (deps.updateGeoProduct) {
+      tools.updateGeoProduct = createUpdateGeoProductTool({
+        organizationId,
+        updateGeoProduct: deps.updateGeoProduct,
+      });
+    }
+    if (deps.deleteGeoProduct) {
+      tools.deleteGeoProduct = createDeleteGeoProductTool({
+        organizationId,
+        deleteGeoProduct: deps.deleteGeoProduct,
+      });
+    }
+    descriptions.push(
+      "**GEO Products**: Each tracked prompt can belong to one of the project's products. When the user asks to add a product, call createGeoProduct; it files the prompts without a product that fit it on its own, and new prompts are filed automatically. To move prompts the user names, find them with findGeoPrompts and call moveGeoPrompts with their ids and the product name, or null to take them out of their product. Moving prompts does not change how new prompts are filed. Rename a product or change its niche with updateGeoProduct; delete one only when the user asks, with deleteGeoProduct, which the user approves. Report how many prompts moved."
     );
   }
   tools.showChart = createShowChartTool();

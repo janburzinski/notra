@@ -15,6 +15,7 @@ import {
 } from "zod";
 
 import {
+  GEO_PRODUCTS_MAX,
   GEO_BRAND_SEARCH_MAX_QUERY_LENGTH,
   GEO_BRAND_SEARCH_MIN_QUERY_LENGTH,
   GEO_COMPETITOR_MAX_SYNONYMS,
@@ -361,6 +362,24 @@ export const geoProductCreateInputSchema = geoOrganizationInputSchema.extend({
   niche: string().trim().max(GEO_PRODUCT_NICHE_MAX_LENGTH).optional(),
 });
 
+export const geoProductUpdateInputSchema = geoOrganizationInputSchema
+  .extend({
+    productId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+    name: string().trim().min(1).max(GEO_PRODUCT_NAME_MAX_LENGTH).optional(),
+    niche: string()
+      .trim()
+      .max(GEO_PRODUCT_NICHE_MAX_LENGTH)
+      .nullable()
+      .optional(),
+  })
+  .refine((input) => input.name !== undefined || input.niche !== undefined, {
+    message: "Provide name or niche",
+  });
+
+export const geoProductDeleteInputSchema = geoOrganizationInputSchema.extend({
+  productId: string().min(1).max(GEO_SHORT_FIELD_MAX_LENGTH),
+});
+
 export const geoPromptUpdateInputSchema = geoOrganizationInputSchema
   .extend({
     promptId: string().min(1),
@@ -487,6 +506,15 @@ export const geoConversationGenerationSchema = object({
   conversations: array(geoGeneratedConversationSchema).max(
     GEO_GENERATED_CONVERSATIONS_MAX
   ),
+});
+
+export const geoProductSiteCheckSchema = object({
+  products: array(
+    object({
+      name: string().min(1).max(GEO_PRODUCT_NAME_MAX_LENGTH),
+      niche: string().max(GEO_PRODUCT_NICHE_MAX_LENGTH),
+    })
+  ).max(GEO_PRODUCTS_MAX),
 });
 
 export const geoWebsiteDiscoverySchema = object({

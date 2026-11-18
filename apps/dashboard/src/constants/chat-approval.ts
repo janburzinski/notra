@@ -8,9 +8,10 @@ export const CHAT_APPROVAL_ROW_IDLE_CLASS = "hover:bg-muted";
 export const CHAT_APPROVAL_ROW_PICKED_CLASS = "bg-primary/8";
 
 /**
- * Tools that ask for every call: each one spends AI answers on its own input
- * (a prompt, its engines), so allowing one call must not allow the next.
+ * Tools that ask for every call, so allowing one call must not allow the next:
+ * scans spend AI answers on their own input, and each product delete is final.
  */
 export const CHAT_APPROVAL_ONCE_ONLY_TOOL_NAMES: ReadonlySet<string> = new Set([
   "scanGeoPrompt",
+  "deleteGeoProduct",
 ]);

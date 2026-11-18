@@ -48,6 +48,12 @@ import { trackServerEventAndFlush } from "@/lib/analytics/posthog-server";
 import { buildChatExtraTools } from "@/lib/chat/extra-tools";
 import { isCodeResearchEnabledForOrganization } from "@/lib/code-research/flag";
 import {
+  createGeoProductForChat,
+  deleteGeoProductForChat,
+  moveGeoPromptsForChat,
+  updateGeoProductForChat,
+} from "@/lib/geo/agent-products";
+import {
   findGeoPromptsForChat,
   startGeoPromptScanForChat,
 } from "@/lib/geo/agent-prompt-scan";
@@ -302,6 +308,10 @@ export async function streamChatResponseStep(
         loadPostAgentReach: loadPostAgentReachSummary,
         startGeoPromptScan: startGeoPromptScanForChat,
         findGeoPrompts: findGeoPromptsForChat,
+        createGeoProduct: createGeoProductForChat,
+        moveGeoPrompts: moveGeoPromptsForChat,
+        updateGeoProduct: updateGeoProductForChat,
+        deleteGeoProduct: deleteGeoProductForChat,
         onFirstChunk() {
           if (timing.firstChunkAt === null) {
             timing.firstChunkAt = Date.now();

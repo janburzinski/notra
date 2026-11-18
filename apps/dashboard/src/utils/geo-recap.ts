@@ -318,6 +318,13 @@ function answersNoun(count: number) {
   return count === 1 ? "AI answer" : "AI answers";
 }
 
+/** Headline for a week whose only news is products found on the site. */
+export function buildNewProductsHeadline(count: number): string {
+  return count === 1
+    ? "A new product joined your GEO tracking."
+    : `${count} new products joined your GEO tracking.`;
+}
+
 export function buildWeeklyHeadline({
   gained,
   lost,

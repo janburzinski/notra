@@ -208,6 +208,18 @@ export interface GeoImportDialogProps {
   organizationId: string;
 }
 
+export interface GeoProductsSectionProps {
+  organizationId: string;
+}
+
+export interface GeoProductEditRowProps {
+  /** null adds a new product. */
+  product: GeoProduct | null;
+  pending: boolean;
+  onSave: (values: { name: string; niche: string | null }) => void;
+  onCancel: () => void;
+}
+
 export interface PromptProductCellProps {
   row: GeoPromptTableRow;
   /** The project's products, main product first. */

@@ -38,3 +38,18 @@ export const GEO_PROMPT_SCAN_TASK_DENIED_MESSAGE =
 
 export const GEO_SCAN_NOT_FOUND_MESSAGE =
   "No scan with that id exists in this workspace.";
+
+export const GEO_PRODUCT_CREATE_FAILED_MESSAGE =
+  "The product couldn't be created. Try again in a moment.";
+
+export const GEO_PROMPTS_MOVE_FAILED_MESSAGE =
+  "The prompts couldn't be moved. Try again in a moment.";
+
+export const GEO_PRODUCT_TASK_DENIED_MESSAGE =
+  "Products are only changed when a person asks for it in chat.";
+
+export const GEO_PRODUCT_UPDATE_FAILED_MESSAGE =
+  "The product couldn't be updated. Try again in a moment.";
+
+export const GEO_PRODUCT_DELETE_FAILED_MESSAGE =
+  "The product couldn't be deleted. Try again in a moment.";

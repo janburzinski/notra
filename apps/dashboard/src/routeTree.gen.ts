@@ -35,6 +35,7 @@ import { Route as ApiCommandPaletteNavigateRouteImport } from './routes/api.comm
 import { Route as ApiCronAutopilotRouteImport } from './routes/api.cron.autopilot'
 import { Route as ApiCronBrewContactsRouteImport } from './routes/api.cron.brew-contacts'
 import { Route as ApiCronGeoContentGapsRouteImport } from './routes/api.cron.geo-content-gaps'
+import { Route as ApiCronGeoProductsRouteImport } from './routes/api.cron.geo-products'
 import { Route as ApiCronGeoRecapRouteImport } from './routes/api.cron.geo-recap'
 import { Route as ApiCronGeoScanRouteImport } from './routes/api.cron.geo-scan'
 import { Route as ApiCronLinearTokensRouteImport } from './routes/api.cron.linear-tokens'
@@ -89,8 +90,12 @@ import { Route as ApiInternalGeoAnswerLimitRouteImport } from './routes/api.inte
 import { Route as ApiInternalGeoFreeScanRouteImport } from './routes/api.internal.geo.free-scan'
 import { Route as ApiInternalGeoPersonaGenerationRouteImport } from './routes/api.internal.geo.persona-generation'
 import { Route as ApiInternalGeoPersonaRunRouteImport } from './routes/api.internal.geo.persona-run'
+import { Route as ApiInternalGeoProductCreateRouteImport } from './routes/api.internal.geo.product-create'
+import { Route as ApiInternalGeoProductDeleteRouteImport } from './routes/api.internal.geo.product-delete'
+import { Route as ApiInternalGeoProductUpdateRouteImport } from './routes/api.internal.geo.product-update'
 import { Route as ApiInternalGeoPromptFindRouteImport } from './routes/api.internal.geo.prompt-find'
 import { Route as ApiInternalGeoPromptScanRouteImport } from './routes/api.internal.geo.prompt-scan'
+import { Route as ApiInternalGeoPromptsMoveRouteImport } from './routes/api.internal.geo.prompts-move'
 import { Route as ApiInternalGeoSequenceRunRouteImport } from './routes/api.internal.geo.sequence-run'
 import { Route as ApiInternalGeoWriterPlanRouteImport } from './routes/api.internal.geo.writer-plan'
 import { Route as ApiInternalSitesAdminRouteImport } from './routes/api.internal.sites.admin'
@@ -254,6 +259,11 @@ const ApiCronBrewContactsRoute = ApiCronBrewContactsRouteImport.update({
 const ApiCronGeoContentGapsRoute = ApiCronGeoContentGapsRouteImport.update({
   id: '/api/cron/geo-content-gaps',
   path: '/api/cron/geo-content-gaps',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCronGeoProductsRoute = ApiCronGeoProductsRouteImport.update({
+  id: '/api/cron/geo-products',
+  path: '/api/cron/geo-products',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCronGeoRecapRoute = ApiCronGeoRecapRouteImport.update({
@@ -555,6 +565,24 @@ const ApiInternalGeoPersonaRunRoute =
     path: '/api/internal/geo/persona-run',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiInternalGeoProductCreateRoute =
+  ApiInternalGeoProductCreateRouteImport.update({
+    id: '/api/internal/geo/product-create',
+    path: '/api/internal/geo/product-create',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalGeoProductDeleteRoute =
+  ApiInternalGeoProductDeleteRouteImport.update({
+    id: '/api/internal/geo/product-delete',
+    path: '/api/internal/geo/product-delete',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalGeoProductUpdateRoute =
+  ApiInternalGeoProductUpdateRouteImport.update({
+    id: '/api/internal/geo/product-update',
+    path: '/api/internal/geo/product-update',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiInternalGeoPromptFindRoute =
   ApiInternalGeoPromptFindRouteImport.update({
     id: '/api/internal/geo/prompt-find',
@@ -565,6 +593,12 @@ const ApiInternalGeoPromptScanRoute =
   ApiInternalGeoPromptScanRouteImport.update({
     id: '/api/internal/geo/prompt-scan',
     path: '/api/internal/geo/prompt-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiInternalGeoPromptsMoveRoute =
+  ApiInternalGeoPromptsMoveRouteImport.update({
+    id: '/api/internal/geo/prompts-move',
+    path: '/api/internal/geo/prompts-move',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiInternalGeoSequenceRunRoute =
@@ -771,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
+  '/api/cron/geo-products': typeof ApiCronGeoProductsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
@@ -825,8 +860,12 @@ export interface FileRoutesByFullPath {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/product-create': typeof ApiInternalGeoProductCreateRoute
+  '/api/internal/geo/product-delete': typeof ApiInternalGeoProductDeleteRoute
+  '/api/internal/geo/product-update': typeof ApiInternalGeoProductUpdateRoute
   '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
   '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
+  '/api/internal/geo/prompts-move': typeof ApiInternalGeoPromptsMoveRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -885,6 +924,7 @@ export interface FileRoutesByTo {
   '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
+  '/api/cron/geo-products': typeof ApiCronGeoProductsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
@@ -939,8 +979,12 @@ export interface FileRoutesByTo {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/product-create': typeof ApiInternalGeoProductCreateRoute
+  '/api/internal/geo/product-delete': typeof ApiInternalGeoProductDeleteRoute
+  '/api/internal/geo/product-update': typeof ApiInternalGeoProductUpdateRoute
   '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
   '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
+  '/api/internal/geo/prompts-move': typeof ApiInternalGeoPromptsMoveRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -1000,6 +1044,7 @@ export interface FileRoutesById {
   '/api/cron/autopilot': typeof ApiCronAutopilotRoute
   '/api/cron/brew-contacts': typeof ApiCronBrewContactsRoute
   '/api/cron/geo-content-gaps': typeof ApiCronGeoContentGapsRoute
+  '/api/cron/geo-products': typeof ApiCronGeoProductsRoute
   '/api/cron/geo-recap': typeof ApiCronGeoRecapRoute
   '/api/cron/geo-scan': typeof ApiCronGeoScanRoute
   '/api/cron/linear-tokens': typeof ApiCronLinearTokensRoute
@@ -1054,8 +1099,12 @@ export interface FileRoutesById {
   '/api/internal/geo/free-scan': typeof ApiInternalGeoFreeScanRoute
   '/api/internal/geo/persona-generation': typeof ApiInternalGeoPersonaGenerationRoute
   '/api/internal/geo/persona-run': typeof ApiInternalGeoPersonaRunRoute
+  '/api/internal/geo/product-create': typeof ApiInternalGeoProductCreateRoute
+  '/api/internal/geo/product-delete': typeof ApiInternalGeoProductDeleteRoute
+  '/api/internal/geo/product-update': typeof ApiInternalGeoProductUpdateRoute
   '/api/internal/geo/prompt-find': typeof ApiInternalGeoPromptFindRoute
   '/api/internal/geo/prompt-scan': typeof ApiInternalGeoPromptScanRoute
+  '/api/internal/geo/prompts-move': typeof ApiInternalGeoPromptsMoveRoute
   '/api/internal/geo/sequence-run': typeof ApiInternalGeoSequenceRunRoute
   '/api/internal/geo/writer-plan': typeof ApiInternalGeoWriterPlanRoute
   '/api/internal/sites/admin': typeof ApiInternalSitesAdminRoute
@@ -1116,6 +1165,7 @@ export interface FileRouteTypes {
     | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
+    | '/api/cron/geo-products'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/linear-tokens'
@@ -1170,8 +1220,12 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/product-create'
+    | '/api/internal/geo/product-delete'
+    | '/api/internal/geo/product-update'
     | '/api/internal/geo/prompt-find'
     | '/api/internal/geo/prompt-scan'
+    | '/api/internal/geo/prompts-move'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1230,6 +1284,7 @@ export interface FileRouteTypes {
     | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
+    | '/api/cron/geo-products'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/linear-tokens'
@@ -1284,8 +1339,12 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/product-create'
+    | '/api/internal/geo/product-delete'
+    | '/api/internal/geo/product-update'
     | '/api/internal/geo/prompt-find'
     | '/api/internal/geo/prompt-scan'
+    | '/api/internal/geo/prompts-move'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1344,6 +1403,7 @@ export interface FileRouteTypes {
     | '/api/cron/autopilot'
     | '/api/cron/brew-contacts'
     | '/api/cron/geo-content-gaps'
+    | '/api/cron/geo-products'
     | '/api/cron/geo-recap'
     | '/api/cron/geo-scan'
     | '/api/cron/linear-tokens'
@@ -1398,8 +1458,12 @@ export interface FileRouteTypes {
     | '/api/internal/geo/free-scan'
     | '/api/internal/geo/persona-generation'
     | '/api/internal/geo/persona-run'
+    | '/api/internal/geo/product-create'
+    | '/api/internal/geo/product-delete'
+    | '/api/internal/geo/product-update'
     | '/api/internal/geo/prompt-find'
     | '/api/internal/geo/prompt-scan'
+    | '/api/internal/geo/prompts-move'
     | '/api/internal/geo/sequence-run'
     | '/api/internal/geo/writer-plan'
     | '/api/internal/sites/admin'
@@ -1459,6 +1523,7 @@ export interface RootRouteChildren {
   ApiCronAutopilotRoute: typeof ApiCronAutopilotRoute
   ApiCronBrewContactsRoute: typeof ApiCronBrewContactsRoute
   ApiCronGeoContentGapsRoute: typeof ApiCronGeoContentGapsRoute
+  ApiCronGeoProductsRoute: typeof ApiCronGeoProductsRoute
   ApiCronGeoRecapRoute: typeof ApiCronGeoRecapRoute
   ApiCronGeoScanRoute: typeof ApiCronGeoScanRoute
   ApiCronLinearTokensRoute: typeof ApiCronLinearTokensRoute
@@ -1507,8 +1572,12 @@ export interface RootRouteChildren {
   ApiInternalGeoFreeScanRoute: typeof ApiInternalGeoFreeScanRoute
   ApiInternalGeoPersonaGenerationRoute: typeof ApiInternalGeoPersonaGenerationRoute
   ApiInternalGeoPersonaRunRoute: typeof ApiInternalGeoPersonaRunRoute
+  ApiInternalGeoProductCreateRoute: typeof ApiInternalGeoProductCreateRoute
+  ApiInternalGeoProductDeleteRoute: typeof ApiInternalGeoProductDeleteRoute
+  ApiInternalGeoProductUpdateRoute: typeof ApiInternalGeoProductUpdateRoute
   ApiInternalGeoPromptFindRoute: typeof ApiInternalGeoPromptFindRoute
   ApiInternalGeoPromptScanRoute: typeof ApiInternalGeoPromptScanRoute
+  ApiInternalGeoPromptsMoveRoute: typeof ApiInternalGeoPromptsMoveRoute
   ApiInternalGeoSequenceRunRoute: typeof ApiInternalGeoSequenceRunRoute
   ApiInternalGeoWriterPlanRoute: typeof ApiInternalGeoWriterPlanRoute
   ApiInternalSitesAdminRoute: typeof ApiInternalSitesAdminRoute
@@ -1716,6 +1785,13 @@ declare module '@tanstack/react-router' {
       path: '/api/cron/geo-content-gaps'
       fullPath: '/api/cron/geo-content-gaps'
       preLoaderRoute: typeof ApiCronGeoContentGapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/geo-products': {
+      id: '/api/cron/geo-products'
+      path: '/api/cron/geo-products'
+      fullPath: '/api/cron/geo-products'
+      preLoaderRoute: typeof ApiCronGeoProductsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/cron/geo-recap': {
@@ -2096,6 +2172,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiInternalGeoPersonaRunRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/internal/geo/product-create': {
+      id: '/api/internal/geo/product-create'
+      path: '/api/internal/geo/product-create'
+      fullPath: '/api/internal/geo/product-create'
+      preLoaderRoute: typeof ApiInternalGeoProductCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/geo/product-delete': {
+      id: '/api/internal/geo/product-delete'
+      path: '/api/internal/geo/product-delete'
+      fullPath: '/api/internal/geo/product-delete'
+      preLoaderRoute: typeof ApiInternalGeoProductDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/geo/product-update': {
+      id: '/api/internal/geo/product-update'
+      path: '/api/internal/geo/product-update'
+      fullPath: '/api/internal/geo/product-update'
+      preLoaderRoute: typeof ApiInternalGeoProductUpdateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/internal/geo/prompt-find': {
       id: '/api/internal/geo/prompt-find'
       path: '/api/internal/geo/prompt-find'
@@ -2108,6 +2205,13 @@ declare module '@tanstack/react-router' {
       path: '/api/internal/geo/prompt-scan'
       fullPath: '/api/internal/geo/prompt-scan'
       preLoaderRoute: typeof ApiInternalGeoPromptScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/internal/geo/prompts-move': {
+      id: '/api/internal/geo/prompts-move'
+      path: '/api/internal/geo/prompts-move'
+      fullPath: '/api/internal/geo/prompts-move'
+      preLoaderRoute: typeof ApiInternalGeoPromptsMoveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/internal/geo/sequence-run': {
@@ -2454,6 +2558,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCronAutopilotRoute: ApiCronAutopilotRoute,
   ApiCronBrewContactsRoute: ApiCronBrewContactsRoute,
   ApiCronGeoContentGapsRoute: ApiCronGeoContentGapsRoute,
+  ApiCronGeoProductsRoute: ApiCronGeoProductsRoute,
   ApiCronGeoRecapRoute: ApiCronGeoRecapRoute,
   ApiCronGeoScanRoute: ApiCronGeoScanRoute,
   ApiCronLinearTokensRoute: ApiCronLinearTokensRoute,
@@ -2508,8 +2613,12 @@ const rootRouteChildren: RootRouteChildren = {
   ApiInternalGeoFreeScanRoute: ApiInternalGeoFreeScanRoute,
   ApiInternalGeoPersonaGenerationRoute: ApiInternalGeoPersonaGenerationRoute,
   ApiInternalGeoPersonaRunRoute: ApiInternalGeoPersonaRunRoute,
+  ApiInternalGeoProductCreateRoute: ApiInternalGeoProductCreateRoute,
+  ApiInternalGeoProductDeleteRoute: ApiInternalGeoProductDeleteRoute,
+  ApiInternalGeoProductUpdateRoute: ApiInternalGeoProductUpdateRoute,
   ApiInternalGeoPromptFindRoute: ApiInternalGeoPromptFindRoute,
   ApiInternalGeoPromptScanRoute: ApiInternalGeoPromptScanRoute,
+  ApiInternalGeoPromptsMoveRoute: ApiInternalGeoPromptsMoveRoute,
   ApiInternalGeoSequenceRunRoute: ApiInternalGeoSequenceRunRoute,
   ApiInternalGeoWriterPlanRoute: ApiInternalGeoWriterPlanRoute,
   ApiInternalSitesAdminRoute: ApiInternalSitesAdminRoute,

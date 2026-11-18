@@ -216,7 +216,7 @@ export function PromptsTable({
   const handleCreateProduct = async (promptId: string, name: string) => {
     setCreatingProducts((current) => ({ ...current, [promptId]: name }));
     try {
-      const product = await createProduct.mutateAsync({ name });
+      const { product } = await createProduct.mutateAsync({ name });
       setPromptProduct(promptId, product);
     } catch {
       // The mutation's onError already showed the toast.

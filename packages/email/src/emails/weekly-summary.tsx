@@ -20,7 +20,19 @@ import { EMAIL_CONFIG } from "../utils/config";
 import { engineEmailLogoSrc } from "../utils/engine-logo";
 import { toneFromDelta } from "../utils/geo-recap";
 
-function weeklySummarySubtext(organizationName: string, quiet: boolean) {
+function weeklySummarySubtext(
+  organizationName: string,
+  quiet: boolean,
+  hasScans: boolean,
+  hasNewProducts: boolean
+) {
+  if (!hasScans) {
+    return `Last week in GEO for ${organizationName}.`;
+  }
+  // Sent for its new products, not as the monthly check-in.
+  if (quiet && hasNewProducts) {
+    return `Last week in GEO for ${organizationName}. Visibility held steady, and new products joined your tracking.`;
+  }
   return quiet
     ? `Last week in GEO for ${organizationName}. Nothing moved enough to report, so this is your monthly check-in.`
     : `Last week in GEO for ${organizationName}, compared with the week before.`;
@@ -38,9 +50,13 @@ export const WeeklySummaryEmail = ({
   items = GEO_RECAP_NO_ITEMS,
   remainingCount = 0,
   competitors = GEO_RECAP_NO_COMPETITORS,
+  newProducts = GEO_RECAP_NO_ITEMS,
+  newProductsRemaining = 0,
   action,
   dashboardLink = `${EMAIL_CONFIG.getAppUrl()}/${organizationSlug}/geo`,
 }: WeeklySummaryEmailProps) => {
+  // Weeks with only new products have no two weeks of scans to compare.
+  const hasScans = answersChecked > 0;
   const visibilityPill =
     visibilityDeltaLabel === "—" ? undefined : visibilityDeltaLabel;
 
@@ -48,44 +64,62 @@ export const WeeklySummaryEmail = ({
     <EmailLayout
       heading={headline}
       preview={headline}
-      subtext={weeklySummarySubtext(organizationName, quiet)}
+      subtext={weeklySummarySubtext(
+        organizationName,
+        quiet,
+        hasScans,
+        newProducts.length > 0
+      )}
     >
-      <Section>
-        <EmailTitleCard
-          action={
-            <Text
-              style={{
-                color: EMAIL_THEME.subtleForeground,
-                fontSize: "12px",
-                margin: 0,
-                whiteSpace: "nowrap",
-              }}
-            >
-              {weekLabel}
-            </Text>
-          }
-          heading="GEO this week"
-        >
-          <Row>
-            <GeoMetricCell
-              label="Visibility"
-              pill={visibilityPill}
-              tone={toneFromDelta(visibilityDeltaLabel)}
-              value={visibilityLabel}
-            />
-            <GeoMetricCell
-              last
-              label="AI answers checked"
-              value={answersChecked.toLocaleString("en-US")}
-            />
-          </Row>
-        </EmailTitleCard>
-      </Section>
+      {hasScans ? (
+        <Section>
+          <EmailTitleCard
+            action={
+              <Text
+                style={{
+                  color: EMAIL_THEME.subtleForeground,
+                  fontSize: "12px",
+                  margin: 0,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {weekLabel}
+              </Text>
+            }
+            heading="GEO this week"
+          >
+            <Row>
+              <GeoMetricCell
+                label="Visibility"
+                pill={visibilityPill}
+                tone={toneFromDelta(visibilityDeltaLabel)}
+                value={visibilityLabel}
+              />
+              <GeoMetricCell
+                last
+                label="AI answers checked"
+                value={answersChecked.toLocaleString("en-US")}
+              />
+            </Row>
+          </EmailTitleCard>
+        </Section>
+      ) : null}
 
       {items.length > 0 ? (
         <Section className="mt-4">
           <EmailTitleCard heading="What changed">
             <GeoChangeList items={items} remainingCount={remainingCount} />
+          </EmailTitleCard>
+        </Section>
+      ) : null}
+
+      {newProducts.length > 0 ? (
+        <Section className="mt-4">
+          <EmailTitleCard heading="New products">
+            <GeoChangeList
+              items={newProducts}
+              remainingCount={newProductsRemaining}
+            />
           </EmailTitleCard>
         </Section>
       ) : null}
@@ -214,6 +248,19 @@ WeeklySummaryEmail.PreviewProps = {
       name: "Descript",
       shareLabel: "19%",
       deltaLabel: "unchanged",
+    },
+  ],
+  newProducts: [
+    {
+      id: "product-live",
+      title: "Acme Live",
+      changes: [
+        {
+          id: "product-live:added",
+          detail: "Teams that need live captions during video calls",
+          tone: "neutral",
+        },
+      ],
     },
   ],
   action: {

@@ -42,6 +42,10 @@ export interface WeeklySummaryEmailProps {
   items: readonly GeoRecapItem[];
   remainingCount: number;
   competitors: readonly GeoRecapCompetitor[];
+  /** Products added this week, most often found on the site by the weekly check. */
+  newProducts?: readonly GeoRecapItem[];
+  /** New products beyond the ones listed. */
+  newProductsRemaining?: number;
   action?: GeoRecapAction;
   dashboardLink: string;
 }

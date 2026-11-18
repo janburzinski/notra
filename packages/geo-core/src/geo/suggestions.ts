@@ -14,6 +14,7 @@ import { geoDb, geoSkip } from "./effect";
 import { GeoDatabaseError } from "./errors";
 import { lockGeoProjectInTransaction } from "./lock";
 import { toTrackedPrompt } from "./mappers";
+import { reloadSortedPrompt, sortNewPromptsIntoProducts } from "./product-sort";
 import { toggleGeoPrompt } from "./programs";
 import { requireGeoProject } from "./projects";
 import { promptKey } from "./prompt-key";
@@ -265,7 +266,19 @@ export const acceptSuggestion = Effect.fn("geo.suggestions.accept")(function* (
         : new GeoDatabaseError({ label: "accept suggestion", cause }),
   });
   yield* pickTrackedSuggestions(input, created);
-  return accepted;
+  // Search Console and Autopilot suggestions come without a product. A
+  // reused prompt keeps the product (or none) its owner already chose.
+  if (accepted.prompt.productId || !created.includes(accepted.prompt.id)) {
+    return accepted;
+  }
+  const sorted = yield* sortNewPromptsIntoProducts(
+    input.organizationId,
+    projectId,
+    [accepted.prompt.id]
+  );
+  const saved =
+    sorted > 0 ? yield* reloadSortedPrompt(accepted.prompt.id) : undefined;
+  return saved ? { ...accepted, prompt: toTrackedPrompt(saved) } : accepted;
 });
 
 export const acceptAllSuggestions = Effect.fn("geo.suggestions.acceptAll")(
@@ -307,20 +320,36 @@ export const acceptAllSuggestions = Effect.fn("geo.suggestions.acceptAll")(
             asc(geoPromptSuggestions.id)
           )
           .for("update");
+        const promptIds: string[] = [];
         for (const row of suggestions) {
-          await acceptSuggestionInTx(
+          const prompt = await acceptSuggestionInTx(
             tx,
             input.organizationId,
             projectId,
             row,
             created
           );
+          if (!prompt.productId) {
+            promptIds.push(prompt.id);
+          }
         }
-        return { projectId, suggestions, accepted: suggestions.length };
+        return {
+          projectId,
+          suggestions,
+          accepted: suggestions.length,
+          promptIds,
+        };
       })
     );
+    const { promptIds, ...accepted } = result;
     yield* pickTrackedSuggestions(input, created);
-    return result;
+    // Only prompts this call created; reused ones keep their owner's choice.
+    yield* sortNewPromptsIntoProducts(
+      input.organizationId,
+      projectId,
+      promptIds.filter((id) => created.includes(id))
+    );
+    return accepted;
   }
 );
 
