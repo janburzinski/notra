@@ -1,0 +1,42 @@
+packages/db/src/schema.ts
+  s_a3bcac14881eee::t_31bb86e888496b 1815,1838-1840
+apps/api/tests/feedback-program.test.ts
+  s_a3bcac14881eee::t_c96772b6833dfb 12,44,125-131,133-134,138,144-146,149,158-167,170-186,190-191,194-217
+apps/api/src/types/feedback.ts
+  s_a3bcac14881eee::t_822930de513081 21
+  s_a3bcac14881eee::t_e391077c45e1b4 44-45,48-51,83
+apps/api/src/programs/feedback.ts
+  s_a3bcac14881eee::t_e391077c45e1b4 4,17,26-29,52,55,61-66,215,219,221-235,237,239-256,306,309-310,313,324
+apps/api/src/routes/feedback.ts
+  s_a3bcac14881eee::t_822930de513081 205
+apps/docs/feedback/send-feedback.mdx
+  s_a3bcac14881eee::t_38f9c26bcc255a 134
+packages/schemas/src/schemas/api/feedback.ts
+  s_a3bcac14881eee::t_38f9c26bcc255a 233
+packages/db/migrations/0172_agent_feedback_content_key.sql
+  ai_agent 1-2
+packages/db/migrations/meta/0172_snapshot.json
+  ai_agent 1-18472
+packages/db/migrations/meta/_journal.json
+  ai_agent 1208-1214
+apps/api/src/constants/feedback.ts
+  s_a3bcac14881eee::t_e391077c45e1b4 17
+apps/api/src/utils/feedback.ts
+  s_a3bcac14881eee::t_822930de513081 16,26-27,29-54,58-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "9792c044f8934fe6c4b0f574bf2e046967d7db55",
+  "prompts": {},
+  "sessions": {
+    "s_a3bcac14881eee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a71c0f3-1554-4fd7-a5c8-6ab0aaa277bf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
