@@ -1,0 +1,67 @@
+packages/ai/src/schemas/autopilot-agent.ts
+  s_a69441b239a3c3::t_cd3739aceefa9b 39-44,77
+apps/dashboard/src/utils/autopilot-settings.ts
+  s_a69441b239a3c3::t_d29c6a08062828 50
+apps/web/src/content/pages/features/autopilot.md
+  s_a69441b239a3c3::t_057684b8768cbc 57
+apps/dashboard/src/lib/autopilot/settings.ts
+  s_a69441b239a3c3::t_de021b6fb2a48e 115,233
+packages/db/migrations/0175_autopilot_daily_brief.sql
+  ai_agent 1
+apps/dashboard/tests/autopilot-flow.test.ts
+  s_a69441b239a3c3::t_521ba482a76916 1719-1725,1731-1751,1757-1777
+  s_a69441b239a3c3::t_aa28018820b335 1726-1730,1752-1756
+apps/dashboard/src/lib/autopilot/brief-today.ts
+  s_a69441b239a3c3::t_dff67d50a8161e 12-15
+  s_a69441b239a3c3::t_afc0ea62b13f7f 19,22
+apps/dashboard/src/lib/autopilot/draft-emails.ts
+  s_a69441b239a3c3::t_afc0ea62b13f7f 22,36,39-40,43
+packages/schemas/src/schemas/dashboard/autopilot.ts
+  s_a69441b239a3c3::t_d29c6a08062828 157-158,222
+apps/dashboard/src/lib/orpc/routers/autopilot.ts
+  s_a69441b239a3c3::t_d29c6a08062828 371
+  s_a69441b239a3c3::t_de021b6fb2a48e 402-404,409-417
+packages/db/migrations/meta/_journal.json
+  ai_agent 1229-1235
+packages/tools/src/constants/autopilot.ts
+  s_a69441b239a3c3::t_cd3739aceefa9b 5,7
+packages/db/src/schema.ts
+  s_a69441b239a3c3::t_bfb95a3ff1cb0d 4912-4917
+apps/dashboard/messages/en.json
+  s_a69441b239a3c3::t_de021b6fb2a48e 6644-6646
+  s_a69441b239a3c3::t_5c6ace8cf568dc 10236-10237,10270-10271
+apps/dashboard/src/lib/hooks/use-autopilot-settings-summaries.ts
+  s_a69441b239a3c3::t_5c6ace8cf568dc 37-39,44-46
+packages/db/migrations/meta/0175_snapshot.json
+  ai_agent 1-18383
+apps/dashboard/src/lib/autopilot/run.ts
+  s_a69441b239a3c3::t_afc0ea62b13f7f 371-381
+apps/dashboard/src/lib/autopilot/agent.ts
+  s_a69441b239a3c3::t_cd3739aceefa9b 164
+packages/tools/src/autopilot/tools.ts
+  s_a69441b239a3c3::t_cd3739aceefa9b 37
+apps/dashboard/src/components/autopilot/autopilot-settings-sections.tsx
+  s_a69441b239a3c3::t_5c6ace8cf568dc 224-233
+apps/dashboard/src/components/dashboard/daily-brief-overlay.tsx
+  s_a69441b239a3c3::t_de021b6fb2a48e 12,87-106,109-110,120-126,128
+  s_a69441b239a3c3::t_c067a416c405e0 107-108,111-119,134-138
+apps/dashboard/messages/de.json
+  s_a69441b239a3c3::t_5c6ace8cf568dc 10236-10237,10270-10271
+  s_a69441b239a3c3::t_de021b6fb2a48e 6644-6646
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cf468b3d35293b472818c5c7a44338d7cf4ec344",
+  "prompts": {},
+  "sessions": {
+    "s_a69441b239a3c3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7b34e9e7-e4ec-4cd6-82a8-4e49009ecceb",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
