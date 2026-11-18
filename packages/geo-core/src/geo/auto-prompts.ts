@@ -189,23 +189,24 @@ const requestAutoPrompts = Effect.fn("geo.autoPrompts.request")(function* (
   organizationId: string,
   context: GeoAutoPromptContext
 ) {
-  const result = yield* Effect.tryPromise({
-    try: () =>
-      generateText({
+  return yield* Effect.tryPromise({
+    try: async () => {
+      const result = await generateText({
         model: gateway(GEO_WEBSITE_DISCOVERY_MODEL, { organizationId }),
         providerOptions: { gateway: { tags: ["geo-auto-prompts"] } },
         output: Output.object({ schema: geoAutoPromptsSchema }),
         prompt: buildAutoPromptsRequest(context),
         instructions: GEO_AUTO_PROMPT_SYSTEM_PROMPT,
         maxOutputTokens: GEO_AUTO_PROMPT_MAX_TOKENS,
-      }),
+      });
+      return result.output;
+    },
     catch: (cause) =>
       new GeoDiscoveryError({
         message: "Failed to generate auto prompts",
         cause,
       }),
   });
-  return result.output;
 });
 
 const generateGeoAutoPrompts = Effect.fn("geo.autoPrompts.generate")(function* (
