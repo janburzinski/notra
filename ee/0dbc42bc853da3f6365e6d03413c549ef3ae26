@@ -1,0 +1,78 @@
+apps/ui/registry/notra/composer/components/composer.tsx
+  s_e60e61dd00b8ad::t_8e801b8c2fbc30 21
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 122
+  s_e60e61dd00b8ad::t_a6cc30caa8532c 90,94,123,126,128,131-139,152,161,195,197,200-212
+  s_e60e61dd00b8ad::t_c818ad1a11d107 140,213
+apps/ui/registry/notra/composer/examples/composer-state-streaming.tsx
+  s_e60e61dd00b8ad::t_a6cc30caa8532c 18
+apps/ui/package.json
+  s_e60e61dd00b8ad::t_3b66cd267a889d 33-35
+apps/ui/registry/notra/edge-light/examples/edge-light.tsx
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-28
+apps/ui/registry.json
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1477,1479,1484,1486,1489,1491,1494,1496,1501-1510,1522-1529,1531,1538,1543,1547-1549,1551-1552,1555-1557,1559,1561-1566,1568-1569,1572,1577,1790
+  s_e60e61dd00b8ad::t_8e801b8c2fbc30 1787
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 1480
+  s_e60e61dd00b8ad::t_3b66cd267a889d 1478,1481-1483,1485,1487-1488,1490,1492-1493,1495,1497-1500,1511-1521,1530,1532-1537,1539-1542,1544-1546,1550,1553-1554,1558,1560,1567,1570-1571,1573-1576,1578-1583
+packages/ui/src/components/ui/edge-light.tsx
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-8,10-58
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 9
+packages/ui/src/types/composer.ts
+  s_e60e61dd00b8ad::t_f2f2013ad3146a 22-23
+apps/ui/registry/notra/edge-light/constants/edge-light.ts
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-2
+apps/ui/registry/notra/composer/types/composer.ts
+  s_e60e61dd00b8ad::t_a6cc30caa8532c 16
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 15
+apps/ui/docs/components/composer.mdx
+  s_e60e61dd00b8ad::t_8e801b8c2fbc30 55
+apps/dashboard/src/components/chat/chat-input.tsx
+  s_e60e61dd00b8ad::t_27e3d28d6733d0 1873
+apps/ui/src/styles/examples.css
+  s_e60e61dd00b8ad::t_c818ad1a11d107 6
+packages/ui/src/types/edge-light.ts
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-5
+apps/blog/scripts/web-chrome.js
+  ai_agent 2,178,181,187,193,221,247-249,462,465-466,474-475
+packages/ui/src/components/ui/composer.tsx
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 154
+  s_e60e61dd00b8ad::t_31d688f6a77e19 240-257
+  s_e60e61dd00b8ad::t_f2f2013ad3146a 123,127,188,273
+  s_e60e61dd00b8ad::t_c818ad1a11d107 11,172,258
+apps/ui/scripts/registry-css.ts
+  s_e60e61dd00b8ad::t_354dbd9ddfbbfd 1-14,16-116
+  s_e60e61dd00b8ad::t_c818ad1a11d107 15
+apps/ui/docs/components/edge-light.mdx
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-2,4-9,11-22,25,27-31,33-34
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 3,10,23-24,26,32
+apps/ui/registry/notra/edge-light/components/edge-light.tsx
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-9,11-59
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 10
+apps/ui/registry/notra/edge-light/types/edge-light.ts
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-5
+packages/ui/src/constants/edge-light.ts
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1-2
+apps/ui/docs/components/meta.ts
+  s_e60e61dd00b8ad::t_c818ad1a11d107 13
+packages/ui/src/styles/globals.css
+  s_e60e61dd00b8ad::t_c818ad1a11d107 4
+packages/ui/src/styles/edge-light.css
+  s_e60e61dd00b8ad::t_c818ad1a11d107 1,3-4,6-237
+  s_e60e61dd00b8ad::t_d8935eee8cde1e 2,5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ee0dbc42bc853da3f6365e6d03413c549ef3ae26",
+  "prompts": {},
+  "sessions": {
+    "s_e60e61dd00b8ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "620a65b7-a0bc-44af-a455-7a3d76f9f2cc",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
