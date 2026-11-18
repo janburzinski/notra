@@ -1,0 +1,62 @@
+{
+  "heading": "How many prompts do you want to track?",
+  "subheading": "Every prompt runs once on every model you pick, each time we scan. Each run is one AI answer.",
+  "promptsLabel": "Prompts",
+  "promptsUnit": "prompts",
+  "sliderValue": "{count, number} prompts, {milestone}",
+  "milestones": {
+    "spotCheck": {
+      "name": "Spot check",
+      "detail": "for your brand and the one question buyers ask most."
+    },
+    "coreQuestions": {
+      "name": "Core buyer questions",
+      "detail": "for one product in one market."
+    },
+    "category": {
+      "name": "The whole category",
+      "detail": "with every use case, comparison and alternative."
+    },
+    "markets": {
+      "name": "Several markets",
+      "detail": "across regions, segments or product lines."
+    },
+    "everyAngle": {
+      "name": "Every angle",
+      "detail": "for several products or brands, tracked in depth."
+    }
+  },
+  "frequencies": {
+    "daily": { "label": "Daily", "inline": "daily" },
+    "every-2-days": { "label": "Every 2 days", "inline": "every 2 days" },
+    "every-3-days": { "label": "Every 3 days", "inline": "every 3 days" },
+    "weekly": { "label": "Weekly", "inline": "weekly" },
+    "every-2-weeks": { "label": "Every 2 weeks", "inline": "every 2 weeks" },
+    "monthly": { "label": "Monthly", "inline": "monthly" }
+  },
+  "models": "Models",
+  "modelCount": "{count, plural, one {# model} other {# models}}",
+  "scanFrequency": "Scan frequency",
+  "scansPerMonth": "{scans, plural, one {# scan} other {# scans}} / month",
+  "seeMoreModels": "See more models",
+  "backToFirstModels": "Back to the first models",
+  "seeMore": "See {count} more",
+  "back": "Back",
+  "showExactModels": "Pick exact models",
+  "hideExactModels": "Hide exact models",
+  "overLargestPlan": "More than our largest plan includes",
+  "atPlanLimit": "Right at the plan limit",
+  "headroom": "Room for {count, number} more prompts",
+  "customPricing": "Priced to your usage",
+  "yearlyAlternative": "or {price}/year, {badge}",
+  "customQuota": "Custom answer quota",
+  "included": "{count, number} included",
+  "stayOnPlan": "Stay on {plan} for {price}/mo",
+  "scanInstead": "Scan {frequency} instead",
+  "linkCopied": "Link to this estimate copied",
+  "recommended": "Recommended",
+  "startWith": "Start with {plan}",
+  "copyLink": "Copy link to this estimate",
+  "answersUnit": "AI answers / mo",
+  "breakdown": "{prompts, plural, one {# prompt} other {# prompts}} × {models, number} models × {scans, number} scans"
+}

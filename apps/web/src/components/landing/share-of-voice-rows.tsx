@@ -1,5 +1,6 @@
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import {
   Table,
@@ -22,7 +23,8 @@ const LOGO_TILE_CLASS =
   "-m-0.5 flex size-6 shrink-0 items-center justify-center rounded-md dark:bg-[#F6F3F1]";
 
 function BrandLogo({ brand, logo }: { brand: string; logo: ShareRowLogo }) {
-  const alt = `${brand} logo`;
+  const t = useTranslations("landing.features.share");
+  const alt = t("logoAlt", { brand });
   if (logo.darkSrc) {
     return (
       <>
@@ -71,6 +73,7 @@ export function ShareOfVoiceRows({
   rows: ShareRow[];
   headers: { brand: string; share: string; mentions: string };
 }) {
+  const format = useFormatter();
   return (
     <Table className="table-fixed">
       <TableHeader className="bg-muted/60">
@@ -109,7 +112,9 @@ export function ShareOfVoiceRows({
                   max={SHARE_MAX}
                   value={row.share}
                 />
-                <span className="text-sm tabular-nums">{row.share}%</span>
+                <span className="text-sm tabular-nums">
+                  {format.number(row.share / SHARE_MAX, { style: "percent" })}
+                </span>
               </span>
             </TableCell>
             <TableCell
@@ -119,7 +124,7 @@ export function ShareOfVoiceRows({
                 MENTIONS_COL
               )}
             >
-              {row.mentions}
+              {format.number(row.mentions)}
             </TableCell>
           </TableRow>
         ))}

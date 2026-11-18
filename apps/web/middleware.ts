@@ -6,6 +6,7 @@ import {
   AGENT_BYPASS_PARAM,
   GEO_INGEST_ENDPOINT,
 } from "./src/constants/proxy.js";
+import { landingLocaleRedirect } from "./src/utils/landing-locale.js";
 import { isAgentRequest, isProxiedPath } from "./src/utils/proxy-paths.js";
 
 const geoTracker = new Tracker({
@@ -28,8 +29,11 @@ export default function middleware(request: Request) {
 
   waitUntil(geoTracker.track(request));
 
-  if (url.searchParams.has(AGENT_BYPASS_PARAM) || !isAgentRequest(request)) {
+  if (url.searchParams.has(AGENT_BYPASS_PARAM)) {
     return;
+  }
+  if (!isAgentRequest(request)) {
+    return landingLocaleRedirect(request);
   }
   url.searchParams.set(AGENT_BYPASS_PARAM, "1");
   return rewrite(url);

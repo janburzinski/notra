@@ -1,0 +1,62 @@
+{
+  "heading": "Wie viele Prompts willst du tracken?",
+  "subheading": "Bei jedem Scan läuft jeder Prompt einmal auf jedem Modell, das du auswählst, und jeder Durchlauf zählt als eine KI-Antwort.",
+  "promptsLabel": "Prompts",
+  "promptsUnit": "Prompts",
+  "sliderValue": "{count, number} Prompts, {milestone}",
+  "milestones": {
+    "spotCheck": {
+      "name": "Stichprobe",
+      "detail": "für deine Marke und die eine Frage, die Käufer am häufigsten stellen."
+    },
+    "coreQuestions": {
+      "name": "Die wichtigsten Kauffragen",
+      "detail": "für ein Produkt in einem Markt."
+    },
+    "category": {
+      "name": "Die ganze Kategorie",
+      "detail": "mit allen Use Cases, Vergleichen und Alternativen."
+    },
+    "markets": {
+      "name": "Mehrere Märkte",
+      "detail": "über Regionen, Segmente oder Produktlinien hinweg."
+    },
+    "everyAngle": {
+      "name": "Jeder Blickwinkel",
+      "detail": "für mehrere Produkte oder Marken, gründlich getrackt."
+    }
+  },
+  "frequencies": {
+    "daily": { "label": "Täglich", "inline": "täglich" },
+    "every-2-days": { "label": "Alle 2 Tage", "inline": "alle 2 Tage" },
+    "every-3-days": { "label": "Alle 3 Tage", "inline": "alle 3 Tage" },
+    "weekly": { "label": "Wöchentlich", "inline": "wöchentlich" },
+    "every-2-weeks": { "label": "Alle 2 Wochen", "inline": "alle 2 Wochen" },
+    "monthly": { "label": "Monatlich", "inline": "monatlich" }
+  },
+  "models": "Modelle",
+  "modelCount": "{count, plural, one {# Modell} other {# Modelle}}",
+  "scanFrequency": "Scan-Häufigkeit",
+  "scansPerMonth": "{scans, plural, one {# Scan} other {# Scans}} / Monat",
+  "seeMoreModels": "Weitere Modelle anzeigen",
+  "backToFirstModels": "Zurück zu den ersten Modellen",
+  "seeMore": "{count} weitere",
+  "back": "Zurück",
+  "showExactModels": "Modelle einzeln auswählen",
+  "hideExactModels": "Modellauswahl ausblenden",
+  "overLargestPlan": "Mehr, als unser größter Plan enthält",
+  "atPlanLimit": "Genau am Limit des Plans",
+  "headroom": "Platz für {count, number} weitere Prompts",
+  "customPricing": "Preis richtet sich nach deiner Nutzung",
+  "yearlyAlternative": "oder {price}/Jahr, {badge}",
+  "customQuota": "Individuelles Antwortkontingent",
+  "included": "{count, number} inklusive",
+  "stayOnPlan": "Bleib bei {plan} für {price}/Monat",
+  "scanInstead": "Scanne stattdessen {frequency}",
+  "linkCopied": "Link zu dieser Schätzung kopiert",
+  "recommended": "Empfohlen",
+  "startWith": "Mit {plan} starten",
+  "copyLink": "Link zu dieser Schätzung kopieren",
+  "answersUnit": "KI-Antworten / Monat",
+  "breakdown": "{prompts, plural, one {# Prompt} other {# Prompts}} × {models, number} Modelle × {scans, number} Scans"
+}

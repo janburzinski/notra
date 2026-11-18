@@ -1,6 +1,7 @@
 import { PurposeBadge } from "@notra/ui/components/geo/purpose-badge";
 import { ScrollArea, ScrollBar } from "@notra/ui/components/ui/scroll-area";
 import { cn } from "@notra/ui/lib/utils";
+import { useTranslations } from "use-intl";
 
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import {
@@ -102,11 +103,12 @@ export function CitationRows({
   onEntered,
   headers,
 }: CitationRowsProps) {
+  const t = useTranslations("landing.answers");
   return (
     <div
       className={DUAL_TONE_TABLE_ROOT}
       role="region"
-      aria-label="Recent AI crawlers"
+      aria-label={t("citationsLabel")}
     >
       <div className={DUAL_TONE_TABLE_HEADER}>
         <table className={DUAL_TONE_TABLE_CLASS}>

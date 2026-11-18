@@ -1,7 +1,7 @@
 import { cn } from "@notra/ui/lib/utils";
 import { useState } from "react";
 
-import { FAQ_CONTENT } from "@/constants/landing/faq";
+import { useLandingFaqContent } from "@/hooks/use-landing-faq-content";
 import type { FaqItem, FaqSectionProps } from "@/types/landing/faq";
 
 function FaqToggleIcon({ open }: { open: boolean }) {
@@ -88,11 +88,9 @@ function getInitialOpenId(items: FaqItem[]) {
   return defaultItem ? defaultItem.id : null;
 }
 
-export function FaqSection({
-  content = FAQ_CONTENT,
-  className,
-}: FaqSectionProps) {
-  const { heading, subcopy, items } = content;
+export function FaqSection({ content, className }: FaqSectionProps) {
+  const landingContent = useLandingFaqContent();
+  const { heading, subcopy, items } = content ?? landingContent;
   const [openId, setOpenId] = useState<string | null>(() =>
     getInitialOpenId(items)
   );

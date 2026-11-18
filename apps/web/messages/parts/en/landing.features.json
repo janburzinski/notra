@@ -1,0 +1,106 @@
+{
+  "heading": "Every number the dashboard shows you.",
+  "subcopyLineOne": "These are the tables in the product, filled with sample data.",
+  "subcopyLineTwo": "They show mentions, positions, share of voice and the traffic behind them.",
+  "cards": {
+    "engines": {
+      "title": "Mention rate by engine",
+      "description": "Each prompt goes to each model you turn on, with web search where the engine has it. You get who mentioned you, where in the list and whether that moved since the last scan."
+    },
+    "share": {
+      "title": "Share of voice",
+      "description": "Who gets recommended when you don't. Add direct and indirect competitors, plus the misspellings people use for them and see the split per prompt, language and engine."
+    },
+    "traffic": {
+      "title": "AI traffic, attributed",
+      "description": "Hits from 66 known AI agents, sorted by what they were doing: training a model, building an index, reading a page to answer someone or a person clicking through. We don't count a fetch as a citation."
+    },
+    "gaps": {
+      "title": "Content gaps to write",
+      "description": "The questions where engines answer and you are not in the answer, ranked by how winnable they look. Write plans a guide, listicle or comparison and the draft lands in Content."
+    }
+  },
+  "engines": {
+    "heading": "Mention rate by engine",
+    "subhead": "Last 30 days, 14 prompts, English and German",
+    "headers": {
+      "engine": "Engine",
+      "mentionRate": "Mention rate",
+      "avgPosition": "Avg position",
+      "lastChecked": "Last checked"
+    },
+    "hoursAgo": "{count}h ago"
+  },
+  "share": {
+    "heading": "Share of voice",
+    "subhead": "Brands named across 312 answers",
+    "footnote": "Sample numbers, made up for this page. Logos belong to their owners.",
+    "headers": {
+      "brand": "Brand",
+      "share": "Share",
+      "mentions": "Mentions"
+    },
+    "logoAlt": "{brand} logo"
+  },
+  "traffic": {
+    "heading": "AI Traffic",
+    "subhead": "AI crawlers and referrals visiting your site",
+    "kpis": {
+      "crawlers": "Crawlers",
+      "referrals": "Referrals",
+      "total": "Total"
+    },
+    "headers": {
+      "source": "Source",
+      "purpose": "Purpose",
+      "visits": "Visits",
+      "lastSeen": "Last seen"
+    },
+    "secondsAgo": "{count}s ago",
+    "minutesAgo": "{count}m ago"
+  },
+  "purposes": {
+    "training-crawler": {
+      "label": "Model training",
+      "description": "Collects pages for model training corpora"
+    },
+    "search-index": {
+      "label": "Search index",
+      "description": "Builds the index an AI answer engine searches"
+    },
+    "assistant-browse": {
+      "label": "Cited in answer",
+      "description": "Fetched while an assistant was answering someone. A fetch is not proof of a citation"
+    },
+    "assistant-referral": {
+      "label": "Referral",
+      "description": "A person clicked through to your site from an AI answer"
+    }
+  },
+  "gaps": {
+    "heading": "Content Gaps",
+    "subhead": "Questions engines answer without mentioning you",
+    "headers": {
+      "content": "Content",
+      "opportunity": "Opportunity",
+      "missing": "Missing engines",
+      "action": "Write"
+    },
+    "meterLabel": "{rate}% mention rate, {level}/{steps} opportunity",
+    "rows": {
+      "geoMetrics": "What GEO metrics should a marketing team track?",
+      "b2bPlatforms": "Which GEO platforms work best for B2B SaaS?",
+      "perplexityCitations": "How do I get cited by Perplexity?",
+      "aiCrawlers": "How do AI crawlers find and cite a website?",
+      "whatIsGeo": "What is generative engine optimization?"
+    }
+  },
+  "liveTraffic": {
+    "headers": {
+      "when": "When",
+      "provider": "Provider",
+      "path": "Path",
+      "purpose": "Purpose"
+    }
+  }
+}

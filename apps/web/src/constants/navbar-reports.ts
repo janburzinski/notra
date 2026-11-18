@@ -12,10 +12,7 @@ export const NAVBAR_REPORTS_OVERVIEW_STYLE: Omit<
   copyClassName: "w-96",
 };
 
-export const NAVBAR_REPORTS_OVERVIEW = {
-  href: STATE_OF_AI_SEARCH_PATH,
-  description: "Which brands AI recommends, category by category.",
-} as const;
+export const NAVBAR_REPORTS_OVERVIEW_PATH = STATE_OF_AI_SEARCH_PATH;
 
 export const NAVBAR_REPORTS_ENGINES: readonly NavbarReportsEngine[] = [
   "chatgpt",

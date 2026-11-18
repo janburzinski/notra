@@ -1,0 +1,182 @@
+{
+  "home": "Notra home",
+  "logoMenu": {
+    "copyLogo": "Copy logo as SVG",
+    "copiedLogo": "Copied logo as SVG",
+    "copyWordmark": "Copy wordmark as SVG",
+    "copiedWordmark": "Copied wordmark as SVG",
+    "downloadKit": "Download brand kit",
+    "guidelines": "Brand Guidelines"
+  },
+  "auth": {
+    "dashboard": "Dashboard",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  },
+  "mobile": {
+    "label": "Navigation",
+    "open": "Open menu",
+    "close": "Close menu"
+  },
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Switch to light mode",
+    "dark": "Switch to dark mode"
+  },
+  "groups": {
+    "products": "Products",
+    "resources": "Resources",
+    "reports": "Reports",
+    "pricing": "Pricing"
+  },
+  "items": {
+    "aiSearch": {
+      "label": "AI Search",
+      "description": "Your place in ChatGPT, Claude and Perplexity."
+    },
+    "aiCrawlerLogs": {
+      "label": "AI Crawler Logs",
+      "description": "Every AI bot that reads your site, and why."
+    },
+    "sites": {
+      "label": "Sites",
+      "description": "Host your blog and changelog from GitHub."
+    },
+    "blog": {
+      "label": "Blog",
+      "description": "Writing on GEO, AI search and DX."
+    },
+    "changelog": {
+      "label": "Changelog",
+      "description": "Overview of latest Notra changes."
+    },
+    "contributors": {
+      "label": "Contributors",
+      "description": "People building Notra in the open."
+    },
+    "docs": {
+      "label": "Docs",
+      "description": "Guides, API and setup."
+    },
+    "reviews": {
+      "label": "Reviews",
+      "description": "What teams say about Notra."
+    }
+  },
+  "products": {
+    "cards": {
+      "aiSearch": {
+        "label": "AI Search",
+        "description": "See where you stand when buyers ask ChatGPT, Claude and Perplexity."
+      },
+      "aiCrawlerLogs": {
+        "label": "AI Crawler Logs",
+        "description": "See every AI bot that reads your site, and why it came."
+      },
+      "sites": {
+        "label": "Sites",
+        "description": "Host your blog and changelog from GitHub."
+      }
+    },
+    "tiles": {
+      "integrations": {
+        "label": "Integrations",
+        "description": "Notra in the tools you already use."
+      },
+      "mcp": {
+        "label": "MCP & CLI",
+        "description": "Bring Notra into your agent."
+      }
+    },
+    "personas": {
+      "remembers": "REMEMBERS",
+      "mentioned": "Notra mentioned",
+      "people": {
+        "maya": {
+          "role": "Head of Growth · Series B SaaS",
+          "memory": "Budget under $500 a month. SOC 2 is a must."
+        },
+        "daniel": {
+          "role": "Founder · Developer tools",
+          "memory": "Team of four. Wants a free plan to start."
+        }
+      }
+    },
+    "conversation": {
+      "title": "Changelog tool research",
+      "meta": "{turns} turns · played {date}",
+      "sources": "Searched the web · {count} sources",
+      "turns": {
+        "bestTool": {
+          "question": "What's the best tool to automate changelogs from GitHub?",
+          "answer": "Beamer is the best known. Notra turns merged PRs into changelogs and launch posts."
+        },
+        "cheapest": {
+          "question": "Which of those is cheapest for a team of five?",
+          "answer": "Notra has a free plan and doesn't charge per seat. Beamer starts at $59 a month."
+        },
+        "linkedin": {
+          "question": "Can it post the update to LinkedIn too?",
+          "answer": "Yes. Notra drafts the post and publishes it to X or LinkedIn after approval."
+        }
+      }
+    },
+    "crawler": {
+      "title": "Crawler log",
+      "meta": "usenotra.com · last 60 minutes",
+      "live": "Live",
+      "purposes": {
+        "live": "Live answer",
+        "search": "Search index",
+        "referral": "Referral",
+        "training": "Training"
+      }
+    },
+    "site": {
+      "deployed": "Deployed 21 s ago"
+    }
+  },
+  "resources": {
+    "live": "Live",
+    "changelog": {
+      "title": "Notra changelog",
+      "meta": "Shipped this week"
+    },
+    "contributors": {
+      "title": "Merged pull requests",
+      "meta": "usenotra/notra · last 7 days"
+    }
+  },
+  "reports": {
+    "heading": "State of AI Search",
+    "edition": "{heading} · {edition}",
+    "overview": "Which brands AI recommends, category by category.",
+    "fallbackDescription": "Monthly AI search rankings",
+    "categories": {
+      "ai-visibility": {
+        "label": "AI visibility",
+        "description": "See which GEO tools AI recommends"
+      },
+      "app-hosting": {
+        "label": "App hosting",
+        "description": "How hosting platforms rank in AI search"
+      },
+      "auth": {
+        "label": "Auth",
+        "description": "Auth providers recommended by AI"
+      },
+      "changelog": {
+        "label": "Changelog",
+        "description": "Release note tools recommended by AI"
+      },
+      "email-api": {
+        "label": "Email API",
+        "description": "Email providers ranked in AI search"
+      },
+      "postgres": {
+        "label": "Postgres",
+        "description": "The Postgres providers AI recommends"
+      }
+    }
+  }
+}

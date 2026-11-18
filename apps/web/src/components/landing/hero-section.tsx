@@ -4,6 +4,7 @@ import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { parseAsString, useQueryState } from "nuqs";
 import { useEffect, useRef } from "react";
+import { useLocale, useTranslations } from "use-intl";
 
 import { HeroDither } from "@/components/landing/hero-dither";
 import { HeroHeadline } from "@/components/landing/hero-headline";
@@ -38,6 +39,8 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
   const variant = previewVariant ?? flagVariant;
   const copy = HERO_VARIANTS[variant] ?? HERO_VARIANTS[HERO_CONTROL_VARIANT];
   const exposureTracked = useRef(false);
+  const t = useTranslations("landing.hero.variants");
+  const locale = useLocale();
 
   useEffect(() => {
     if (!enrolled || previewVariant || exposureTracked.current) {
@@ -59,7 +62,8 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
       flag_key: HERO_EXPERIMENT_FLAG,
       variant: enrolled ? variant : null,
       cta: "primary",
-      label: copy.cta,
+      label: t(`${copy.id}.cta`),
+      locale,
     });
   }
 
@@ -71,7 +75,8 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
       flag_key: HERO_EXPERIMENT_FLAG,
       variant,
       cta: "secondary",
-      label: copy.secondaryLabel,
+      label: t(`${copy.id}.secondaryLabel`),
+      locale,
       href: copy.secondaryHref,
     });
   }
@@ -91,14 +96,17 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
         <div className="relative flex h-full w-full flex-col items-center">
           <div className="flex w-full min-w-0 flex-col items-center gap-7 px-3 pt-22 pb-2 sm:gap-10 sm:px-6 sm:pt-28 lg:pt-[7.5rem]">
             <div className="flex w-full min-w-0 flex-col items-center gap-5 sm:gap-7">
-              <HeroHeadline lineOne={copy.headlineLineOne} lineTwo={copy} />
+              <HeroHeadline variant={copy} />
               <p className="max-w-[42.875rem] text-center font-sans text-[0.9375rem]/[1.45] font-medium tracking-[-0.005em] text-pretty text-[#1E1E1EBF] sm:text-[1.25rem]/[1.14] dark:text-white/70">
-                {copy.subhead}
+                {t(`${copy.id}.subhead`)}
               </p>
             </div>
 
             {variant === HERO_CONTROL_VARIANT ? (
-              <HeroWebsiteForm cta={copy.cta} onSubmit={trackPrimaryClick} />
+              <HeroWebsiteForm
+                cta={t(`${copy.id}.cta`)}
+                onSubmit={trackPrimaryClick}
+              />
             ) : (
               <div className="flex flex-row items-center justify-center gap-4 sm:gap-7">
                 <span className="relative flex">
@@ -116,7 +124,7 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
                     }
                     variant="primary"
                   >
-                    {copy.cta}
+                    {t(`${copy.id}.cta`)}
                   </CtaButton>
                   <HeroTapHand />
                 </span>
@@ -140,7 +148,7 @@ export function HeroSection({ enrolled, flagVariant }: HeroSectionProps) {
                   }
                   variant="light"
                 >
-                  {copy.secondaryLabel}
+                  {t(`${copy.id}.secondaryLabel`)}
                 </CtaButton>
               </div>
             )}

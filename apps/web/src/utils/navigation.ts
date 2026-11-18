@@ -8,117 +8,50 @@ import {
   Robot01Icon,
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
-import type { IconSvgElement } from "@hugeicons/react";
 
 import { REPORTS_NAV } from "@/constants/reports-navigation";
+import type { MarketingNavEntryConfig } from "@/types/navbar";
 
-export interface MarketingNavCard {
-  href: string;
-  label: string;
-  description: string;
-  icon: IconSvgElement;
-  external?: boolean;
-}
-
-export interface MarketingNavRailItem {
-  href: string;
-  label: string;
-  description?: string;
-  icon: IconSvgElement;
-  external?: boolean;
-}
-
-export interface MarketingNavGroup {
-  type: "group";
-  layout?: "compact";
-  panel?: "products" | "resources" | "reports";
-  label: string;
-  cardsHeading: string;
-  cards: readonly MarketingNavCard[];
-  railHeading: string;
-  rail: readonly MarketingNavRailItem[];
-}
-
-interface MarketingNavLink {
-  type: "link";
-  href: string;
-  label: string;
-}
-
-export type MarketingNavEntry = MarketingNavGroup | MarketingNavLink;
-
-export const MARKETING_NAV: readonly MarketingNavEntry[] = [
+export const MARKETING_NAV: readonly MarketingNavEntryConfig[] = [
   {
     type: "group",
+    id: "products",
     panel: "products",
-    label: "Products",
-    cardsHeading: "Product",
     cards: [
+      { id: "aiSearch", href: "/features", icon: AiSearch02Icon },
       {
-        href: "/features",
-        label: "AI Search",
-        description: "Your place in ChatGPT, Claude and Perplexity.",
-        icon: AiSearch02Icon,
-      },
-      {
+        id: "aiCrawlerLogs",
         href: "/features/ai-crawler-logs",
-        label: "AI Crawler Logs",
-        description: "Every AI bot that reads your site, and why.",
         icon: Robot01Icon,
       },
-      {
-        href: "/features/sites",
-        label: "Sites",
-        description: "Host your blog and changelog from GitHub.",
-        icon: BrowserIcon,
-      },
+      { id: "sites", href: "/features/sites", icon: BrowserIcon },
     ],
-    railHeading: "Developers",
     rail: [],
   },
   {
     type: "group",
+    id: "resources",
     panel: "resources",
-    label: "Resources",
-    cardsHeading: "Resources",
     cards: [
-      {
-        href: "/blog",
-        label: "Blog",
-        description: "Writing on GEO, AI search and DX.",
-        icon: QuillWrite01Icon,
-      },
-      {
-        href: "/changelog",
-        label: "Changelog",
-        description: "Overview of latest Notra changes.",
-        icon: Megaphone01Icon,
-      },
-      {
-        href: "/contributors",
-        label: "Contributors",
-        description: "People building Notra in the open.",
-        icon: UserGroupIcon,
-      },
+      { id: "blog", href: "/blog", icon: QuillWrite01Icon },
+      { id: "changelog", href: "/changelog", icon: Megaphone01Icon },
+      { id: "contributors", href: "/contributors", icon: UserGroupIcon },
     ],
-    railHeading: "More",
     rail: [
       {
+        id: "docs",
         href: "https://www.usenotra.com/docs",
-        label: "Docs",
-        description: "Guides, API and setup.",
         icon: BookOpen01Icon,
         external: true,
       },
       {
+        id: "reviews",
         href: "https://www.notrareviews.com/",
-        label: "Reviews",
-        description: "What teams say about Notra.",
         icon: FavouriteIcon,
         external: true,
       },
     ],
   },
   REPORTS_NAV,
-  { type: "link", href: "/pricing", label: "Pricing" },
+  { type: "link", id: "pricing", href: "/pricing" },
 ];

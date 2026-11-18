@@ -131,7 +131,7 @@ export function findFittingCadence(input: PromptCalculatorInput) {
     const frequency = option.id as PromptCalculatorFrequencyId;
     const { plan } = estimatePromptUsage({ ...input, frequency });
     if (plan.answersPerMonth !== null) {
-      return { frequency, label: option.label, plan };
+      return { frequency, plan };
     }
   }
   return null;

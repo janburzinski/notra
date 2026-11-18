@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { useTranslations } from "use-intl";
 
 import { CompareLogoTile } from "@/components/compare/compare-logo";
 import { CompareCell } from "@/components/compare/compare-table";
@@ -28,7 +29,6 @@ import {
   NOTRA_COMPARE_PLANS,
   NOTRA_PRICING_NOTE,
 } from "@/constants/compare/page";
-import { CTA_BANNER_PRIMARY_LABEL } from "@/constants/landing/cta-banner";
 import type {
   CompareCompetitorProps,
   ComparePlanCardProps,
@@ -46,6 +46,7 @@ import {
 } from "@/utils/compare";
 
 export function CompareHero({ competitor, signupSource }: CompareSignupProps) {
+  const ctaT = useTranslations("landing.cta");
   const [before, after] = splitHeadline(
     competitor.headline,
     competitor.headlineAccent
@@ -84,7 +85,7 @@ export function CompareHero({ competitor, signupSource }: CompareSignupProps) {
               render={<TrackedSignupLink source={`${signupSource}_hero`} />}
               variant="primary"
             >
-              {CTA_BANNER_PRIMARY_LABEL}
+              {ctaT("primary")}
             </CtaButton>
             <CtaButton
               className="w-full sm:w-auto"

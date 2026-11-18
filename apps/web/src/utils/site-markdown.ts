@@ -1,31 +1,9 @@
-import {
-  ANSWER_EXAMPLE_HEADING,
-  ANSWER_EXAMPLE_SUBCOPY,
-} from "@/constants/landing/answer-example";
-import { FAQ_CONTENT } from "@/constants/landing/faq";
-import {
-  FEATURES_ENGINES_COPY,
-  FEATURES_GAPS_COPY,
-  FEATURES_HEADING,
-  FEATURES_SHARE_COPY,
-  FEATURES_SUBCOPY_LINE_ONE,
-  FEATURES_SUBCOPY_LINE_TWO,
-  FEATURES_TRAFFIC_COPY,
-} from "@/constants/landing/features";
+import { createTranslator } from "use-intl/core";
+
+import { LANDING_FAQ_ITEMS } from "@/constants/landing/faq";
 import { GEO_ENGINE_NAMES } from "@/constants/landing/geo-engines";
-import {
-  HERO_HEADLINE_CYCLE,
-  HERO_HEADLINE_LINE_ONE,
-  HERO_HEADLINE_LINE_TWO_PREFIX,
-  HERO_HEADLINE_SUFFIX,
-  HERO_SUBHEAD,
-} from "@/constants/landing/hero";
-import { MARQUEE_CAPTION } from "@/constants/landing/marquee-quote";
-import {
-  PRICING_HEADING,
-  PRICING_PLANS as PRICING_CARD_PLANS,
-  PRICING_SUBHEADING,
-} from "@/constants/landing/pricing";
+import { HERO_HEADLINE_CYCLE } from "@/constants/landing/hero";
+import { PRICING_PLANS as PRICING_CARD_PLANS } from "@/constants/landing/pricing";
 import {
   PROMPT_CALCULATOR_ANCHOR,
   PROMPT_CALCULATOR_DAYS_PER_MONTH,
@@ -55,6 +33,44 @@ import {
   findFittingCadence,
 } from "@/utils/prompt-calculator";
 import { SITE_URL } from "@/utils/urls";
+
+import en from "../../messages/en.json";
+
+const answersCopy = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.answers",
+});
+
+const featuresT = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.features",
+});
+
+const heroT = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.hero.variants.control",
+});
+
+const faqT = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.faq",
+});
+
+const pricingT = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.pricing",
+});
+
+const calculatorT = createTranslator({
+  locale: "en",
+  messages: en,
+  namespace: "landing.promptCalculator",
+});
 
 function renderPlanPrice(
   plan: (typeof PRICING_PLANS)[keyof typeof PRICING_PLANS]
@@ -115,14 +131,14 @@ export function buildFeaturesMarkdown() {
       "Scans run daily by default, or every 48 hours, 3 days, week, 2 weeks or 30 days. Every answer is stored in full with the searches the engine ran and the pages it cited.",
     ]),
     markdownSection("What the dashboard shows", [
-      `### ${FEATURES_ENGINES_COPY.title}`,
-      FEATURES_ENGINES_COPY.description,
+      `### ${featuresT("cards.engines.title")}`,
+      featuresT("cards.engines.description"),
       "",
-      `### ${FEATURES_SHARE_COPY.title}`,
-      FEATURES_SHARE_COPY.description,
+      `### ${featuresT("cards.share.title")}`,
+      featuresT("cards.share.description"),
       "",
       "### Answers",
-      ANSWER_EXAMPLE_SUBCOPY,
+      answersCopy("subcopy"),
       "",
       "### Competitors",
       "Track up to 2,000 competitors with their domains and the misspellings people use for them. Open any of them to see mentions over time and the exact prompts and engines where they appear instead of you.",
@@ -131,15 +147,15 @@ export function buildFeaturesMarkdown() {
       "Follow a single AI agent across your site: which pages it fetched, in what order and whether it asked for markdown.",
     ]),
     markdownSection("AI traffic, attributed", [
-      FEATURES_TRAFFIC_COPY.description,
+      featuresT("cards.traffic.description"),
       "",
       "You don't need a script tag. Add the @usenotra/sdk package as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It sends a small request envelope to Notra, matching happens on our side and anything human is dropped before it is stored.",
       "",
       "Every hit is labelled by purpose: model training, search index, cited in answer (an assistant read the page while answering someone) or referral (a person clicked through from an AI answer).",
     ]),
     markdownSection("Turning gaps into content", [
-      `### ${FEATURES_GAPS_COPY.title}`,
-      FEATURES_GAPS_COPY.description,
+      `### ${featuresT("cards.gaps.title")}`,
+      featuresT("cards.gaps.description"),
       "",
       "### Write",
       "Pick a gap and choose guide, listicle or comparison. Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief and the draft opens in Content, with real internal links and a FAQ section.",
@@ -207,7 +223,7 @@ function describeEstimate(input: PromptCalculatorInput) {
   const estimate = estimatePromptUsage(input);
   const answers = estimate.answersPerMonth.toLocaleString("en-US");
   if (estimate.plan.answersPerMonth !== null) {
-    return `${answers} AI answers / month → ${estimate.plan.name} (${estimate.plan.price.monthly}${estimate.plan.priceSuffix?.monthly ?? ""})`;
+    return `${answers} AI answers / month → ${estimate.plan.name} (${estimate.plan.price?.monthly ?? ""}${pricingT("perPeriod.monthly")})`;
   }
   const fit = findFittingCadence(input);
   if (!fit) {
@@ -216,13 +232,13 @@ function describeEstimate(input: PromptCalculatorInput) {
   const slower = { ...input, frequency: fit.frequency };
   const slowerAnswers =
     estimatePromptUsage(slower).answersPerMonth.toLocaleString("en-US");
-  return `${answers} AI answers / month → Enterprise. Scanning \`${fit.frequency}\` instead brings it to ${slowerAnswers} → ${fit.plan.name} (${fit.plan.price.monthly}/month): ${calculatorUrl(slower)}`;
+  return `${answers} AI answers / month → Enterprise. Scanning \`${fit.frequency}\` instead brings it to ${slowerAnswers} → ${fit.plan.name} (${fit.plan.price?.monthly ?? ""}/month): ${calculatorUrl(slower)}`;
 }
 
 function buildPromptCalculatorMarkdown() {
   const quotas = PRICING_CARD_PLANS.map((plan) =>
-    plan.answersPerMonth === null
-      ? `| ${plan.name} | more than ${PRICING_CARD_PLANS.at(-2)?.answersPerMonth?.toLocaleString("en-US") ?? ""} | ${plan.price.monthly} |`
+    plan.answersPerMonth === null || plan.price === null
+      ? `| ${plan.name} | more than ${PRICING_CARD_PLANS.at(-2)?.answersPerMonth?.toLocaleString("en-US") ?? ""} | ${pricingT("customPrice")} |`
       : `| ${plan.name} | ${plan.answersPerMonth.toLocaleString("en-US")} | ${plan.price.monthly}/month or ${plan.price.yearly}/year |`
   );
   const frequencies = PROMPT_CALCULATOR_FREQUENCIES.map((option) => {
@@ -235,13 +251,15 @@ function buildPromptCalculatorMarkdown() {
       : `${PROMPT_CALCULATOR_DAYS_PER_MONTH}/${option.intervalDays} ≈ ${exact.toFixed(3)}`;
     return `\`${option.id}\` (${shown})`;
   });
-  const projectLimits = PRICING_CARD_PLANS.map(
-    (plan) =>
-      `${plan.name} ${plan.features.find((feature) => feature.icon === "projects")?.label ?? ""}`
-  ).join(", ");
+  const projectLimits = PRICING_CARD_PLANS.map((plan) => {
+    const projects = plan.features.find(
+      (feature) => feature.icon === "projects"
+    );
+    return `${plan.name} ${projects ? pricingT(`features.${projects.id}`, { count: projects.count ?? 0 }) : ""}`;
+  }).join(", ");
   const promptGuide = PROMPT_CALCULATOR_MILESTONES.map(
     (milestone) =>
-      `- Up to ${milestone.prompts.toLocaleString("en-US")}: ${milestone.name} ${milestone.detail}`
+      `- Up to ${milestone.prompts.toLocaleString("en-US")}: ${calculatorT(`milestones.${milestone.id}.name`)} ${calculatorT(`milestones.${milestone.id}.detail`)}`
   );
   const examples = CALCULATOR_EXAMPLES.map(({ situation, input }, index) =>
     [
@@ -367,7 +385,7 @@ export function buildLandingMarkdown() {
   const socialProofLines = SOCIAL_PROOF_LOGOS.map(
     (logo) => `- [${logo.name}](${logo.href})`
   );
-  const headline = `${HERO_HEADLINE_LINE_ONE} ${HERO_HEADLINE_LINE_TWO_PREFIX} ${listEngines()}${HERO_HEADLINE_SUFFIX}`;
+  const headline = `${heroT("lineOne")} ${heroT("lineTwoPrefix")} ${listEngines()}${heroT("lineTwoSuffix")}`;
 
   return [
     "# Notra",
@@ -376,7 +394,7 @@ export function buildLandingMarkdown() {
     "",
     `## ${headline}`,
     "",
-    HERO_SUBHEAD,
+    heroT("subhead"),
     "",
     "Primary CTA: [Start for free](https://app.usenotra.com/signup)",
     "",
@@ -386,35 +404,39 @@ export function buildLandingMarkdown() {
       "- [Blog](https://www.usenotra.com/blog.md)",
       "- [Changelog](https://www.usenotra.com/changelog.md)",
     ]),
-    markdownSection("Social Proof", [MARQUEE_CAPTION, "", ...socialProofLines]),
-    markdownSection(FEATURES_HEADING, [
-      FEATURES_SUBCOPY_LINE_ONE,
-      FEATURES_SUBCOPY_LINE_TWO,
+    markdownSection("Social Proof", [
+      en.landing.logoMarquee.caption,
       "",
-      `### ${FEATURES_ENGINES_COPY.title}`,
-      FEATURES_ENGINES_COPY.description,
-      "",
-      `### ${FEATURES_SHARE_COPY.title}`,
-      FEATURES_SHARE_COPY.description,
-      "",
-      `### ${FEATURES_TRAFFIC_COPY.title}`,
-      FEATURES_TRAFFIC_COPY.description,
-      "",
-      `### ${FEATURES_GAPS_COPY.title}`,
-      FEATURES_GAPS_COPY.description,
+      ...socialProofLines,
     ]),
-    markdownSection(ANSWER_EXAMPLE_HEADING, [ANSWER_EXAMPLE_SUBCOPY]),
+    markdownSection(featuresT("heading"), [
+      featuresT("subcopyLineOne"),
+      featuresT("subcopyLineTwo"),
+      "",
+      `### ${featuresT("cards.engines.title")}`,
+      featuresT("cards.engines.description"),
+      "",
+      `### ${featuresT("cards.share.title")}`,
+      featuresT("cards.share.description"),
+      "",
+      `### ${featuresT("cards.traffic.title")}`,
+      featuresT("cards.traffic.description"),
+      "",
+      `### ${featuresT("cards.gaps.title")}`,
+      featuresT("cards.gaps.description"),
+    ]),
+    markdownSection(answersCopy("heading"), [answersCopy("subcopy")]),
     markdownSection("Pricing", [
-      PRICING_HEADING,
-      PRICING_SUBHEADING,
+      pricingT("heading"),
+      pricingT("subheading"),
       "",
       "See the dedicated pricing page: [Pricing](https://www.usenotra.com/pricing.md)",
     ]),
     markdownSection(
-      FAQ_CONTENT.heading,
-      FAQ_CONTENT.items.flatMap((item) => [
-        `### ${item.question}`,
-        item.answer,
+      faqT("heading"),
+      LANDING_FAQ_ITEMS.flatMap(({ id }) => [
+        `### ${faqT(`items.${id}.question`)}`,
+        faqT(`items.${id}.answer`),
         "",
       ])
     ),

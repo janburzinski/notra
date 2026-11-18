@@ -5,16 +5,15 @@ import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { cn } from "@notra/ui/lib/utils";
 import { parseAsString, useQueryState } from "nuqs";
 import { type FormEvent, useState } from "react";
+import { useTranslations } from "use-intl";
 
 import { HeroTapHand } from "@/components/landing/hero-tap-hand";
 import { AUTH_SIGNUP_URL } from "@/constants/auth";
 import {
   HERO_SIGNUP_SOURCE,
   HERO_TAP_PRESS_CLASSNAME,
-  HERO_WEBSITE_INVALID_MESSAGE,
   HERO_WEBSITE_MAX_LENGTH,
   HERO_WEBSITE_PARAM,
-  HERO_WEBSITE_PLACEHOLDER,
 } from "@/constants/landing/hero";
 import type { HeroWebsiteFormProps } from "@/types/landing/hero";
 import { startSignup } from "@/utils/signup";
@@ -29,6 +28,7 @@ export function HeroWebsiteForm({
     parseAsString.withDefault("").withOptions({ history: "replace" })
   );
   const [invalid, setInvalid] = useState(false);
+  const t = useTranslations("landing.hero");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,7 +66,7 @@ export function HeroWebsiteForm({
         <input
           aria-describedby={invalid ? "hero-website-error" : undefined}
           aria-invalid={invalid || undefined}
-          aria-label="Your website"
+          aria-label={t("websiteLabel")}
           autoCapitalize="none"
           autoComplete="url"
           className="min-w-0 flex-1 bg-transparent font-sans text-base text-[#1E1E1E] outline-none placeholder:text-[#1E1E1E80] dark:text-white dark:placeholder:text-white/50"
@@ -76,7 +76,7 @@ export function HeroWebsiteForm({
             setInvalid(false);
             setWebsite(event.target.value || null);
           }}
-          placeholder={HERO_WEBSITE_PLACEHOLDER}
+          placeholder={t("websitePlaceholder")}
           spellCheck={false}
           type="text"
           value={website}
@@ -101,7 +101,7 @@ export function HeroWebsiteForm({
           id="hero-website-error"
           role="alert"
         >
-          {HERO_WEBSITE_INVALID_MESSAGE}
+          {t("websiteInvalid")}
         </p>
       ) : null}
     </form>

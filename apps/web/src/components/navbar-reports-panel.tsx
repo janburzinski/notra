@@ -1,4 +1,5 @@
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import {
   NavbarBentoFeatureTile,
@@ -12,7 +13,7 @@ import {
 } from "@/constants/navbar-bento";
 import {
   NAVBAR_REPORTS_ENGINES,
-  NAVBAR_REPORTS_OVERVIEW,
+  NAVBAR_REPORTS_OVERVIEW_PATH,
   NAVBAR_REPORTS_OVERVIEW_STYLE,
 } from "@/constants/navbar-reports";
 import {
@@ -22,6 +23,9 @@ import {
 import type { NavbarBentoPanelProps } from "@/types/navbar-bento";
 
 export function NavbarReportsPanel({ group, onSelect }: NavbarBentoPanelProps) {
+  const t = useTranslations("navbar.reports");
+  const format = useFormatter();
+  const heading = t("heading");
   return (
     <div className={CLASSES.panel}>
       <div className="grid grid-cols-3 gap-3">
@@ -47,10 +51,17 @@ export function NavbarReportsPanel({ group, onSelect }: NavbarBentoPanelProps) {
       <div className={CLASSES.row}>
         <NavbarBentoLinkTile
           link={{
-            ...NAVBAR_REPORTS_OVERVIEW,
+            href: NAVBAR_REPORTS_OVERVIEW_PATH,
+            description: t("overview"),
             label: REPORTS_NAV_EDITION
-              ? `${group.cardsHeading} · ${REPORTS_NAV_EDITION}`
-              : group.cardsHeading,
+              ? t("edition", {
+                  heading,
+                  edition: format.dateTime(
+                    new Date(`${REPORTS_NAV_EDITION}-01T00:00:00Z`),
+                    { month: "long", year: "numeric" }
+                  ),
+                })
+              : heading,
           }}
           onSelect={onSelect}
           style={NAVBAR_REPORTS_OVERVIEW_STYLE}

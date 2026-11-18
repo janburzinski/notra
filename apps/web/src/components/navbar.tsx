@@ -24,6 +24,7 @@ import {
   useScroll,
 } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "use-intl";
 
 import { useIsClient } from "@/components/landing/hero-headline";
 import { NavbarCompactPanel } from "@/components/navbar-compact-panel";
@@ -43,6 +44,7 @@ import {
   AUTH_SIGNIN_HOTKEY,
   AUTH_SIGNIN_URL,
 } from "@/constants/auth";
+import { LANDING_HOME_PATHS } from "@/constants/i18n";
 import { NAVBAR_DESKTOP_SIGNUP_SOURCE } from "@/constants/navbar";
 import {
   NAVBAR_CONTENT_TRANSITION,
@@ -57,8 +59,12 @@ import { useDashboardSession } from "@/lib/auth/use-dashboard-session";
 import { useNavbarAuthHotkeys } from "@/lib/auth/use-navbar-auth-hotkeys";
 import { BRAND_ASSETS } from "@/lib/brand/constants";
 import { getNavbarVariantForPath } from "@/lib/navigation/navbar-variant";
+import { useMarketingNav } from "@/lib/navigation/use-marketing-nav";
 import { useMobileNavMenu } from "@/lib/navigation/use-mobile-nav-menu";
 import type {
+  MarketingNavCard,
+  MarketingNavGroup,
+  MarketingNavRailItem,
   NavbarAuthActionsProps,
   NavbarKbdProps,
   NavbarPanelSize,
@@ -76,12 +82,6 @@ import {
   isCompactNavbarPanel,
 } from "@/utils/navbar-panel-position";
 import { getNavbarChromePresentation } from "@/utils/navbar-presentation";
-import {
-  MARKETING_NAV,
-  type MarketingNavCard,
-  type MarketingNavGroup,
-  type MarketingNavRailItem,
-} from "@/utils/navigation";
 
 const HOVER_CLOSE_DELAY = 120;
 const SHELL_TRANSITION = tween("slow", "emphasized");
@@ -199,10 +199,8 @@ function getSlideDirection(
     return 0;
   }
 
-  const currentIndex = groups.findIndex((group) => group.label === activeGroup);
-  const previousIndex = groups.findIndex(
-    (group) => group.label === previousGroup
-  );
+  const currentIndex = groups.findIndex((group) => group.id === activeGroup);
+  const previousIndex = groups.findIndex((group) => group.id === previousGroup);
 
   if (currentIndex === -1 || previousIndex === -1) {
     return 0;
@@ -232,6 +230,9 @@ function getNavbarMotion(reduceMotion: boolean, instantMenuMotion: boolean) {
 export function Navbar({ variant }: NavbarProps = {}) {
   const pathname = useLocation({ select: (location) => location.pathname });
   const resolvedVariant = variant ?? getNavbarVariantForPath(pathname);
+  const t = useTranslations("navbar");
+  const locale = useLocale();
+  const nav = useMarketingNav();
 
   const [isOpen, setIsOpen] = useState(false);
   const [keyboardNavigation, setKeyboardNavigation] = useState(false);
@@ -261,10 +262,8 @@ export function Navbar({ variant }: NavbarProps = {}) {
 
   const groups = useMemo<MarketingNavGroup[]>(
     () =>
-      MARKETING_NAV.filter(
-        (entry): entry is MarketingNavGroup => entry.type === "group"
-      ),
-    []
+      nav.filter((entry): entry is MarketingNavGroup => entry.type === "group"),
+    [nav]
   );
 
   const { isAuthenticated, isResolved } = useDashboardSession();
@@ -383,7 +382,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
 
   // While the dropdown fades out it keeps the size and place of the last group.
   const displayGroup = activeGroup ?? previousGroup;
-  const displayGroupData = groups.find((group) => group.label === displayGroup);
+  const displayGroupData = groups.find((group) => group.id === displayGroup);
   const displaySize = displayGroup ? panelSizes.get(displayGroup) : undefined;
   const dropdownOpen = activeGroup !== null;
   const justOpened = dropdownOpen && previousGroup === null;
@@ -459,9 +458,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   nativeButton={false}
                   render={
                     <Link
-                      aria-label="Notra home"
+                      aria-label={t("home")}
                       className="group flex flex-1 items-center"
-                      to="/"
+                      to={LANDING_HOME_PATHS[locale]}
                       onContextMenu={(event) => {
                         event.preventDefault();
                         setLogoMenuOpen(true);
@@ -485,35 +484,38 @@ export function Navbar({ variant }: NavbarProps = {}) {
                 >
                   <DropdownMenuItem
                     onClick={() =>
-                      copyToClipboard(notraMarkSvgString, "Copied logo as SVG")
+                      copyToClipboard(
+                        notraMarkSvgString,
+                        t("logoMenu.copiedLogo")
+                      )
                     }
                   >
                     <HugeiconsIcon icon={Copy01Icon} />
-                    Copy logo as SVG
+                    {t("logoMenu.copyLogo")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() =>
                       copySvgAsset(
                         BRAND_ASSETS.wordmark.svg,
-                        "Copied wordmark as SVG"
+                        t("logoMenu.copiedWordmark")
                       )
                     }
                   >
                     <HugeiconsIcon icon={Copy01Icon} />
-                    Copy wordmark as SVG
+                    {t("logoMenu.copyWordmark")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     render={
                       <a download href={BRAND_ASSETS.zip}>
                         <HugeiconsIcon icon={Download01Icon} />
-                        Download brand kit
+                        {t("logoMenu.downloadKit")}
                       </a>
                     }
                   />
                   <DropdownMenuSeparator />
                   <DropdownMenuItem render={<Link to="/brand" />}>
                     <HugeiconsIcon icon={PaintBoardIcon} />
-                    Brand Guidelines
+                    {t("logoMenu.guidelines")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -529,7 +531,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                   }
                 }}
               >
-                {MARKETING_NAV.map((entry) => {
+                {nav.map((entry) => {
                   if (entry.type === "link") {
                     return (
                       <Link
@@ -547,29 +549,23 @@ export function Navbar({ variant }: NavbarProps = {}) {
                       </Link>
                     );
                   }
-                  const isActive = activeGroup === entry.label;
+                  const isActive = activeGroup === entry.id;
                   return (
                     <button
                       aria-expanded={isActive}
                       aria-controls={
-                        isActive
-                          ? `desktop-navigation-${entry.label}`
-                          : undefined
+                        isActive ? `desktop-navigation-${entry.id}` : undefined
                       }
                       aria-haspopup="menu"
                       data-slot="navbar-entry"
                       className={`duration-fast inline-flex cursor-pointer items-center gap-1 font-sans text-base leading-5 tracking-[-0.02em] transition-colors ease-out aria-expanded:bg-[#1E1E1E1F] aria-expanded:text-[#1E1E1E] dark:aria-expanded:bg-white/14 dark:aria-expanded:text-white ${mutedNavClass}`}
-                      key={entry.label}
+                      key={entry.id}
                       onClick={(event) => {
                         setKeyboardNavigation(event.detail === 0);
-                        setActiveGroup(isActive ? null : entry.label);
+                        setActiveGroup(isActive ? null : entry.id);
                       }}
                       onKeyDown={(event) =>
-                        handleNavbarTriggerKeyDown(
-                          event,
-                          entry.label,
-                          openGroup
-                        )
+                        handleNavbarTriggerKeyDown(event, entry.id, openGroup)
                       }
                       onMouseEnter={() => {
                         if (
@@ -577,14 +573,14 @@ export function Navbar({ variant }: NavbarProps = {}) {
                             "(hover: hover) and (pointer: fine)"
                           ).matches
                         ) {
-                          openGroup(entry.label);
+                          openGroup(entry.id);
                         }
                       }}
                       ref={(node) => {
                         if (node) {
-                          triggerRefs.current.set(entry.label, node);
+                          triggerRefs.current.set(entry.id, node);
                         } else {
-                          triggerRefs.current.delete(entry.label);
+                          triggerRefs.current.delete(entry.id);
                         }
                       }}
                       type="button"
@@ -659,7 +655,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                       >
                         {groups.map((group) => {
                           const content = getNavbarContentMotion({
-                            label: group.label,
+                            label: group.id,
                             activeGroup,
                             previousGroup,
                             direction,
@@ -678,10 +674,10 @@ export function Navbar({ variant }: NavbarProps = {}) {
                                 dropdownOpen &&
                                   "will-change-[transform,opacity]"
                               )}
-                              id={`desktop-navigation-${group.label}`}
-                              inert={group.label !== activeGroup}
+                              id={`desktop-navigation-${group.id}`}
+                              inert={group.id !== activeGroup}
                               initial={false}
-                              key={group.label}
+                              key={group.id}
                               onKeyDown={(event) => {
                                 setKeyboardNavigation(true);
                                 handleNavbarMenuKeyDown(event, closePanel);
@@ -698,9 +694,9 @@ export function Navbar({ variant }: NavbarProps = {}) {
                                 className="w-max"
                                 ref={(node) => {
                                   if (node) {
-                                    measureRefs.current.set(group.label, node);
+                                    measureRefs.current.set(group.id, node);
                                   } else {
-                                    measureRefs.current.delete(group.label);
+                                    measureRefs.current.delete(group.id);
                                   }
                                 }}
                               >
@@ -735,7 +731,7 @@ export function Navbar({ variant }: NavbarProps = {}) {
                 <button
                   aria-controls="mobile-navigation"
                   aria-expanded={isOpen}
-                  aria-label={isOpen ? "Close menu" : "Open menu"}
+                  aria-label={isOpen ? t("mobile.close") : t("mobile.open")}
                   className="relative inline-flex size-9 items-center justify-center rounded-md text-[#1E1E1E] hover:bg-[#C8B2EE26] lg:hidden dark:text-white dark:hover:bg-white/6"
                   onClick={() => setIsOpen((prev) => !prev)}
                   ref={menuButtonRef}
@@ -766,6 +762,7 @@ const SIGNUP_BUTTON_CLASS =
 function DesktopAuthActions({
   isAuthenticated,
 }: Pick<NavbarAuthActionsProps, "isAuthenticated">) {
+  const t = useTranslations("navbar.auth");
   return (
     <div
       className="hidden h-8 shrink-0 items-center justify-end lg:flex"
@@ -778,7 +775,7 @@ function DesktopAuthActions({
             className={SIGNUP_BUTTON_CLASS}
             href={AUTH_DASHBOARD_URL}
           >
-            Dashboard
+            {t("dashboard")}
             <NavbarKbd onLight>{AUTH_APP_HOTKEY}</NavbarKbd>
           </a>
         ) : (
@@ -788,7 +785,7 @@ function DesktopAuthActions({
               className="font-display duration-fast inline-flex items-center gap-1.5 text-base leading-[1.14] tracking-[-0.015em] text-[#1E1E1E] transition-opacity ease-out hover:opacity-70 dark:text-white"
               href={AUTH_SIGNIN_URL}
             >
-              Sign In
+              {t("signIn")}
               <NavbarKbd>{AUTH_SIGNIN_HOTKEY}</NavbarKbd>
             </a>
             <TrackedSignupLink
@@ -796,7 +793,7 @@ function DesktopAuthActions({
               className={SIGNUP_BUTTON_CLASS}
               source={NAVBAR_DESKTOP_SIGNUP_SOURCE}
             >
-              Sign Up
+              {t("signUp")}
               <NavbarKbd onLight>{AUTH_APP_HOTKEY}</NavbarKbd>
             </TrackedSignupLink>
           </>

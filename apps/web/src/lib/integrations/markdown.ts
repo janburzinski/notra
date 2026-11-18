@@ -41,11 +41,7 @@ import {
   INTEGRATIONS_DOCS_URL,
   STATIC_INTEGRATION_PAGE_SLUGS,
 } from "@/constants/integrations";
-import {
-  CTA_BANNER_CONTACT_HREF,
-  CTA_BANNER_PRIMARY_LABEL,
-  CTA_BANNER_SECONDARY_LABEL,
-} from "@/constants/landing/cta-banner";
+import { CTA_BANNER_CONTACT_HREF } from "@/constants/landing/cta-banner";
 import {
   LINEAR_CONNECT_HREF,
   LINEAR_CONNECT_LABEL,
@@ -96,6 +92,8 @@ import type { Integration, IntegrationTool } from "@/types/integrations";
 import { getIntegrationReferralUrl } from "@/utils/integration-referral-url";
 import { escapeMarkdownLinkText, markdownSection } from "@/utils/markdown";
 import { SITE_URL } from "@/utils/urls";
+
+import en from "../../../messages/en.json";
 
 function getIntegrationSlug(integration: Integration): string {
   return integration.slug ?? integration.id;
@@ -254,8 +252,8 @@ export function buildSlackIntegrationMarkdown(): string {
     markdownSection(SLACK_CTA_HEADING, [
       SLACK_CTA_SUBCOPY,
       "",
-      `- [${CTA_BANNER_PRIMARY_LABEL}](${AUTH_SIGNUP_URL})`,
-      `- [${CTA_BANNER_SECONDARY_LABEL}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
+      `- [${en.landing.cta.primary}](${AUTH_SIGNUP_URL})`,
+      `- [${en.landing.cta.secondary}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
     ]),
   ].join("\n");
 }
@@ -301,8 +299,8 @@ export function buildGithubIntegrationMarkdown(): string {
     markdownSection(GITHUB_CTA_HEADING, [
       GITHUB_CTA_SUBCOPY,
       "",
-      `- [${CTA_BANNER_PRIMARY_LABEL}](${AUTH_SIGNUP_URL})`,
-      `- [${CTA_BANNER_SECONDARY_LABEL}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
+      `- [${en.landing.cta.primary}](${AUTH_SIGNUP_URL})`,
+      `- [${en.landing.cta.secondary}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
     ]),
   ].join("\n");
 }
@@ -346,8 +344,8 @@ export function buildLinearIntegrationMarkdown(): string {
     markdownSection(LINEAR_CTA_HEADING, [
       LINEAR_CTA_SUBCOPY,
       "",
-      `- [${CTA_BANNER_PRIMARY_LABEL}](${AUTH_SIGNUP_URL})`,
-      `- [${CTA_BANNER_SECONDARY_LABEL}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
+      `- [${en.landing.cta.primary}](${AUTH_SIGNUP_URL})`,
+      `- [${en.landing.cta.secondary}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
     ]),
   ].join("\n");
 }
@@ -394,8 +392,8 @@ export function buildGranolaIntegrationMarkdown(): string {
     markdownSection(GRANOLA_CTA_HEADING, [
       GRANOLA_CTA_SUBCOPY,
       "",
-      `- [${CTA_BANNER_PRIMARY_LABEL}](${AUTH_SIGNUP_URL})`,
-      `- [${CTA_BANNER_SECONDARY_LABEL}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
+      `- [${en.landing.cta.primary}](${AUTH_SIGNUP_URL})`,
+      `- [${en.landing.cta.secondary}](${toAbsoluteUrl(CTA_BANNER_CONTACT_HREF)})`,
     ]),
   ].join("\n");
 }

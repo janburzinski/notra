@@ -14,6 +14,7 @@ export type MetadataTitle =
 interface MetadataAlternates {
   canonical?: string;
   types?: Record<string, string>;
+  languages?: Record<string, string>;
 }
 
 interface MetadataRobots {
@@ -76,6 +77,7 @@ export interface HeadMeta {
 export interface HeadLink {
   rel: string;
   href: string;
+  hrefLang?: string;
   type?: string;
   sizes?: string;
   title?: string;

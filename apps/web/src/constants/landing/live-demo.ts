@@ -14,8 +14,3 @@ export const LIVE_DEMO_PREVIEW_THEME_SCRIPT = `(() => {
   if (source.media !== media) source.media = media;
   if (image.loading !== "eager") image.loading = "eager";
 })();`;
-
-export const LIVE_DEMO_PREVIEW_ALT =
-  "Notra GEO overview with visibility by engine and what changed";
-
-export const LIVE_DEMO_OPEN_LABEL = "Explore the demo";

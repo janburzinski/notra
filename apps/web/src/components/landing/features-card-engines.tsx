@@ -1,5 +1,6 @@
 import { GeoBar } from "@notra/ui/components/geo/geo-bar";
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import { MockFrame } from "@/components/landing/mock-frame";
@@ -12,9 +13,7 @@ import {
   TableRow,
 } from "@/components/marketing-table";
 import {
-  FEATURES_ENGINE_HEADERS,
   FEATURES_ENGINE_ROWS,
-  FEATURES_ENGINES_FRAME,
   FEATURES_TABLE_OPTIONAL_COL,
 } from "@/constants/landing/features";
 import { GEO_ENGINE_NAMES } from "@/constants/landing/geo-engines";
@@ -26,19 +25,18 @@ const POSITION_COL = "w-[6.75rem]";
 const CHECKED_COL = "w-[6.5rem]";
 
 export function FeaturesCardEngines() {
+  const t = useTranslations("landing.features.engines");
+  const format = useFormatter();
   return (
-    <MockFrame
-      heading={FEATURES_ENGINES_FRAME.heading}
-      subhead={FEATURES_ENGINES_FRAME.subhead}
-    >
+    <MockFrame heading={t("heading")} subhead={t("subhead")}>
       <Table className="table-fixed">
         <TableHeader className="bg-muted/60">
           <TableRow>
             <TableHead className={HEADER_CLASS}>
-              {FEATURES_ENGINE_HEADERS.engine}
+              {t("headers.engine")}
             </TableHead>
             <TableHead className={cn(HEADER_CLASS, RATE_COL)}>
-              {FEATURES_ENGINE_HEADERS.mentionRate}
+              {t("headers.mentionRate")}
             </TableHead>
             <TableHead
               className={cn(
@@ -47,7 +45,7 @@ export function FeaturesCardEngines() {
                 POSITION_COL
               )}
             >
-              {FEATURES_ENGINE_HEADERS.avgPosition}
+              {t("headers.avgPosition")}
             </TableHead>
             <TableHead
               className={cn(
@@ -56,7 +54,7 @@ export function FeaturesCardEngines() {
                 CHECKED_COL
               )}
             >
-              {FEATURES_ENGINE_HEADERS.lastChecked}
+              {t("headers.lastChecked")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -77,7 +75,9 @@ export function FeaturesCardEngines() {
                     value={row.mentionRate}
                   />
                   <span className="text-sm tabular-nums">
-                    {row.mentionRate}%
+                    {format.number(row.mentionRate / RATE_MAX, {
+                      style: "percent",
+                    })}
                   </span>
                 </span>
               </TableCell>
@@ -88,7 +88,7 @@ export function FeaturesCardEngines() {
                   POSITION_COL
                 )}
               >
-                #{row.avgPosition}
+                #{format.number(row.avgPosition)}
               </TableCell>
               <TableCell
                 className={cn(
@@ -97,7 +97,7 @@ export function FeaturesCardEngines() {
                   CHECKED_COL
                 )}
               >
-                {row.lastChecked}
+                {t("hoursAgo", { count: row.lastCheckedHours })}
               </TableCell>
             </TableRow>
           ))}

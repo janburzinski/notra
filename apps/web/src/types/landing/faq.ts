@@ -1,3 +1,5 @@
+import type { Messages } from "use-intl";
+
 export type FaqItem = {
   id: string;
   question: string;
@@ -14,4 +16,9 @@ export type FaqContent = {
 export type FaqSectionProps = {
   content?: FaqContent;
   className?: string;
+};
+
+export type LandingFaqItem = {
+  id: Extract<keyof Messages["landing"]["faq"]["items"], string>;
+  defaultOpen: boolean;
 };

@@ -1,0 +1,106 @@
+{
+  "heading": "Jede Zahl, die dir das Dashboard zeigt.",
+  "subcopyLineOne": "Das sind die Tabellen aus dem Produkt, gefüllt mit Beispieldaten.",
+  "subcopyLineTwo": "Sie zeigen Erwähnungen, Positionen, Share of Voice und den Traffic, der dahintersteht.",
+  "cards": {
+    "engines": {
+      "title": "Erwähnungsrate pro KI-Engine",
+      "description": "Jeder Prompt geht an jedes Modell, das du aktivierst, und zwar mit Websuche, wenn die Engine sie anbietet. Du siehst, wer dich erwähnt hat, an welcher Stelle der Liste du stehst und ob sich das seit dem letzten Scan verändert hat."
+    },
+    "share": {
+      "title": "Share of Voice",
+      "description": "Hier siehst du, wer an deiner Stelle empfohlen wird. Leg direkte und indirekte Wettbewerber an, gern auch mit den Schreibweisen, unter denen Leute nach ihnen suchen, und vergleiche die Verteilung pro Prompt, Sprache und Engine."
+    },
+    "traffic": {
+      "title": "KI-Traffic mit klarer Zuordnung",
+      "description": "Wir erfassen Zugriffe von 66 bekannten KI-Agents und sortieren sie danach, was gerade passiert ist, also ob ein Modell trainiert wird, ein Index entsteht, eine Seite für eine Antwort gelesen wird oder ein Mensch durchklickt. Ein bloßer Abruf zählt bei uns nicht als Zitierung."
+    },
+    "gaps": {
+      "title": "Content-Lücken, die du schließen kannst",
+      "description": "Das sind die Fragen, auf die KI-Engines antworten, ohne dich zu nennen, sortiert danach, wie gut deine Chancen stehen. Mit einem Klick auf Schreiben plant Notra einen Guide, ein Listicle oder einen Vergleich, und der Entwurf landet in Content."
+    }
+  },
+  "engines": {
+    "heading": "Erwähnungsrate pro KI-Engine",
+    "subhead": "Letzte 30 Tage, 14 Prompts, Englisch und Deutsch",
+    "headers": {
+      "engine": "Engine",
+      "mentionRate": "Erwähnungsrate",
+      "avgPosition": "Ø Position",
+      "lastChecked": "Geprüft"
+    },
+    "hoursAgo": "vor {count} Std."
+  },
+  "share": {
+    "heading": "Share of Voice",
+    "subhead": "Marken, die in 312 Antworten genannt werden",
+    "footnote": "Die Zahlen sind Beispielwerte für diese Seite und die Logos gehören ihren jeweiligen Inhabern.",
+    "headers": {
+      "brand": "Marke",
+      "share": "Anteil",
+      "mentions": "Nennungen"
+    },
+    "logoAlt": "Logo von {brand}"
+  },
+  "traffic": {
+    "heading": "KI-Traffic",
+    "subhead": "KI-Crawler und Verweise, die auf deiner Website landen",
+    "kpis": {
+      "crawlers": "Crawler",
+      "referrals": "Verweise",
+      "total": "Gesamt"
+    },
+    "headers": {
+      "source": "Quelle",
+      "purpose": "Zweck",
+      "visits": "Besuche",
+      "lastSeen": "Zuletzt"
+    },
+    "secondsAgo": "vor {count} s",
+    "minutesAgo": "vor {count} Min."
+  },
+  "purposes": {
+    "training-crawler": {
+      "label": "Modelltraining",
+      "description": "Sammelt Seiten als Trainingsdaten für KI-Modelle"
+    },
+    "search-index": {
+      "label": "Suchindex",
+      "description": "Baut den Index auf, den eine KI-Engine für ihre Antworten durchsucht"
+    },
+    "assistant-browse": {
+      "label": "In Antwort zitiert",
+      "description": "Ein Assistent hat die Seite abgerufen, während er jemandem geantwortet hat. Ein Abruf beweist aber noch keine Zitierung"
+    },
+    "assistant-referral": {
+      "label": "Verweis",
+      "description": "Jemand ist über eine KI-Antwort auf deine Website gekommen"
+    }
+  },
+  "gaps": {
+    "heading": "Content-Lücken",
+    "subhead": "Fragen, die KI-Engines beantworten, ohne dich zu nennen",
+    "headers": {
+      "content": "Inhalt",
+      "opportunity": "Chance",
+      "missing": "Fehlende Engines",
+      "action": "Schreiben"
+    },
+    "meterLabel": "Erwähnungsrate {rate} %, Chance {level}/{steps}",
+    "rows": {
+      "geoMetrics": "Welche GEO-Kennzahlen sollte ein Marketingteam verfolgen?",
+      "b2bPlatforms": "Welche GEO-Plattformen eignen sich am besten für B2B-SaaS?",
+      "perplexityCitations": "Wie werde ich von Perplexity zitiert?",
+      "aiCrawlers": "Wie finden und zitieren KI-Crawler eine Website?",
+      "whatIsGeo": "Was ist Generative Engine Optimization?"
+    }
+  },
+  "liveTraffic": {
+    "headers": {
+      "when": "Wann",
+      "provider": "Anbieter",
+      "path": "Pfad",
+      "purpose": "Zweck"
+    }
+  }
+}

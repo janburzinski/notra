@@ -1,4 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
+import type { Messages } from "use-intl";
 
 export type EngineId =
   | "chatgpt"
@@ -23,7 +24,7 @@ export interface EngineRateRow {
   mentions: number;
   checks: number;
   avgPosition: number;
-  lastChecked: string;
+  lastCheckedHours: number;
 }
 
 export interface ShareRowLogo {
@@ -44,9 +45,8 @@ export interface ShareRow {
 }
 
 export interface KpiTile {
-  id: string;
-  label: string;
-  value: string;
+  id: Extract<keyof Messages["landing"]["features"]["traffic"]["kpis"], string>;
+  value: number;
 }
 
 type TrafficPurpose =
@@ -90,12 +90,11 @@ export interface TrafficSourceRow {
   engine: LandingEngineId;
   purpose: TrafficPurpose;
   visits: number;
-  lastSeen: string;
+  lastSeenSeconds: number;
 }
 
 export interface GapRow {
-  id: string;
-  content: string;
+  id: Extract<keyof Messages["landing"]["features"]["gaps"]["rows"], string>;
   opportunity: number;
   mentionRate: number;
   missing: EngineId[];
@@ -105,10 +104,21 @@ export type AnswerSentiment = "positive" | "neutral" | "negative";
 
 export type AnswerPositionTone = "top" | "mid" | "low";
 
+type AnswerExampleMessages = Messages["landing"]["answers"];
+
+export type AnswerExampleEngineId = Extract<
+  keyof AnswerExampleMessages["excerpts"],
+  EngineId
+>;
+
+export type AnswerExampleFactId = Extract<
+  keyof AnswerExampleMessages["facts"],
+  string
+>;
+
 export interface AnswerEngineResult {
-  id: EngineId;
+  id: AnswerExampleEngineId;
   mentioned: boolean;
   position: number | null;
   sentiment: AnswerSentiment;
-  excerpt: string;
 }

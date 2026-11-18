@@ -1,13 +1,9 @@
 import type {
   BillingPeriod,
-  BillingToggleOption,
   PricingFreePlan,
   PricingPlan,
   TrackedEngine,
 } from "@/types/landing/pricing";
-
-export const TRACKED_ENGINES_CAPTION =
-  "Track the answers people actually see in ChatGPT, Claude, Gemini, Copilot and Google";
 
 const ENGINE_LOGO_BASE = "/logos/ai-engines";
 
@@ -23,176 +19,160 @@ export const TRACKED_ENGINES: TrackedEngine[] = [
   { name: "Google", src: `${ENGINE_LOGO_BASE}/google.svg`, width: 28 },
 ];
 
-export const PRICING_ANNUAL_BADGE = "2 months free";
-
 export const PRICING_DEFAULT_BILLING: BillingPeriod = "monthly";
 
-export const PRICING_BILLING_OPTIONS: BillingToggleOption[] = [
-  { value: "monthly", label: "Monthly" },
-  { value: "yearly", label: "Yearly" },
-];
-
-export const PRICING_HEADING = "Pricing that grows with you.";
-
-export const PRICING_SUBHEADING =
-  "Every paid plan includes tracking, attribution and the writer. Start free and cancel anytime.";
+export const PRICING_BILLING_OPTIONS: BillingPeriod[] = ["monthly", "yearly"];
 
 const SIGNUP_URL = "https://app.usenotra.com/signup";
 const ENTERPRISE_MAIL_URL = "mailto:hello@usenotra.com";
 
 export const PRICING_FREE_PLAN: PricingFreePlan = {
   name: "Free",
-  description:
-    "Track AI agents and people visiting your site with one shared event allowance, and collect agent feedback.",
   price: "$0",
   cta: {
-    label: "Start for free",
+    labelId: "startFree",
     kind: "signup",
     href: SIGNUP_URL,
     source: "pricing_free",
     showArrow: true,
   },
   features: [
-    { label: "1M analytics events / mo", icon: "traffic" },
-    { label: "Agent feedback", icon: "feedback" },
+    { id: "events", count: 1, icon: "traffic" },
+    { id: "agentFeedback", icon: "feedback" },
   ],
 };
-
-export const PRICING_CAROUSEL_LABEL = "Plans";
-
-export function pricingCarouselDotLabel(planName: string) {
-  return `Show the ${planName} plan`;
-}
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: "starter",
     answersPerMonth: 6_000,
     name: "Starter",
-    description: "For founders tracking their first prompts.",
     price: { monthly: "$100", yearly: "$1,000" },
-    priceSuffix: { monthly: "/month", yearly: "/year" },
     hasAnnualBadge: true,
     variant: "default",
     cta: {
-      label: "Get started",
+      labelId: "getStarted",
       kind: "signup",
       href: SIGNUP_URL,
       source: "pricing_starter",
       showArrow: true,
     },
     features: [
-      { label: "6,000 AI answers tracked / mo", icon: "tracking" },
+      { id: "answers", count: 6000, icon: "tracking" },
       {
-        label: "5M analytics events / mo",
-        subtitle: "shared by agent and web analytics",
+        id: "events",
+        count: 5,
+        subtitle: "eventsShared",
         icon: "traffic",
       },
-      { label: "8 image generations / mo", icon: "images" },
-      { label: "10 long-form posts / mo", icon: "content" },
-      { label: "Unlimited social posts", icon: "social" },
-      { label: "1 project", icon: "projects" },
+      { id: "images", count: 8, icon: "images" },
+      { id: "posts", count: 10, icon: "content" },
+      { id: "social", icon: "social" },
+      { id: "projects", count: 1, icon: "projects" },
       {
-        label: "100 references",
-        subtitle: "then $0.05 per ref / mo",
+        id: "references",
+        count: 100,
+        subtitle: "referencesOverage",
+        price: "$0.05",
         icon: "references",
       },
-      { label: "Standard support + Slack", icon: "support" },
+      { id: "supportStandard", icon: "support" },
     ],
   },
   {
     id: "growth",
     answersPerMonth: 16_000,
     name: "Growth",
-    description: "For teams tracking prompts across engines and languages.",
     price: { monthly: "$250", yearly: "$2,500" },
-    priceSuffix: { monthly: "/month", yearly: "/year" },
     hasAnnualBadge: true,
     variant: "featured",
     cta: {
-      label: "Get started",
+      labelId: "getStarted",
       kind: "signup",
       href: SIGNUP_URL,
       source: "pricing_growth",
       showArrow: true,
     },
     features: [
-      { label: "16,000 AI answers tracked / mo", icon: "tracking" },
+      { id: "answers", count: 16000, icon: "tracking" },
       {
-        label: "15M analytics events / mo",
-        subtitle: "shared by agent and web analytics",
+        id: "events",
+        count: 15,
+        subtitle: "eventsShared",
         icon: "traffic",
       },
-      { label: "20 image generations / mo", icon: "images" },
-      { label: "25 long-form posts / mo", icon: "content" },
-      { label: "Unlimited social posts", icon: "social" },
-      { label: "3 projects", icon: "projects" },
+      { id: "images", count: 20, icon: "images" },
+      { id: "posts", count: 25, icon: "content" },
+      { id: "social", icon: "social" },
+      { id: "projects", count: 3, icon: "projects" },
       {
-        label: "500 references",
-        subtitle: "then $0.04 per ref / mo",
+        id: "references",
+        count: 500,
+        subtitle: "referencesOverage",
+        price: "$0.04",
         icon: "references",
       },
-      { label: "Standard support + Slack", icon: "support" },
+      { id: "supportStandard", icon: "support" },
     ],
   },
   {
     id: "scale",
     answersPerMonth: 35_000,
     name: "Scale",
-    description: "For agencies and teams running several brands.",
     price: { monthly: "$550", yearly: "$5,500" },
-    priceSuffix: { monthly: "/month", yearly: "/year" },
     hasAnnualBadge: true,
     variant: "default",
     cta: {
-      label: "Get started",
+      labelId: "getStarted",
       kind: "signup",
       href: SIGNUP_URL,
       source: "pricing_scale",
       showArrow: true,
     },
     features: [
-      { label: "35,000 AI answers tracked / mo", icon: "tracking" },
+      { id: "answers", count: 35000, icon: "tracking" },
       {
-        label: "30M analytics events / mo",
-        subtitle: "shared by agent and web analytics",
+        id: "events",
+        count: 30,
+        subtitle: "eventsShared",
         icon: "traffic",
       },
-      { label: "45 image generations / mo", icon: "images" },
-      { label: "50 long-form posts / mo", icon: "content" },
-      { label: "Unlimited social posts", icon: "social" },
-      { label: "10 projects", icon: "projects" },
+      { id: "images", count: 45, icon: "images" },
+      { id: "posts", count: 50, icon: "content" },
+      { id: "social", icon: "social" },
+      { id: "projects", count: 10, icon: "projects" },
       {
-        label: "1,000 references",
-        subtitle: "then $0.03 per ref / mo",
+        id: "references",
+        count: 1000,
+        subtitle: "referencesOverage",
+        price: "$0.03",
         icon: "references",
       },
-      { label: "Priority support", icon: "support" },
+      { id: "supportPriority", icon: "support" },
     ],
   },
   {
     id: "enterprise",
     answersPerMonth: null,
     name: "Enterprise",
-    description: "For large orgs with custom scale and compliance needs.",
-    price: { monthly: "Custom", yearly: "Custom" },
+    price: null,
     variant: "default",
     cta: {
-      label: "Contact us",
+      labelId: "contactUs",
       kind: "mail",
       href: ENTERPRISE_MAIL_URL,
       source: "pricing_enterprise",
       showArrow: false,
     },
     features: [
-      { label: "Unlimited AI answers tracked", icon: "tracking" },
-      { label: "Unlimited analytics events", icon: "traffic" },
-      { label: "Unlimited image generations", icon: "images" },
-      { label: "Unlimited long-form posts", icon: "content" },
-      { label: "Unlimited social posts", icon: "social" },
-      { label: "Unlimited projects", icon: "projects" },
-      { label: "Unlimited references", icon: "references" },
-      { label: "Dedicated support", icon: "support" },
+      { id: "answersUnlimited", icon: "tracking" },
+      { id: "eventsUnlimited", icon: "traffic" },
+      { id: "imagesUnlimited", icon: "images" },
+      { id: "postsUnlimited", icon: "content" },
+      { id: "social", icon: "social" },
+      { id: "projectsUnlimited", icon: "projects" },
+      { id: "referencesUnlimited", icon: "references" },
+      { id: "supportDedicated", icon: "support" },
     ],
   },
 ];

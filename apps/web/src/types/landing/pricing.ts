@@ -1,4 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
+import type { Messages } from "use-intl";
 
 export type PricingIconKey =
   | "tracking"
@@ -16,21 +17,22 @@ export type PricingIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
 export type BillingPeriod = "monthly" | "yearly";
 
-export interface BillingToggleOption {
-  value: BillingPeriod;
-  label: string;
-}
+type PricingMessages = Messages["landing"]["pricing"];
+
+type PricingFeatureId = Extract<keyof PricingMessages["features"], string>;
 
 interface PricingFeature {
-  label: string;
-  subtitle?: string;
+  id: PricingFeatureId;
+  count?: number;
+  subtitle?: PricingFeatureId;
+  price?: string;
   icon: PricingIconKey;
 }
 
 type PricingCtaKind = "signup" | "mail";
 
 interface PricingCta {
-  label: string;
+  labelId: Extract<keyof PricingMessages["cta"], string>;
   kind: PricingCtaKind;
   href: string;
   source: string;
@@ -38,12 +40,10 @@ interface PricingCta {
 }
 
 export interface PricingPlan {
-  id: string;
+  id: Exclude<Extract<keyof PricingMessages["plans"], string>, "free">;
   answersPerMonth: number | null;
   name: string;
-  description: string;
-  price: Record<BillingPeriod, string>;
-  priceSuffix?: Record<BillingPeriod, string>;
+  price: Record<BillingPeriod, string> | null;
   variant: "default" | "featured";
   hasAnnualBadge?: boolean;
   cta: PricingCta;
@@ -52,7 +52,6 @@ export interface PricingPlan {
 
 export interface PricingFreePlan {
   name: string;
-  description: string;
   price: string;
   cta: PricingCta;
   features: PricingFeature[];

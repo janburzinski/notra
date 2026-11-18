@@ -65,6 +65,10 @@ export async function buildSitemapEntries(): Promise<SitemapEntry[]> {
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },
     {
+      url: `${SITE_URL}/de`,
+      lastModified: STATIC_PAGE_LAST_MODIFIED,
+    },
+    {
       url: `${SITE_URL}/features`,
       lastModified: STATIC_PAGE_LAST_MODIFIED,
     },

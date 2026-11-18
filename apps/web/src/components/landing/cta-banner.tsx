@@ -1,15 +1,12 @@
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { Link } from "@tanstack/react-router";
+import { useTranslations } from "use-intl";
 
 import { DeferredDithering } from "@/components/deferred-dithering";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
   CTA_BANNER_CONTACT_HREF,
-  CTA_BANNER_HEADING,
-  CTA_BANNER_PRIMARY_LABEL,
-  CTA_BANNER_SECONDARY_LABEL,
   CTA_BANNER_SIGNUP_SOURCE,
-  CTA_BANNER_SUBCOPY,
 } from "@/constants/landing/cta-banner";
 import type { CtaBannerProps } from "@/types/landing/cta-banner";
 
@@ -29,10 +26,11 @@ export function CtaBannerDither() {
 }
 
 export function CtaBanner({
-  heading = CTA_BANNER_HEADING,
-  subcopy = CTA_BANNER_SUBCOPY,
+  heading,
+  subcopy,
   signupSource = CTA_BANNER_SIGNUP_SOURCE,
 }: CtaBannerProps) {
+  const t = useTranslations("landing.cta");
   return (
     <div className="relative mx-auto flex w-full max-w-[87rem] shrink-0 items-center justify-center overflow-clip rounded-[1.5625rem] bg-[#C8B2EE40] px-6 py-12 antialiased sm:min-h-[27.4375rem] sm:py-16 dark:bg-[#231d3a]">
       <CtaBannerDither />
@@ -40,10 +38,10 @@ export function CtaBanner({
         <div className="flex flex-col items-center gap-3">
           <div className="flex flex-col items-center gap-4.5">
             <h2 className="font-display max-w-[46.625rem] text-center text-[2.25rem] leading-[110%] font-medium tracking-[-0.0625rem] text-balance text-[#1E1E1E] sm:text-[3rem] sm:tracking-[-0.125rem] lg:text-[4rem] dark:text-white">
-              {heading}
+              {heading ?? t("heading")}
             </h2>
             <p className="max-w-[33.5rem] text-center font-sans text-base/6 font-medium tracking-[-0.03125rem] text-balance text-[#1E1E1EE6] sm:text-lg/5.5 dark:text-white/85">
-              {subcopy}
+              {subcopy ?? t("subcopy")}
             </p>
           </div>
         </div>
@@ -54,7 +52,7 @@ export function CtaBanner({
             render={<TrackedSignupLink source={signupSource} />}
             variant="primary"
           >
-            {CTA_BANNER_PRIMARY_LABEL}
+            {t("primary")}
           </CtaButton>
           <CtaButton
             className="w-full max-w-full text-lg sm:w-auto"
@@ -62,7 +60,7 @@ export function CtaBanner({
             render={<Link to={CTA_BANNER_CONTACT_HREF} />}
             variant="light"
           >
-            {CTA_BANNER_SECONDARY_LABEL}
+            {t("secondary")}
           </CtaButton>
         </div>
       </div>

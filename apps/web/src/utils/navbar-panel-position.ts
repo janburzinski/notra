@@ -1,5 +1,4 @@
-import type { NavbarPanelSize } from "@/types/navbar";
-import type { MarketingNavGroup } from "@/utils/navigation";
+import type { MarketingNavGroup, NavbarPanelSize } from "@/types/navbar";
 
 export function isCompactNavbarPanel(group: MarketingNavGroup | undefined) {
   return group?.layout === "compact" && !group.panel;

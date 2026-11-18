@@ -1,0 +1,30 @@
+{
+  "heading": "Häufige Fragen",
+  "subcopy": "Kurze Antworten auf die Fragen, die wir am häufigsten hören.",
+  "items": {
+    "what-is-geo": {
+      "question": "Was ist GEO?",
+      "answer": "GEO steht für Generative Engine Optimization. Es geht darum, dass deine Marke in der Antwort auftaucht, wenn jemand ChatGPT, Claude, Gemini oder Perplexity fragt, was er kaufen soll. Notra misst, wo du in diesen Antworten vorkommst, und zeigt dir, wie du das verbesserst."
+    },
+    "engines": {
+      "question": "Welche KI-Engines und Modelle scannt ihr?",
+      "answer": "ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews und Google AI Mode erfassen wir direkt aus den Apps, damit du die Antworten siehst, die Menschen wirklich bekommen. Dazu kommen Claude, Grok, Kimi, GLM und DeepSeek, die aus ihrem Trainingswissen antworten. Du entscheidest, welche davon laufen."
+    },
+    "answers-tracked": {
+      "question": "Was zählt als getrackte KI-Antwort?",
+      "answer": "Eine Antwort ist ein Prompt, den wir bei einem Scan einer KI-Engine in einer Sprache stellen. Wenn du zehn Prompts auf fünf KI-Engines in zwei Sprachen alle 48 Stunden scannst, kommst du auf etwa 1.500 Antworten im Monat."
+    },
+    "traffic": {
+      "question": "Wie funktioniert das Traffic-Tracking? Brauche ich ein Script-Tag?",
+      "answer": "Nein, du bindest @usenotra/sdk als Proxy oder Middleware in deine Next.js-, Nuxt-, TanStack-Start-, Astro- oder SvelteKit-Seite ein. Das SDK schickt einen kleinen Auszug jedes Requests an Notra, wir ordnen ihn auf unserer Seite zu und verwerfen alles, was von Menschen kommt, bevor es gespeichert wird."
+    },
+    "citation": {
+      "question": "Ist ein Crawler-Abruf dasselbe wie eine Zitierung?",
+      "answer": "Nein, als in der Antwort zitiert zählt eine Seite nur, wenn ein Assistent sie abgerufen hat, während er jemandem geantwortet hat. Trainings-Crawler und Indexer bekommen eigene Labels, und ein Verweis ist ein echter Mensch, der aus einer KI-Antwort heraus auf deine Seite klickt. Notra weist jede dieser Arten getrennt aus."
+    },
+    "write": {
+      "question": "Kann Notra die Inhalte auch schreiben?",
+      "answer": "Ja, such dir eine Lücke aus und wähl Guide, Listicle oder Vergleich. Der Bereich Schreiben plant dann ein Briefing aus deiner Markenidentität, deiner Sitemap und den Wettbewerbern, die du trackst. Sobald du das Briefing freigibst, öffnet sich der Entwurf unter Inhalte."
+    }
+  }
+}

@@ -1,0 +1,637 @@
+{
+  "footer": {
+    "tagline": "Find out what AI engines say about you, and fix it.",
+    "home": "Notra",
+    "socialLabel": "Visit Notra on {network}",
+    "privacySettings": "Privacy settings",
+    "copyright": "© {year} Notra, Inc.",
+    "groups": {
+      "product": "Product",
+      "integrations": "Integrations",
+      "developers": "Developers",
+      "sources": "Sources",
+      "company": "Company",
+      "community": "Community",
+      "freeTools": "Free Tools"
+    },
+    "links": {
+      "aiTraffic": "AI Traffic",
+      "personas": "Personas",
+      "conversations": "Conversations",
+      "sites": "Sites",
+      "freeScan": "Free scan",
+      "pricing": "Pricing",
+      "compare": "Compare",
+      "changelog": "Changelog",
+      "marketplace": "Marketplace",
+      "framer": "Framer",
+      "raycast": "Raycast",
+      "geoSdk": "GEO SDK",
+      "docs": "Docs",
+      "cli": "CLI",
+      "mcpServer": "MCP Server",
+      "github": "GitHub",
+      "linear": "Linear",
+      "slack": "Slack",
+      "granola": "Granola",
+      "brandAssets": "Brand Assets",
+      "reviews": "Reviews",
+      "contact": "Contact",
+      "stateOfAiSearch": "State of AI Search",
+      "stateOfAiTraffic": "State of AI Traffic",
+      "starVideo": "GitHub Star Video Generator",
+      "ipChecker": "AI Crawler IP Checker",
+      "featureCheck": "AI Feature Check",
+      "utmBuilder": "UTM Builder",
+      "qrCode": "QR Code Generator",
+      "privacy": "Privacy",
+      "legal": "Legal",
+      "terms": "Terms"
+    }
+  },
+  "landing": {
+    "announcement": {
+      "text": "Agent and web analytics share 1 million free events a month",
+      "textMobile": "Agent + web analytics: 1M free events / mo"
+    },
+    "answers": {
+      "heading": "Read what each engine said.",
+      "subcopy": "Every scan keeps the whole answer. Open a prompt and read what each engine wrote, where you show up and which pages it pulled to get there.",
+      "prompt": "What are good Quillbase alternatives for startups?",
+      "expand": "Read the full answer",
+      "resultsTitle": "Across engines",
+      "headers": {
+        "engine": "Engine",
+        "mentioned": "Mentioned",
+        "position": "Position",
+        "sentiment": "Sentiment"
+      },
+      "sentiment": {
+        "positive": "Positive",
+        "neutral": "Neutral",
+        "negative": "Negative"
+      },
+      "outcome": {
+        "mentioned": "Mentioned",
+        "notMentioned": "Not mentioned"
+      },
+      "positionNone": "None",
+      "citationsLabel": "Recent AI crawlers",
+      "excerpts": {
+        "chatgpt": "If you are a small team that ships often, a few options stand out:\n\n1. **Draftly** has solid templates for landing pages and ads, but is weaker on technical products.\n2. **Notra** turns shipped work into changelogs and posts, and tracks how AI engines mention your brand. A good fit if your team ships weekly.\n3. **Penfold** is a general writing assistant. Cheaper, but there is no publishing workflow.\n\nIf GEO tracking matters to you, Notra is the only one of the three that measures it.",
+        "perplexity": "For startups replacing Quillbase, the strongest options are:\n\n- [Notra](https://usenotra.com/blog/geo-guide): generates changelogs and launch posts from your repo and tracks brand mentions across AI engines.\n- [Draftly](https://draftly.example/templates): template driven, good for paid ads.\n- [Penfold](https://penfold.example/pricing): lightweight writing assistant.\n\nNotra is the most frequently recommended for engineering led teams, according to [G2](https://www.g2.com/categories/ai-writing) reviews.",
+        "claude": "A few alternatives worth a look, depending on what you need:\n\n**Draftly** if marketing pages are the main job.\n**Penfold** if you want a cheap general purpose writer.\n**Notra** if you want content generated from shipped work and visibility tracking in AI search.\n\nI would trial two of them against a real launch before committing.",
+        "gemini": "Popular Quillbase alternatives for startups include Draftly, Penfold and Copyhaus. Draftly is often chosen for its templates, Penfold for price and Copyhaus for agency style workflows. Consider trialing each with a real campaign before choosing."
+      },
+      "facts": {
+        "full": {
+          "title": "Full answers",
+          "text": "Read the sentence the engine wrote, the position you got and the names listed next to yours."
+        },
+        "live": {
+          "title": "Live search, cited",
+          "text": "Engines with web search run every prompt with live retrieval. You see the searches the engine made and the pages it cited."
+        },
+        "reply": {
+          "title": "Reply in place",
+          "text": "Ask a follow-up in the thread and see if the recommendation survives a buyer pushing back."
+        }
+      }
+    },
+    "cta": {
+      "heading": "Find out what AI agents say about you and change it.",
+      "subcopy": "Add a few prompts and run a scan to read the answers. Notra is free to start.",
+      "primary": "Start for free",
+      "secondary": "Book a Call"
+    },
+    "faq": {
+      "heading": "Common questions",
+      "subcopy": "Short answers to what comes up most.",
+      "items": {
+        "what-is-geo": {
+          "question": "What is GEO?",
+          "answer": "GEO stands for Generative Engine Optimization. It means getting your brand into the answer when someone asks ChatGPT, Claude, Gemini or Perplexity what to buy. Notra measures where you appear in those answers and shows you how to improve it."
+        },
+        "engines": {
+          "question": "Which engines and models do you scan?",
+          "answer": "ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews and Google AI Mode, captured from the apps themselves so you see the answers people actually get, plus Claude, Grok, Kimi, GLM and DeepSeek answering from what they learned in training. You pick which ones run."
+        },
+        "answers-tracked": {
+          "question": "What counts as an AI answer tracked?",
+          "answer": "One prompt asked to one engine in one language on one scan. Ten prompts across five engines in two languages, scanned every 48 hours, is about 1,500 answers a month."
+        },
+        "traffic": {
+          "question": "How does traffic tracking work? Do I need a script tag?",
+          "answer": "You don't need one. Add @usenotra/sdk as a proxy or middleware in your Next.js, Nuxt, TanStack Start, Astro or SvelteKit site. It posts a small request envelope to Notra, we do the matching on our side and anything human is dropped before it is stored."
+        },
+        "citation": {
+          "question": "Is a crawler fetch the same as a citation?",
+          "answer": "No. Cited in answer means an assistant fetched the page while it was answering someone. Training crawlers and indexers get their own labels, and a Referral is a real person clicking through from an AI answer. Notra reports each one separately."
+        },
+        "write": {
+          "question": "Can Notra write the content too?",
+          "answer": "Yes. Pick a gap, choose guide, listicle or comparison and Write plans a brief from your brand identity, your sitemap and the competitors you track. You approve the brief, the draft opens in Content."
+        }
+      }
+    },
+    "features": {
+      "heading": "Every number the dashboard shows you.",
+      "subcopyLineOne": "These are the tables in the product, filled with sample data.",
+      "subcopyLineTwo": "They show mentions, positions, share of voice and the traffic behind them.",
+      "cards": {
+        "engines": {
+          "title": "Mention rate by engine",
+          "description": "Each prompt goes to each model you turn on, with web search where the engine has it. You get who mentioned you, where in the list and whether that moved since the last scan."
+        },
+        "share": {
+          "title": "Share of voice",
+          "description": "Who gets recommended when you don't. Add direct and indirect competitors, plus the misspellings people use for them and see the split per prompt, language and engine."
+        },
+        "traffic": {
+          "title": "AI traffic, attributed",
+          "description": "Hits from 66 known AI agents, sorted by what they were doing: training a model, building an index, reading a page to answer someone or a person clicking through. We don't count a fetch as a citation."
+        },
+        "gaps": {
+          "title": "Content gaps to write",
+          "description": "The questions where engines answer and you are not in the answer, ranked by how winnable they look. Write plans a guide, listicle or comparison and the draft lands in Content."
+        }
+      },
+      "engines": {
+        "heading": "Mention rate by engine",
+        "subhead": "Last 30 days, 14 prompts, English and German",
+        "headers": {
+          "engine": "Engine",
+          "mentionRate": "Mention rate",
+          "avgPosition": "Avg position",
+          "lastChecked": "Last checked"
+        },
+        "hoursAgo": "{count}h ago"
+      },
+      "share": {
+        "heading": "Share of voice",
+        "subhead": "Brands named across 312 answers",
+        "footnote": "Sample numbers, made up for this page. Logos belong to their owners.",
+        "headers": {
+          "brand": "Brand",
+          "share": "Share",
+          "mentions": "Mentions"
+        },
+        "logoAlt": "{brand} logo"
+      },
+      "traffic": {
+        "heading": "AI Traffic",
+        "subhead": "AI crawlers and referrals visiting your site",
+        "kpis": {
+          "crawlers": "Crawlers",
+          "referrals": "Referrals",
+          "total": "Total"
+        },
+        "headers": {
+          "source": "Source",
+          "purpose": "Purpose",
+          "visits": "Visits",
+          "lastSeen": "Last seen"
+        },
+        "secondsAgo": "{count}s ago",
+        "minutesAgo": "{count}m ago"
+      },
+      "purposes": {
+        "training-crawler": {
+          "label": "Model training",
+          "description": "Collects pages for model training corpora"
+        },
+        "search-index": {
+          "label": "Search index",
+          "description": "Builds the index an AI answer engine searches"
+        },
+        "assistant-browse": {
+          "label": "Cited in answer",
+          "description": "Fetched while an assistant was answering someone. A fetch is not proof of a citation"
+        },
+        "assistant-referral": {
+          "label": "Referral",
+          "description": "A person clicked through to your site from an AI answer"
+        }
+      },
+      "gaps": {
+        "heading": "Content Gaps",
+        "subhead": "Questions engines answer without mentioning you",
+        "headers": {
+          "content": "Content",
+          "opportunity": "Opportunity",
+          "missing": "Missing engines",
+          "action": "Write"
+        },
+        "meterLabel": "{rate}% mention rate, {level}/{steps} opportunity",
+        "rows": {
+          "geoMetrics": "What GEO metrics should a marketing team track?",
+          "b2bPlatforms": "Which GEO platforms work best for B2B SaaS?",
+          "perplexityCitations": "How do I get cited by Perplexity?",
+          "aiCrawlers": "How do AI crawlers find and cite a website?",
+          "whatIsGeo": "What is generative engine optimization?"
+        }
+      },
+      "liveTraffic": {
+        "headers": {
+          "when": "When",
+          "provider": "Provider",
+          "path": "Path",
+          "purpose": "Purpose"
+        }
+      }
+    },
+    "hero": {
+      "websiteLabel": "Your website",
+      "websitePlaceholder": "company.com",
+      "websiteInvalid": "Enter a valid website, like company.com",
+      "demoOpen": "Explore the demo",
+      "demoPreviewAlt": "Notra GEO overview with visibility by engine and what changed",
+      "variantSwitcherLabel": "Hero variant preview",
+      "variantSwitcherHide": "Hide variant switcher",
+      "variants": {
+        "control": {
+          "lineOne": "Be the answer when",
+          "lineTwoPrefix": "buyers ask",
+          "lineTwoSuffix": ".",
+          "subhead": "Notra is a GEO tool that asks ChatGPT, Claude and Gemini the questions your buyers ask. It shows whether you appear, who appears instead and how to fix it.",
+          "cta": "Start for free",
+          "secondaryLabel": "Book a Call"
+        },
+        "visibility": {
+          "lineOne": "See if you show up",
+          "lineTwoPrefix": "in",
+          "lineTwoSuffix": ".",
+          "subhead": "See which prompts your buyers ask AI, whether you show up in the answer and exactly what to publish to win the ones you lose.",
+          "cta": "Check your AI visibility",
+          "secondaryLabel": "Book a Call"
+        },
+        "slack": {
+          "lineOne": "Use <brand>Slack</brand> to show up",
+          "lineTwoPrefix": "in",
+          "lineTwoSuffix": ".",
+          "subhead": "Ask Notra in Slack how your brand shows up in ChatGPT, Claude and Gemini. It replies in the thread with the prompts you lose and drafts the pages that win them back, ready to approve without leaving Slack.",
+          "cta": "Add Notra to Slack",
+          "secondaryLabel": "See the Slack app"
+        },
+        "claude": {
+          "lineOne": "Ask <brand>Claude</brand> if buyers",
+          "lineTwoPrefix": "find you in",
+          "lineTwoSuffix": ".",
+          "subhead": "Notra is a verified Claude connector. Ask Claude where your brand appears in AI answers, who shows up instead and what to publish next, all from the chat you already use.",
+          "cta": "Start for free",
+          "secondaryLabel": "Add to Claude"
+        },
+        "claude-expert": {
+          "lineOne": "Turn <brand>Claude</brand> into an",
+          "lineTwoPrefix": "SEO & GEO expert",
+          "lineTwoSuffix": ".",
+          "subhead": "Connect Notra to Claude and ask how your brand shows up in ChatGPT, Claude and Gemini. Claude finds the prompts you lose and drafts the pages that win them back.",
+          "cta": "Start for free",
+          "secondaryLabel": "Add to Claude"
+        },
+        "chatgpt": {
+          "lineOne": "Ask <brand>ChatGPT</brand> if buyers",
+          "lineTwoPrefix": "find you in",
+          "lineTwoSuffix": ".",
+          "subhead": "Notra is a ChatGPT app. Ask ChatGPT where your brand appears in AI answers, who shows up instead and what to publish next, all from the chat you already use.",
+          "cta": "Start for free",
+          "secondaryLabel": "Add to ChatGPT"
+        },
+        "chatgpt-expert": {
+          "lineOne": "Turn <brand>ChatGPT</brand> into an",
+          "lineTwoPrefix": "SEO & GEO expert",
+          "lineTwoSuffix": ".",
+          "subhead": "Connect Notra to ChatGPT and ask how your brand shows up in ChatGPT, Claude and Gemini. ChatGPT finds the prompts you lose and drafts the pages that win them back.",
+          "cta": "Start for free",
+          "secondaryLabel": "Add to ChatGPT"
+        }
+      }
+    },
+    "logoMarquee": {
+      "caption": "Used by teams that ship every week"
+    },
+    "page": {
+      "title": "Notra. Get recommended by AI engines.",
+      "description": "Notra is a GEO tool that asks ChatGPT, Claude and Gemini the questions your buyers ask. It shows whether you appear, who appears instead and how to fix it."
+    },
+    "pricing": {
+      "heading": "Pricing that grows with you.",
+      "subheading": "Every paid plan includes tracking, attribution and the writer. Start free and cancel anytime.",
+      "enginesCaption": "Track the answers people actually see in ChatGPT, Claude, Gemini, Copilot and Google",
+      "annualBadge": "2 months free",
+      "customPrice": "Custom",
+      "carouselLabel": "Plans",
+      "carouselDot": "Show the {plan} plan",
+      "billing": {
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "perPeriod": {
+        "monthly": "/month",
+        "yearly": "/year"
+      },
+      "cta": {
+        "startFree": "Start for free",
+        "getStarted": "Get started",
+        "contactUs": "Contact us"
+      },
+      "plans": {
+        "free": "Track AI agents and people visiting your site with one shared event allowance, and collect agent feedback.",
+        "starter": "For founders tracking their first prompts.",
+        "growth": "For teams tracking prompts across engines and languages.",
+        "scale": "For agencies and teams running several brands.",
+        "enterprise": "For large orgs with custom scale and compliance needs."
+      },
+      "features": {
+        "answers": "{count, number} AI answers tracked / mo",
+        "answersUnlimited": "Unlimited AI answers tracked",
+        "events": "{count}M analytics events / mo",
+        "eventsShared": "shared by agent and web analytics",
+        "eventsUnlimited": "Unlimited analytics events",
+        "agentFeedback": "Agent feedback",
+        "images": "{count} image generations / mo",
+        "imagesUnlimited": "Unlimited image generations",
+        "posts": "{count} long-form posts / mo",
+        "postsUnlimited": "Unlimited long-form posts",
+        "social": "Unlimited social posts",
+        "projects": "{count, plural, one {# project} other {# projects}}",
+        "projectsUnlimited": "Unlimited projects",
+        "references": "{count, number} references",
+        "referencesOverage": "then {price} per ref / mo",
+        "referencesUnlimited": "Unlimited references",
+        "supportStandard": "Standard support + Slack",
+        "supportPriority": "Priority support",
+        "supportDedicated": "Dedicated support"
+      }
+    },
+    "promptCalculator": {
+      "heading": "How many prompts do you want to track?",
+      "subheading": "Every prompt runs once on every model you pick, each time we scan. Each run is one AI answer.",
+      "promptsLabel": "Prompts",
+      "promptsUnit": "prompts",
+      "sliderValue": "{count, number} prompts, {milestone}",
+      "milestones": {
+        "spotCheck": {
+          "name": "Spot check",
+          "detail": "for your brand and the one question buyers ask most."
+        },
+        "coreQuestions": {
+          "name": "Core buyer questions",
+          "detail": "for one product in one market."
+        },
+        "category": {
+          "name": "The whole category",
+          "detail": "with every use case, comparison and alternative."
+        },
+        "markets": {
+          "name": "Several markets",
+          "detail": "across regions, segments or product lines."
+        },
+        "everyAngle": {
+          "name": "Every angle",
+          "detail": "for several products or brands, tracked in depth."
+        }
+      },
+      "frequencies": {
+        "daily": {
+          "label": "Daily",
+          "inline": "daily"
+        },
+        "every-2-days": {
+          "label": "Every 2 days",
+          "inline": "every 2 days"
+        },
+        "every-3-days": {
+          "label": "Every 3 days",
+          "inline": "every 3 days"
+        },
+        "weekly": {
+          "label": "Weekly",
+          "inline": "weekly"
+        },
+        "every-2-weeks": {
+          "label": "Every 2 weeks",
+          "inline": "every 2 weeks"
+        },
+        "monthly": {
+          "label": "Monthly",
+          "inline": "monthly"
+        }
+      },
+      "models": "Models",
+      "modelCount": "{count, plural, one {# model} other {# models}}",
+      "scanFrequency": "Scan frequency",
+      "scansPerMonth": "{scans, plural, one {# scan} other {# scans}} / month",
+      "seeMoreModels": "See more models",
+      "backToFirstModels": "Back to the first models",
+      "seeMore": "See {count} more",
+      "back": "Back",
+      "showExactModels": "Pick exact models",
+      "hideExactModels": "Hide exact models",
+      "overLargestPlan": "More than our largest plan includes",
+      "atPlanLimit": "Right at the plan limit",
+      "headroom": "Room for {count, number} more prompts",
+      "customPricing": "Priced to your usage",
+      "yearlyAlternative": "or {price}/year, {badge}",
+      "customQuota": "Custom answer quota",
+      "included": "{count, number} included",
+      "stayOnPlan": "Stay on {plan} for {price}/mo",
+      "scanInstead": "Scan {frequency} instead",
+      "linkCopied": "Link to this estimate copied",
+      "recommended": "Recommended",
+      "startWith": "Start with {plan}",
+      "copyLink": "Copy link to this estimate",
+      "answersUnit": "AI answers / mo",
+      "breakdown": "{prompts, plural, one {# prompt} other {# prompts}} × {models, number} models × {scans, number} scans"
+    },
+    "testimonials": {
+      "heading": "Teams already <accent>ship</accent> with Notra.",
+      "subheading": "Teams that ship every week use Notra for their changelogs and launch posts."
+    }
+  },
+  "languageSwitcher": {
+    "label": "Language"
+  },
+  "navbar": {
+    "home": "Notra home",
+    "logoMenu": {
+      "copyLogo": "Copy logo as SVG",
+      "copiedLogo": "Copied logo as SVG",
+      "copyWordmark": "Copy wordmark as SVG",
+      "copiedWordmark": "Copied wordmark as SVG",
+      "downloadKit": "Download brand kit",
+      "guidelines": "Brand Guidelines"
+    },
+    "auth": {
+      "dashboard": "Dashboard",
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    },
+    "mobile": {
+      "label": "Navigation",
+      "open": "Open menu",
+      "close": "Close menu"
+    },
+    "theme": {
+      "toggle": "Toggle theme",
+      "light": "Switch to light mode",
+      "dark": "Switch to dark mode"
+    },
+    "groups": {
+      "products": "Products",
+      "resources": "Resources",
+      "reports": "Reports",
+      "pricing": "Pricing"
+    },
+    "items": {
+      "aiSearch": {
+        "label": "AI Search",
+        "description": "Your place in ChatGPT, Claude and Perplexity."
+      },
+      "aiCrawlerLogs": {
+        "label": "AI Crawler Logs",
+        "description": "Every AI bot that reads your site, and why."
+      },
+      "sites": {
+        "label": "Sites",
+        "description": "Host your blog and changelog from GitHub."
+      },
+      "blog": {
+        "label": "Blog",
+        "description": "Writing on GEO, AI search and DX."
+      },
+      "changelog": {
+        "label": "Changelog",
+        "description": "Overview of latest Notra changes."
+      },
+      "contributors": {
+        "label": "Contributors",
+        "description": "People building Notra in the open."
+      },
+      "docs": {
+        "label": "Docs",
+        "description": "Guides, API and setup."
+      },
+      "reviews": {
+        "label": "Reviews",
+        "description": "What teams say about Notra."
+      }
+    },
+    "products": {
+      "cards": {
+        "aiSearch": {
+          "label": "AI Search",
+          "description": "See where you stand when buyers ask ChatGPT, Claude and Perplexity."
+        },
+        "aiCrawlerLogs": {
+          "label": "AI Crawler Logs",
+          "description": "See every AI bot that reads your site, and why it came."
+        },
+        "sites": {
+          "label": "Sites",
+          "description": "Host your blog and changelog from GitHub."
+        }
+      },
+      "tiles": {
+        "integrations": {
+          "label": "Integrations",
+          "description": "Notra in the tools you already use."
+        },
+        "mcp": {
+          "label": "MCP & CLI",
+          "description": "Bring Notra into your agent."
+        }
+      },
+      "personas": {
+        "remembers": "REMEMBERS",
+        "mentioned": "Notra mentioned",
+        "people": {
+          "maya": {
+            "role": "Head of Growth · Series B SaaS",
+            "memory": "Budget under $500 a month. SOC 2 is a must."
+          },
+          "daniel": {
+            "role": "Founder · Developer tools",
+            "memory": "Team of four. Wants a free plan to start."
+          }
+        }
+      },
+      "conversation": {
+        "title": "Changelog tool research",
+        "meta": "{turns} turns · played {date}",
+        "sources": "Searched the web · {count} sources",
+        "turns": {
+          "bestTool": {
+            "question": "What's the best tool to automate changelogs from GitHub?",
+            "answer": "Beamer is the best known. Notra turns merged PRs into changelogs and launch posts."
+          },
+          "cheapest": {
+            "question": "Which of those is cheapest for a team of five?",
+            "answer": "Notra has a free plan and doesn't charge per seat. Beamer starts at $59 a month."
+          },
+          "linkedin": {
+            "question": "Can it post the update to LinkedIn too?",
+            "answer": "Yes. Notra drafts the post and publishes it to X or LinkedIn after approval."
+          }
+        }
+      },
+      "crawler": {
+        "title": "Crawler log",
+        "meta": "usenotra.com · last 60 minutes",
+        "live": "Live",
+        "purposes": {
+          "live": "Live answer",
+          "search": "Search index",
+          "referral": "Referral",
+          "training": "Training"
+        }
+      },
+      "site": {
+        "deployed": "Deployed 21 s ago"
+      }
+    },
+    "resources": {
+      "live": "Live",
+      "changelog": {
+        "title": "Notra changelog",
+        "meta": "Shipped this week"
+      },
+      "contributors": {
+        "title": "Merged pull requests",
+        "meta": "usenotra/notra · last 7 days"
+      }
+    },
+    "reports": {
+      "heading": "State of AI Search",
+      "edition": "{heading} · {edition}",
+      "overview": "Which brands AI recommends, category by category.",
+      "fallbackDescription": "Monthly AI search rankings",
+      "categories": {
+        "ai-visibility": {
+          "label": "AI visibility",
+          "description": "See which GEO tools AI recommends"
+        },
+        "app-hosting": {
+          "label": "App hosting",
+          "description": "How hosting platforms rank in AI search"
+        },
+        "auth": {
+          "label": "Auth",
+          "description": "Auth providers recommended by AI"
+        },
+        "changelog": {
+          "label": "Changelog",
+          "description": "Release note tools recommended by AI"
+        },
+        "email-api": {
+          "label": "Email API",
+          "description": "Email providers ranked in AI search"
+        },
+        "postgres": {
+          "label": "Postgres",
+          "description": "The Postgres providers AI recommends"
+        }
+      }
+    }
+  }
+}

@@ -17,42 +17,12 @@ export const PROMPT_CALCULATOR_ENGINE_IDS = [
 ] as const;
 
 export const PROMPT_CALCULATOR_FREQUENCIES = [
-  {
-    id: "daily",
-    label: "Daily",
-    intervalDays: 1,
-    hint: "Catch shifts in answers the day they happen.",
-  },
-  {
-    id: "every-2-days",
-    label: "Every 2 days",
-    intervalDays: 2,
-    hint: "Close to daily at half the answers.",
-  },
-  {
-    id: "every-3-days",
-    label: "Every 3 days",
-    intervalDays: 3,
-    hint: "A close watch without the day-to-day noise.",
-  },
-  {
-    id: "weekly",
-    label: "Weekly",
-    intervalDays: 7,
-    hint: "Enough for a weekly report.",
-  },
-  {
-    id: "every-2-weeks",
-    label: "Every 2 weeks",
-    intervalDays: 14,
-    hint: "Follow trends rather than single moves.",
-  },
-  {
-    id: "monthly",
-    label: "Monthly",
-    intervalDays: 30,
-    hint: "A monthly check-in on where you stand.",
-  },
+  { id: "daily", intervalDays: 1 },
+  { id: "every-2-days", intervalDays: 2 },
+  { id: "every-3-days", intervalDays: 3 },
+  { id: "weekly", intervalDays: 7 },
+  { id: "every-2-weeks", intervalDays: 14 },
+  { id: "monthly", intervalDays: 30 },
 ] as const;
 
 export const PROMPT_CALCULATOR_DAYS_PER_MONTH = 30;
@@ -74,39 +44,9 @@ export const PROMPT_CALCULATOR_STOPS = [
 ] as const;
 
 export const PROMPT_CALCULATOR_MILESTONES = [
-  {
-    prompts: 5,
-    label: "5",
-    name: "Spot check",
-    detail: "for your brand and the one question buyers ask most.",
-  },
-  {
-    prompts: 25,
-    label: "25",
-    name: "Core buyer questions",
-    detail: "for one product in one market.",
-  },
-  {
-    prompts: 100,
-    label: "100",
-    name: "The whole category",
-    detail: "with every use case, comparison and alternative.",
-  },
-  {
-    prompts: 250,
-    label: "250",
-    name: "Several markets",
-    detail: "across regions, segments or product lines.",
-  },
-  {
-    prompts: 1000,
-    label: "1K",
-    name: "Every angle",
-    detail: "for several products or brands, tracked in depth.",
-  },
+  { prompts: 5, id: "spotCheck" },
+  { prompts: 25, id: "coreQuestions" },
+  { prompts: 100, id: "category" },
+  { prompts: 250, id: "markets" },
+  { prompts: 1000, id: "everyAngle" },
 ] as const;
-
-export const PROMPT_CALCULATOR_HEADING =
-  "How many prompts do you want to track?";
-export const PROMPT_CALCULATOR_SUBHEADING =
-  "Every prompt runs once on every model you pick, each time we scan. Each run is one AI answer.";

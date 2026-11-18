@@ -5,23 +5,18 @@ import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { AnimatePresence, domMax, LazyMotion, m } from "motion/react";
 import { useRef, useState } from "react";
+import { useTranslations } from "use-intl";
 
 import { PricingGiftIcon } from "@/components/landing/pricing-icons";
 import { PricingProShader } from "@/components/landing/pricing-pro-shader";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
 import {
-  PRICING_ANNUAL_BADGE,
   PRICING_BILLING_OPTIONS,
-  PRICING_CAROUSEL_LABEL,
   PRICING_CAROUSEL_PLANS,
   PRICING_DEFAULT_BILLING,
   PRICING_FREE_PLAN,
-  PRICING_HEADING,
   PRICING_PLANS,
-  PRICING_SUBHEADING,
-  pricingCarouselDotLabel,
   TRACKED_ENGINES,
-  TRACKED_ENGINES_CAPTION,
 } from "@/constants/landing/pricing";
 import { PRICING_ICONS } from "@/constants/landing/pricing-icons";
 import type {
@@ -37,10 +32,12 @@ function PricingBillingToggle({
   value,
   onValueChange,
 }: PricingBillingToggleProps) {
+  const t = useTranslations("landing.pricing.billing");
+
   return (
     <div className="flex items-center justify-center gap-2 rounded-full bg-[linear-gradient(180deg,#FFFFFF,#F2F2F2)] p-1.75 shadow-[0_0.0625rem_0.125rem_#28282814,0_0_0_0.0625rem_#ECECEC] dark:bg-white/[0.06] dark:bg-none dark:shadow-[0_0_0_0.0625rem] dark:shadow-white/10">
       {PRICING_BILLING_OPTIONS.map((option) => {
-        const isActive = option.value === value;
+        const isActive = option === value;
 
         return (
           <button
@@ -49,8 +46,8 @@ function PricingBillingToggle({
               "focus-visible:ring-ring/50 relative flex h-8 cursor-pointer touch-manipulation items-center justify-center rounded-full px-3.5 py-1.75 font-sans text-base leading-6 tracking-[-0.01em] focus-visible:ring-[0.1875rem]",
               isActive ? "text-white" : "text-[#1E1E1E] dark:text-white"
             )}
-            key={option.value}
-            onClick={() => onValueChange(option.value)}
+            key={option}
+            onClick={() => onValueChange(option)}
             type="button"
           >
             {isActive ? (
@@ -63,7 +60,7 @@ function PricingBillingToggle({
               />
             ) : null}
             <span className="duration-normal relative z-10 transition-colors">
-              {option.label}
+              {t(option)}
             </span>
           </button>
         );
@@ -73,10 +70,12 @@ function PricingBillingToggle({
 }
 
 function TrackedEnginesRow() {
+  const t = useTranslations("landing.pricing");
+
   return (
     <div className="flex flex-col items-center gap-5">
       <p className="text-center font-sans text-sm font-medium tracking-[-0.01em] text-[#1E1E1EB3] dark:text-white/50">
-        {TRACKED_ENGINES_CAPTION}
+        {t("enginesCaption")}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-5">
         {TRACKED_ENGINES.map((engine) =>
@@ -123,6 +122,7 @@ function TrackedEnginesRow() {
 function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
   const isFeatured = plan.variant === "featured";
   const showBadge = Boolean(plan.hasAnnualBadge) && billingPeriod === "yearly";
+  const t = useTranslations("landing.pricing");
 
   return (
     <div
@@ -159,7 +159,7 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <PricingGiftIcon className="size-4 shrink-0" />
-              {PRICING_ANNUAL_BADGE}
+              {t("annualBadge")}
             </m.span>
           ) : null}
         </AnimatePresence>
@@ -170,7 +170,7 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
           isFeatured ? "text-white/90" : "text-[#6B6B6B] dark:text-white/60"
         )}
       >
-        {plan.description}
+        {t(`plans.${plan.id}`)}
       </p>
     </div>
   );
@@ -178,6 +178,8 @@ function PricingCardHeader({ plan, billingPeriod }: PricingCardProps) {
 
 function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
   const isFeatured = plan.variant === "featured";
+  const t = useTranslations("landing.pricing");
+  const price = plan.price ? plan.price[billingPeriod] : t("customPrice");
 
   return (
     <AnimatePresence initial={false} mode="wait">
@@ -186,7 +188,7 @@ function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
         className="flex items-baseline gap-2"
         exit={{ y: "0.75rem", opacity: 0 }}
         initial={{ y: "0.75rem", opacity: 0 }}
-        key={plan.price[billingPeriod]}
+        key={price}
         transition={{ duration: 0.2, ease: "easeInOut" }}
       >
         <span
@@ -195,9 +197,9 @@ function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
             isFeatured ? "text-white" : "text-[#1E1E1E] dark:text-white"
           )}
         >
-          {plan.price[billingPeriod]}
+          {price}
         </span>
-        {plan.priceSuffix ? (
+        {plan.price ? (
           <span
             className={cn(
               "font-sans text-sm leading-[1.125rem] font-normal tracking-[-0.015em]",
@@ -206,7 +208,7 @@ function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
                 : "text-[#1E1E1EB3] dark:text-white/60"
             )}
           >
-            {plan.priceSuffix[billingPeriod]}
+            {t(`perPeriod.${billingPeriod}`)}
           </span>
         ) : null}
       </m.div>
@@ -216,6 +218,7 @@ function PricingCardPrice({ plan, billingPeriod }: PricingCardProps) {
 
 function PricingCard({ plan, billingPeriod }: PricingCardProps) {
   const isFeatured = plan.variant === "featured";
+  const t = useTranslations("landing.pricing");
 
   const ctaLink =
     plan.cta.kind === "signup" ? (
@@ -251,7 +254,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
               render={ctaLink}
               variant={isFeatured ? "light" : "primary"}
             >
-              <span>{plan.cta.label}</span>
+              <span>{t(`cta.${plan.cta.labelId}`)}</span>
               {plan.cta.showArrow ? (
                 <HugeiconsIcon className="size-4" icon={ArrowRight02Icon} />
               ) : null}
@@ -270,7 +273,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
               const Icon = PRICING_ICONS[feature.icon];
 
               return (
-                <li className="flex items-center gap-2" key={feature.label}>
+                <li className="flex items-center gap-2" key={feature.id}>
                   <span
                     className={cn(
                       "shrink-0",
@@ -290,7 +293,9 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
                           : "text-[#1E1E1EBF] dark:text-white/70"
                       )}
                     >
-                      {feature.label}
+                      {t(`features.${feature.id}`, {
+                        count: feature.count ?? 0,
+                      })}
                     </span>
                     {feature.subtitle ? (
                       <span
@@ -301,7 +306,9 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
                             : "text-[#1E1E1EB3] dark:text-white/50"
                         )}
                       >
-                        {feature.subtitle}
+                        {t(`features.${feature.subtitle}`, {
+                          price: feature.price ?? "",
+                        })}
                       </span>
                     ) : null}
                   </div>
@@ -317,6 +324,7 @@ function PricingCard({ plan, billingPeriod }: PricingCardProps) {
 
 function PricingFreeTier() {
   const plan = PRICING_FREE_PLAN;
+  const t = useTranslations("landing.pricing");
 
   return (
     <article className="flex w-full flex-col gap-6 rounded-3xl bg-[#F7F7F7] p-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 dark:bg-white/[0.04]">
@@ -330,7 +338,7 @@ function PricingFreeTier() {
           </span>
         </div>
         <p className="font-sans text-[0.9375rem] leading-[1.125rem] font-normal tracking-[-0.015em] text-[#6B6B6B] dark:text-white/60">
-          {plan.description}
+          {t("plans.free")}
         </p>
       </div>
 
@@ -339,10 +347,10 @@ function PricingFreeTier() {
           const Icon = PRICING_ICONS[feature.icon];
 
           return (
-            <li className="flex items-center gap-2" key={feature.label}>
+            <li className="flex items-center gap-2" key={feature.id}>
               <Icon className="size-6 shrink-0 text-[#1E1E1EBF] dark:text-white/60" />
               <span className="font-sans text-sm leading-[1.125rem] font-normal text-[#1E1E1EBF] dark:text-white/70">
-                {feature.label}
+                {t(`features.${feature.id}`, { count: feature.count ?? 0 })}
               </span>
             </li>
           );
@@ -357,7 +365,7 @@ function PricingFreeTier() {
         }
         variant="primary"
       >
-        <span>{plan.cta.label}</span>
+        <span>{t(`cta.${plan.cta.labelId}`)}</span>
         <HugeiconsIcon className="size-4" icon={ArrowRight02Icon} />
       </CtaButton>
     </article>
@@ -373,6 +381,7 @@ export function LandingPricingSection({
   );
   const carouselRef = useRef<HTMLDivElement>(null);
   const [activePlan, setActivePlan] = useState(0);
+  const t = useTranslations("landing.pricing");
 
   function handleCarouselScroll() {
     if (carouselRef.current) {
@@ -393,10 +402,10 @@ export function LandingPricingSection({
         {showHeader ? (
           <div className="flex flex-col items-center gap-3 sm:gap-4">
             <h2 className="font-display max-w-[59rem] text-center text-[2rem] leading-[1.12] font-medium tracking-[-0.02em] text-balance text-[#1E1E1E] sm:text-[2.875rem] sm:leading-13 dark:text-white">
-              {PRICING_HEADING}
+              {t("heading")}
             </h2>
             <p className="max-w-[43rem] text-center font-sans text-base/6 font-medium text-balance text-[#1E1E1EBF] sm:text-xl/7 dark:text-white/70">
-              {PRICING_SUBHEADING}
+              {t("subheading")}
             </p>
           </div>
         ) : null}
@@ -409,7 +418,7 @@ export function LandingPricingSection({
 
           <div className="flex w-full flex-col items-center gap-4">
             <div
-              aria-label={PRICING_CAROUSEL_LABEL}
+              aria-label={t("carouselLabel")}
               className="relative -mx-6 flex w-[calc(100%+3rem)] snap-x snap-mandatory scroll-px-6 [scrollbar-width:none] gap-3 overflow-x-auto overscroll-x-contain px-6 sm:mx-0 sm:grid sm:w-full sm:max-w-[48rem] sm:grid-cols-2 sm:gap-4 sm:overflow-visible sm:px-0 lg:max-w-[80rem] lg:grid-cols-4 [&::-webkit-scrollbar]:hidden"
               onScroll={handleCarouselScroll}
               ref={carouselRef}
@@ -427,7 +436,7 @@ export function LandingPricingSection({
               {PRICING_CAROUSEL_PLANS.map((plan, index) => (
                 <button
                   aria-current={index === activePlan}
-                  aria-label={pricingCarouselDotLabel(plan.name)}
+                  aria-label={t("carouselDot", { plan: plan.name })}
                   className="group flex size-6 cursor-pointer items-center justify-center"
                   key={plan.id}
                   onClick={() => {

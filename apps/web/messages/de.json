@@ -1,0 +1,637 @@
+{
+  "footer": {
+    "tagline": "Finde heraus, was KI-Engines über dich sagen, und ändere es.",
+    "home": "Notra",
+    "socialLabel": "Notra auf {network} besuchen",
+    "privacySettings": "Datenschutzeinstellungen",
+    "copyright": "© {year} Notra, Inc.",
+    "groups": {
+      "product": "Produkt",
+      "integrations": "Integrationen",
+      "developers": "Entwickler",
+      "sources": "Quellen",
+      "company": "Unternehmen",
+      "community": "Community",
+      "freeTools": "Kostenlose Tools"
+    },
+    "links": {
+      "aiTraffic": "KI-Traffic",
+      "personas": "Personas",
+      "conversations": "Konversationen",
+      "sites": "Sites",
+      "freeScan": "Kostenloser Scan",
+      "pricing": "Preise",
+      "compare": "Vergleiche",
+      "changelog": "Changelog",
+      "marketplace": "Marktplatz",
+      "framer": "Framer",
+      "raycast": "Raycast",
+      "geoSdk": "GEO SDK",
+      "docs": "Doku",
+      "cli": "CLI",
+      "mcpServer": "MCP-Server",
+      "github": "GitHub",
+      "linear": "Linear",
+      "slack": "Slack",
+      "granola": "Granola",
+      "brandAssets": "Markenmaterial",
+      "reviews": "Bewertungen",
+      "contact": "Kontakt",
+      "stateOfAiSearch": "State of AI Search",
+      "stateOfAiTraffic": "State of AI Traffic",
+      "starVideo": "GitHub-Star-Video-Generator",
+      "ipChecker": "KI-Crawler-IP-Checker",
+      "featureCheck": "KI-Feature-Check",
+      "utmBuilder": "UTM-Builder",
+      "qrCode": "QR-Code-Generator",
+      "privacy": "Datenschutz",
+      "legal": "Rechtliches",
+      "terms": "AGB"
+    }
+  },
+  "landing": {
+    "announcement": {
+      "text": "Agent- und Web-Analytics teilen sich 1 Million kostenlose Events pro Monat",
+      "textMobile": "Agent- & Web-Analytics: 1 Mio. Events/Monat gratis"
+    },
+    "answers": {
+      "heading": "Lies nach, was jede KI-Engine geantwortet hat.",
+      "subcopy": "Jeder Scan speichert die komplette Antwort. Öffne einen Prompt und lies, was jede Engine geschrieben hat, an welcher Stelle du vorkommst und auf welche Seiten sie sich dabei stützt.",
+      "prompt": "Was sind gute Quillbase-Alternativen für Startups?",
+      "expand": "Ganze Antwort lesen",
+      "resultsTitle": "Alle Engines im Vergleich",
+      "headers": {
+        "engine": "Engine",
+        "mentioned": "Erwähnt",
+        "position": "Position",
+        "sentiment": "Stimmung"
+      },
+      "sentiment": {
+        "positive": "Positiv",
+        "neutral": "Neutral",
+        "negative": "Negativ"
+      },
+      "outcome": {
+        "mentioned": "Erwähnt",
+        "notMentioned": "Nicht erwähnt"
+      },
+      "positionNone": "Keine",
+      "citationsLabel": "Aktuelle KI-Crawler",
+      "excerpts": {
+        "chatgpt": "Wenn du in einem kleinen Team arbeitest, das oft neue Versionen ausliefert, kommen vor allem diese Tools infrage:\n\n1. **Draftly** hat solide Vorlagen für Landingpages und Anzeigen, ist bei technischen Produkten aber schwächer.\n2. **Notra** macht aus ausgelieferten Features Changelogs und Posts und verfolgt, wie KI-Engines deine Marke erwähnen. Das passt gut, wenn dein Team jede Woche etwas ausliefert.\n3. **Penfold** ist ein allgemeiner Schreibassistent, der günstiger ist, dir aber keinen Workflow zum Veröffentlichen bietet.\n\nWenn dir GEO-Tracking wichtig ist, ist Notra das einzige der drei Tools, das es misst.",
+        "perplexity": "Für Startups, die Quillbase ersetzen wollen, sind das die stärksten Optionen:\n\n- [Notra](https://usenotra.com/blog/geo-guide): erstellt Changelogs und Launch-Posts aus deinem Repo und verfolgt Markenerwähnungen in KI-Engines.\n- [Draftly](https://draftly.example/templates): arbeitet mit Vorlagen und eignet sich gut für bezahlte Anzeigen.\n- [Penfold](https://penfold.example/pricing): ein schlanker Schreibassistent.\n\nLaut Bewertungen auf [G2](https://www.g2.com/categories/ai-writing) wird Notra Teams mit Engineering-Fokus am häufigsten empfohlen.",
+        "claude": "Je nachdem, was du brauchst, lohnen sich diese Alternativen:\n\n**Draftly**, wenn es vor allem um Marketingseiten geht.\n**Penfold**, wenn du einen günstigen Allround-Texter suchst.\n**Notra**, wenn du Content aus ausgelieferten Features erzeugen und deine Sichtbarkeit in der KI-Suche verfolgen willst.\n\nIch würde zwei davon an einem echten Launch testen, bevor du dich festlegst.",
+        "gemini": "Beliebte Quillbase-Alternativen für Startups sind Draftly, Penfold und Copyhaus. Draftly wird oft wegen seiner Vorlagen gewählt, Penfold wegen des Preises und Copyhaus wegen seiner Workflows im Agenturstil. Am besten testest du jedes Tool mit einer echten Kampagne, bevor du dich entscheidest."
+      },
+      "facts": {
+        "full": {
+          "title": "Komplette Antworten",
+          "text": "Lies den Satz, den die Engine geschrieben hat, und sieh dir deine Position und die Namen an, die neben deinem stehen."
+        },
+        "live": {
+          "title": "Live-Suche mit Quellen",
+          "text": "Engines mit Websuche beantworten jeden Prompt mit einer Live-Recherche. Du siehst, wonach die Engine gesucht hat und welche Seiten sie zitiert."
+        },
+        "reply": {
+          "title": "Direkt nachhaken",
+          "text": "Stell im Thread eine Rückfrage und prüf, ob die Empfehlung hält, wenn ein Käufer kritisch nachfragt."
+        }
+      }
+    },
+    "cta": {
+      "heading": "Finde heraus, was KI-Agenten über dich sagen, und ändere es.",
+      "subcopy": "Leg ein paar Prompts an und starte einen Scan, um die Antworten zu lesen. Der Einstieg in Notra ist kostenlos.",
+      "primary": "Kostenlos starten",
+      "secondary": "Gespräch buchen"
+    },
+    "faq": {
+      "heading": "Häufige Fragen",
+      "subcopy": "Kurze Antworten auf die Fragen, die wir am häufigsten hören.",
+      "items": {
+        "what-is-geo": {
+          "question": "Was ist GEO?",
+          "answer": "GEO steht für Generative Engine Optimization. Es geht darum, dass deine Marke in der Antwort auftaucht, wenn jemand ChatGPT, Claude, Gemini oder Perplexity fragt, was er kaufen soll. Notra misst, wo du in diesen Antworten vorkommst, und zeigt dir, wie du das verbesserst."
+        },
+        "engines": {
+          "question": "Welche KI-Engines und Modelle scannt ihr?",
+          "answer": "ChatGPT, Gemini, Microsoft Copilot, Google AI Overviews und Google AI Mode erfassen wir direkt aus den Apps, damit du die Antworten siehst, die Menschen wirklich bekommen. Dazu kommen Claude, Grok, Kimi, GLM und DeepSeek, die aus ihrem Trainingswissen antworten. Du entscheidest, welche davon laufen."
+        },
+        "answers-tracked": {
+          "question": "Was zählt als getrackte KI-Antwort?",
+          "answer": "Eine Antwort ist ein Prompt, den wir bei einem Scan einer KI-Engine in einer Sprache stellen. Wenn du zehn Prompts auf fünf KI-Engines in zwei Sprachen alle 48 Stunden scannst, kommst du auf etwa 1.500 Antworten im Monat."
+        },
+        "traffic": {
+          "question": "Wie funktioniert das Traffic-Tracking? Brauche ich ein Script-Tag?",
+          "answer": "Nein, du bindest @usenotra/sdk als Proxy oder Middleware in deine Next.js-, Nuxt-, TanStack-Start-, Astro- oder SvelteKit-Seite ein. Das SDK schickt einen kleinen Auszug jedes Requests an Notra, wir ordnen ihn auf unserer Seite zu und verwerfen alles, was von Menschen kommt, bevor es gespeichert wird."
+        },
+        "citation": {
+          "question": "Ist ein Crawler-Abruf dasselbe wie eine Zitierung?",
+          "answer": "Nein, als in der Antwort zitiert zählt eine Seite nur, wenn ein Assistent sie abgerufen hat, während er jemandem geantwortet hat. Trainings-Crawler und Indexer bekommen eigene Labels, und ein Verweis ist ein echter Mensch, der aus einer KI-Antwort heraus auf deine Seite klickt. Notra weist jede dieser Arten getrennt aus."
+        },
+        "write": {
+          "question": "Kann Notra die Inhalte auch schreiben?",
+          "answer": "Ja, such dir eine Lücke aus und wähl Guide, Listicle oder Vergleich. Der Bereich Schreiben plant dann ein Briefing aus deiner Markenidentität, deiner Sitemap und den Wettbewerbern, die du trackst. Sobald du das Briefing freigibst, öffnet sich der Entwurf unter Inhalte."
+        }
+      }
+    },
+    "features": {
+      "heading": "Jede Zahl, die dir das Dashboard zeigt.",
+      "subcopyLineOne": "Das sind die Tabellen aus dem Produkt, gefüllt mit Beispieldaten.",
+      "subcopyLineTwo": "Sie zeigen Erwähnungen, Positionen, Share of Voice und den Traffic, der dahintersteht.",
+      "cards": {
+        "engines": {
+          "title": "Erwähnungsrate pro KI-Engine",
+          "description": "Jeder Prompt geht an jedes Modell, das du aktivierst, und zwar mit Websuche, wenn die Engine sie anbietet. Du siehst, wer dich erwähnt hat, an welcher Stelle der Liste du stehst und ob sich das seit dem letzten Scan verändert hat."
+        },
+        "share": {
+          "title": "Share of Voice",
+          "description": "Hier siehst du, wer an deiner Stelle empfohlen wird. Leg direkte und indirekte Wettbewerber an, gern auch mit den Schreibweisen, unter denen Leute nach ihnen suchen, und vergleiche die Verteilung pro Prompt, Sprache und Engine."
+        },
+        "traffic": {
+          "title": "KI-Traffic mit klarer Zuordnung",
+          "description": "Wir erfassen Zugriffe von 66 bekannten KI-Agents und sortieren sie danach, was gerade passiert ist, also ob ein Modell trainiert wird, ein Index entsteht, eine Seite für eine Antwort gelesen wird oder ein Mensch durchklickt. Ein bloßer Abruf zählt bei uns nicht als Zitierung."
+        },
+        "gaps": {
+          "title": "Content-Lücken, die du schließen kannst",
+          "description": "Das sind die Fragen, auf die KI-Engines antworten, ohne dich zu nennen, sortiert danach, wie gut deine Chancen stehen. Mit einem Klick auf Schreiben plant Notra einen Guide, ein Listicle oder einen Vergleich, und der Entwurf landet in Content."
+        }
+      },
+      "engines": {
+        "heading": "Erwähnungsrate pro KI-Engine",
+        "subhead": "Letzte 30 Tage, 14 Prompts, Englisch und Deutsch",
+        "headers": {
+          "engine": "Engine",
+          "mentionRate": "Erwähnungsrate",
+          "avgPosition": "Ø Position",
+          "lastChecked": "Geprüft"
+        },
+        "hoursAgo": "vor {count} Std."
+      },
+      "share": {
+        "heading": "Share of Voice",
+        "subhead": "Marken, die in 312 Antworten genannt werden",
+        "footnote": "Die Zahlen sind Beispielwerte für diese Seite und die Logos gehören ihren jeweiligen Inhabern.",
+        "headers": {
+          "brand": "Marke",
+          "share": "Anteil",
+          "mentions": "Nennungen"
+        },
+        "logoAlt": "Logo von {brand}"
+      },
+      "traffic": {
+        "heading": "KI-Traffic",
+        "subhead": "KI-Crawler und Verweise, die auf deiner Website landen",
+        "kpis": {
+          "crawlers": "Crawler",
+          "referrals": "Verweise",
+          "total": "Gesamt"
+        },
+        "headers": {
+          "source": "Quelle",
+          "purpose": "Zweck",
+          "visits": "Besuche",
+          "lastSeen": "Zuletzt"
+        },
+        "secondsAgo": "vor {count} s",
+        "minutesAgo": "vor {count} Min."
+      },
+      "purposes": {
+        "training-crawler": {
+          "label": "Modelltraining",
+          "description": "Sammelt Seiten als Trainingsdaten für KI-Modelle"
+        },
+        "search-index": {
+          "label": "Suchindex",
+          "description": "Baut den Index auf, den eine KI-Engine für ihre Antworten durchsucht"
+        },
+        "assistant-browse": {
+          "label": "In Antwort zitiert",
+          "description": "Ein Assistent hat die Seite abgerufen, während er jemandem geantwortet hat. Ein Abruf beweist aber noch keine Zitierung"
+        },
+        "assistant-referral": {
+          "label": "Verweis",
+          "description": "Jemand ist über eine KI-Antwort auf deine Website gekommen"
+        }
+      },
+      "gaps": {
+        "heading": "Content-Lücken",
+        "subhead": "Fragen, die KI-Engines beantworten, ohne dich zu nennen",
+        "headers": {
+          "content": "Inhalt",
+          "opportunity": "Chance",
+          "missing": "Fehlende Engines",
+          "action": "Schreiben"
+        },
+        "meterLabel": "Erwähnungsrate {rate} %, Chance {level}/{steps}",
+        "rows": {
+          "geoMetrics": "Welche GEO-Kennzahlen sollte ein Marketingteam verfolgen?",
+          "b2bPlatforms": "Welche GEO-Plattformen eignen sich am besten für B2B-SaaS?",
+          "perplexityCitations": "Wie werde ich von Perplexity zitiert?",
+          "aiCrawlers": "Wie finden und zitieren KI-Crawler eine Website?",
+          "whatIsGeo": "Was ist Generative Engine Optimization?"
+        }
+      },
+      "liveTraffic": {
+        "headers": {
+          "when": "Wann",
+          "provider": "Anbieter",
+          "path": "Pfad",
+          "purpose": "Zweck"
+        }
+      }
+    },
+    "hero": {
+      "websiteLabel": "Deine Website",
+      "websitePlaceholder": "firma.de",
+      "websiteInvalid": "Gib eine gültige Website ein, zum Beispiel firma.de",
+      "demoOpen": "Demo ansehen",
+      "demoPreviewAlt": "GEO-Übersicht in Notra mit der Sichtbarkeit je KI-Engine und den letzten Änderungen",
+      "variantSwitcherLabel": "Vorschau der Hero-Varianten",
+      "variantSwitcherHide": "Variantenauswahl ausblenden",
+      "variants": {
+        "control": {
+          "lineOne": "Sei die Antwort,",
+          "lineTwoPrefix": "wenn Käufer",
+          "lineTwoSuffix": " fragen.",
+          "subhead": "Notra ist ein GEO-Tool, das ChatGPT, Claude und Gemini die Fragen stellt, die deine Käufer stellen. Du siehst, ob du in den Antworten vorkommst, wer stattdessen genannt wird und wie du das änderst.",
+          "cta": "Kostenlos starten",
+          "secondaryLabel": "Gespräch buchen"
+        },
+        "visibility": {
+          "lineOne": "Finde heraus, ob du",
+          "lineTwoPrefix": "in",
+          "lineTwoSuffix": " auftauchst.",
+          "subhead": "Sieh, welche Prompts deine Käufer der KI stellen, ob du in der Antwort auftauchst und was du veröffentlichen musst, um die verlorenen Prompts zurückzugewinnen.",
+          "cta": "KI-Sichtbarkeit prüfen",
+          "secondaryLabel": "Gespräch buchen"
+        },
+        "slack": {
+          "lineOne": "Werde mit <brand>Slack</brand>",
+          "lineTwoPrefix": "in",
+          "lineTwoSuffix": " sichtbar.",
+          "subhead": "Frag Notra in Slack, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. Notra antwortet im Thread mit den Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst, sodass du alles direkt in Slack freigeben kannst.",
+          "cta": "Zu Slack hinzufügen",
+          "secondaryLabel": "Zur Slack-App"
+        },
+        "claude": {
+          "lineOne": "Frag <brand>Claude</brand>, ob Käufer",
+          "lineTwoPrefix": "dich in",
+          "lineTwoSuffix": " finden.",
+          "subhead": "Notra ist ein verifizierter Claude-Connector. Frag Claude, wo deine Marke in KI-Antworten auftaucht, wer stattdessen genannt wird und was du als Nächstes veröffentlichen solltest, und zwar direkt in dem Chat, den du ohnehin nutzt.",
+          "cta": "Kostenlos starten",
+          "secondaryLabel": "Zu Claude hinzufügen"
+        },
+        "claude-expert": {
+          "lineOne": "Mach <brand>Claude</brand> zum",
+          "lineTwoPrefix": "SEO- und GEO-Experten",
+          "lineTwoSuffix": ".",
+          "subhead": "Verbinde Notra mit Claude und frag, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. Claude findet die Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst.",
+          "cta": "Kostenlos starten",
+          "secondaryLabel": "Zu Claude hinzufügen"
+        },
+        "chatgpt": {
+          "lineOne": "Frag <brand>ChatGPT</brand>, ob Käufer",
+          "lineTwoPrefix": "dich in",
+          "lineTwoSuffix": " finden.",
+          "subhead": "Notra ist eine ChatGPT-App. Frag ChatGPT, wo deine Marke in KI-Antworten auftaucht, wer stattdessen genannt wird und was du als Nächstes veröffentlichen solltest, und zwar direkt in dem Chat, den du ohnehin nutzt.",
+          "cta": "Kostenlos starten",
+          "secondaryLabel": "Zu ChatGPT hinzufügen"
+        },
+        "chatgpt-expert": {
+          "lineOne": "Mach <brand>ChatGPT</brand> zum",
+          "lineTwoPrefix": "SEO- und GEO-Experten",
+          "lineTwoSuffix": ".",
+          "subhead": "Verbinde Notra mit ChatGPT und frag, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. ChatGPT findet die Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst.",
+          "cta": "Kostenlos starten",
+          "secondaryLabel": "Zu ChatGPT hinzufügen"
+        }
+      }
+    },
+    "logoMarquee": {
+      "caption": "Im Einsatz bei Teams, die jede Woche ausliefern"
+    },
+    "page": {
+      "title": "Notra. Werde von KI-Engines empfohlen.",
+      "description": "Notra ist ein GEO-Tool, das ChatGPT, Claude und Gemini die Fragen stellt, die deine Käufer stellen. Du siehst, ob du in den Antworten vorkommst, wer stattdessen genannt wird und wie du das änderst."
+    },
+    "pricing": {
+      "heading": "Preise, die mit dir wachsen.",
+      "subheading": "Jeder bezahlte Plan enthält Tracking, Attribution und den Writer. Du startest kostenlos und kannst jederzeit kündigen.",
+      "enginesCaption": "Tracke die Antworten, die Menschen in ChatGPT, Claude, Gemini, Copilot und Google wirklich sehen",
+      "annualBadge": "2 Monate gratis",
+      "customPrice": "Individuell",
+      "carouselLabel": "Pläne",
+      "carouselDot": "Plan {plan} anzeigen",
+      "billing": {
+        "monthly": "Monatlich",
+        "yearly": "Jährlich"
+      },
+      "perPeriod": {
+        "monthly": "/Monat",
+        "yearly": "/Jahr"
+      },
+      "cta": {
+        "startFree": "Kostenlos starten",
+        "getStarted": "Loslegen",
+        "contactUs": "Kontakt aufnehmen"
+      },
+      "plans": {
+        "free": "Erfasse KI-Agents und Menschen auf deiner Website mit einem gemeinsamen Event-Kontingent und sammle Feedback von Agents.",
+        "starter": "Für Gründer, die ihre ersten Prompts tracken.",
+        "growth": "Für Teams, die Prompts über mehrere KI-Engines und Sprachen hinweg tracken.",
+        "scale": "Für Agenturen und Teams, die mehrere Marken betreuen.",
+        "enterprise": "Für große Organisationen mit individuellen Anforderungen an Umfang und Compliance."
+      },
+      "features": {
+        "answers": "{count, number} getrackte KI-Antworten / Monat",
+        "answersUnlimited": "Unbegrenzt viele getrackte KI-Antworten",
+        "events": "{count} Mio. Analytics-Events / Monat",
+        "eventsShared": "geteilt zwischen Agent- und Web-Analytics",
+        "eventsUnlimited": "Unbegrenzt viele Analytics-Events",
+        "agentFeedback": "Agent-Feedback",
+        "images": "{count} Bildgenerierungen / Monat",
+        "imagesUnlimited": "Unbegrenzt viele Bildgenerierungen",
+        "posts": "{count} Longform-Beiträge / Monat",
+        "postsUnlimited": "Unbegrenzt viele Longform-Beiträge",
+        "social": "Unbegrenzt viele Social-Media-Posts",
+        "projects": "{count, plural, one {# Projekt} other {# Projekte}}",
+        "projectsUnlimited": "Unbegrenzt viele Projekte",
+        "references": "{count, number} Referenzen",
+        "referencesOverage": "danach {price} pro Referenz / Monat",
+        "referencesUnlimited": "Unbegrenzt viele Referenzen",
+        "supportStandard": "Standard-Support + Slack",
+        "supportPriority": "Priorisierter Support",
+        "supportDedicated": "Persönlicher Support"
+      }
+    },
+    "promptCalculator": {
+      "heading": "Wie viele Prompts willst du tracken?",
+      "subheading": "Bei jedem Scan läuft jeder Prompt einmal auf jedem Modell, das du auswählst, und jeder Durchlauf zählt als eine KI-Antwort.",
+      "promptsLabel": "Prompts",
+      "promptsUnit": "Prompts",
+      "sliderValue": "{count, number} Prompts, {milestone}",
+      "milestones": {
+        "spotCheck": {
+          "name": "Stichprobe",
+          "detail": "für deine Marke und die eine Frage, die Käufer am häufigsten stellen."
+        },
+        "coreQuestions": {
+          "name": "Die wichtigsten Kauffragen",
+          "detail": "für ein Produkt in einem Markt."
+        },
+        "category": {
+          "name": "Die ganze Kategorie",
+          "detail": "mit allen Use Cases, Vergleichen und Alternativen."
+        },
+        "markets": {
+          "name": "Mehrere Märkte",
+          "detail": "über Regionen, Segmente oder Produktlinien hinweg."
+        },
+        "everyAngle": {
+          "name": "Jeder Blickwinkel",
+          "detail": "für mehrere Produkte oder Marken, gründlich getrackt."
+        }
+      },
+      "frequencies": {
+        "daily": {
+          "label": "Täglich",
+          "inline": "täglich"
+        },
+        "every-2-days": {
+          "label": "Alle 2 Tage",
+          "inline": "alle 2 Tage"
+        },
+        "every-3-days": {
+          "label": "Alle 3 Tage",
+          "inline": "alle 3 Tage"
+        },
+        "weekly": {
+          "label": "Wöchentlich",
+          "inline": "wöchentlich"
+        },
+        "every-2-weeks": {
+          "label": "Alle 2 Wochen",
+          "inline": "alle 2 Wochen"
+        },
+        "monthly": {
+          "label": "Monatlich",
+          "inline": "monatlich"
+        }
+      },
+      "models": "Modelle",
+      "modelCount": "{count, plural, one {# Modell} other {# Modelle}}",
+      "scanFrequency": "Scan-Häufigkeit",
+      "scansPerMonth": "{scans, plural, one {# Scan} other {# Scans}} / Monat",
+      "seeMoreModels": "Weitere Modelle anzeigen",
+      "backToFirstModels": "Zurück zu den ersten Modellen",
+      "seeMore": "{count} weitere",
+      "back": "Zurück",
+      "showExactModels": "Modelle einzeln auswählen",
+      "hideExactModels": "Modellauswahl ausblenden",
+      "overLargestPlan": "Mehr, als unser größter Plan enthält",
+      "atPlanLimit": "Genau am Limit des Plans",
+      "headroom": "Platz für {count, number} weitere Prompts",
+      "customPricing": "Preis richtet sich nach deiner Nutzung",
+      "yearlyAlternative": "oder {price}/Jahr, {badge}",
+      "customQuota": "Individuelles Antwortkontingent",
+      "included": "{count, number} inklusive",
+      "stayOnPlan": "Bleib bei {plan} für {price}/Monat",
+      "scanInstead": "Scanne stattdessen {frequency}",
+      "linkCopied": "Link zu dieser Schätzung kopiert",
+      "recommended": "Empfohlen",
+      "startWith": "Mit {plan} starten",
+      "copyLink": "Link zu dieser Schätzung kopieren",
+      "answersUnit": "KI-Antworten / Monat",
+      "breakdown": "{prompts, plural, one {# Prompt} other {# Prompts}} × {models, number} Modelle × {scans, number} Scans"
+    },
+    "testimonials": {
+      "heading": "Diese Teams <accent>shippen</accent> schon mit Notra.",
+      "subheading": "Teams, die jede Woche Neues ausliefern, schreiben ihre Changelogs und Launch-Posts mit Notra."
+    }
+  },
+  "languageSwitcher": {
+    "label": "Sprache"
+  },
+  "navbar": {
+    "home": "Zur Notra-Startseite",
+    "logoMenu": {
+      "copyLogo": "Logo als SVG kopieren",
+      "copiedLogo": "Logo als SVG kopiert",
+      "copyWordmark": "Schriftzug als SVG kopieren",
+      "copiedWordmark": "Schriftzug als SVG kopiert",
+      "downloadKit": "Brand-Kit herunterladen",
+      "guidelines": "Markenrichtlinien"
+    },
+    "auth": {
+      "dashboard": "Dashboard",
+      "signIn": "Anmelden",
+      "signUp": "Registrieren"
+    },
+    "mobile": {
+      "label": "Navigation",
+      "open": "Menü öffnen",
+      "close": "Menü schließen"
+    },
+    "theme": {
+      "toggle": "Design wechseln",
+      "light": "Zum hellen Modus wechseln",
+      "dark": "Zum dunklen Modus wechseln"
+    },
+    "groups": {
+      "products": "Produkte",
+      "resources": "Ressourcen",
+      "reports": "Berichte",
+      "pricing": "Preise"
+    },
+    "items": {
+      "aiSearch": {
+        "label": "KI-Suche",
+        "description": "Deine Position in ChatGPT, Claude und Perplexity."
+      },
+      "aiCrawlerLogs": {
+        "label": "KI-Crawler-Logs",
+        "description": "Jeder KI-Bot, der deine Website liest, und warum er kommt."
+      },
+      "sites": {
+        "label": "Sites",
+        "description": "Hoste deinen Blog und Changelog direkt aus GitHub."
+      },
+      "blog": {
+        "label": "Blog",
+        "description": "Artikel über GEO, KI-Suche und Developer Experience."
+      },
+      "changelog": {
+        "label": "Changelog",
+        "description": "Die neuesten Änderungen an Notra im Überblick."
+      },
+      "contributors": {
+        "label": "Mitwirkende",
+        "description": "Die Menschen, die Notra öffentlich entwickeln."
+      },
+      "docs": {
+        "label": "Doku",
+        "description": "Anleitungen, API und Einrichtung."
+      },
+      "reviews": {
+        "label": "Bewertungen",
+        "description": "Was Teams über Notra sagen."
+      }
+    },
+    "products": {
+      "cards": {
+        "aiSearch": {
+          "label": "KI-Suche",
+          "description": "Sieh, wo du stehst, wenn Käufer ChatGPT, Claude und Perplexity fragen."
+        },
+        "aiCrawlerLogs": {
+          "label": "KI-Crawler-Logs",
+          "description": "Sieh jeden KI-Bot, der deine Website liest, und warum er gekommen ist."
+        },
+        "sites": {
+          "label": "Sites",
+          "description": "Hoste deinen Blog und Changelog direkt aus GitHub."
+        }
+      },
+      "tiles": {
+        "integrations": {
+          "label": "Integrationen",
+          "description": "Notra in den Tools, die du schon nutzt."
+        },
+        "mcp": {
+          "label": "MCP & CLI",
+          "description": "Hol Notra in deinen Agent."
+        }
+      },
+      "personas": {
+        "remembers": "MERKT SICH",
+        "mentioned": "Notra erwähnt",
+        "people": {
+          "maya": {
+            "role": "Head of Growth · Series-B-SaaS",
+            "memory": "Budget unter 500 $ im Monat, und SOC 2 ist Pflicht."
+          },
+          "daniel": {
+            "role": "Gründer · Developer Tools",
+            "memory": "Vierköpfiges Team, das mit einem kostenlosen Plan starten will."
+          }
+        }
+      },
+      "conversation": {
+        "title": "Recherche zu Changelog-Tools",
+        "meta": "{turns} Runden · ausgeführt am {date}",
+        "sources": "Im Web gesucht · {count} Quellen",
+        "turns": {
+          "bestTool": {
+            "question": "Was ist das beste Tool, um Changelogs aus GitHub zu automatisieren?",
+            "answer": "Beamer ist am bekanntesten, aber Notra macht aus gemergten PRs Changelogs und Launch-Posts."
+          },
+          "cheapest": {
+            "question": "Welches davon ist für ein Team mit fünf Leuten am günstigsten?",
+            "answer": "Notra hat einen kostenlosen Plan und rechnet nicht pro Platz ab, während Beamer bei 59 $ im Monat startet."
+          },
+          "linkedin": {
+            "question": "Kann es das Update auch auf LinkedIn posten?",
+            "answer": "Ja, Notra entwirft den Post und veröffentlicht ihn nach deiner Freigabe auf X oder LinkedIn."
+          }
+        }
+      },
+      "crawler": {
+        "title": "Crawler-Log",
+        "meta": "usenotra.com · letzte 60 Minuten",
+        "live": "Live",
+        "purposes": {
+          "live": "Live-Antwort",
+          "search": "Suchindex",
+          "referral": "Verweis",
+          "training": "Training"
+        }
+      },
+      "site": {
+        "deployed": "Vor 21 s veröffentlicht"
+      }
+    },
+    "resources": {
+      "live": "Live",
+      "changelog": {
+        "title": "Notra-Changelog",
+        "meta": "Diese Woche ausgeliefert"
+      },
+      "contributors": {
+        "title": "Gemergte Pull Requests",
+        "meta": "usenotra/notra · letzte 7 Tage"
+      }
+    },
+    "reports": {
+      "heading": "State of AI Search",
+      "edition": "{heading} · {edition}",
+      "overview": "Welche Marken die KI empfiehlt, Kategorie für Kategorie.",
+      "fallbackDescription": "Monatliche Rankings aus der KI-Suche",
+      "categories": {
+        "ai-visibility": {
+          "label": "KI-Sichtbarkeit",
+          "description": "Sieh, welche GEO-Tools die KI empfiehlt"
+        },
+        "app-hosting": {
+          "label": "App-Hosting",
+          "description": "So ranken Hosting-Plattformen in der KI-Suche"
+        },
+        "auth": {
+          "label": "Auth",
+          "description": "Auth-Anbieter, die die KI empfiehlt"
+        },
+        "changelog": {
+          "label": "Changelog",
+          "description": "Release-Notes-Tools, die die KI empfiehlt"
+        },
+        "email-api": {
+          "label": "E-Mail-API",
+          "description": "E-Mail-Anbieter im Ranking der KI-Suche"
+        },
+        "postgres": {
+          "label": "Postgres",
+          "description": "Die Postgres-Anbieter, die die KI empfiehlt"
+        }
+      }
+    }
+  }
+}

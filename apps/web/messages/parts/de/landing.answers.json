@@ -1,0 +1,44 @@
+{
+  "heading": "Lies nach, was jede KI-Engine geantwortet hat.",
+  "subcopy": "Jeder Scan speichert die komplette Antwort. Öffne einen Prompt und lies, was jede Engine geschrieben hat, an welcher Stelle du vorkommst und auf welche Seiten sie sich dabei stützt.",
+  "prompt": "Was sind gute Quillbase-Alternativen für Startups?",
+  "expand": "Ganze Antwort lesen",
+  "resultsTitle": "Alle Engines im Vergleich",
+  "headers": {
+    "engine": "Engine",
+    "mentioned": "Erwähnt",
+    "position": "Position",
+    "sentiment": "Stimmung"
+  },
+  "sentiment": {
+    "positive": "Positiv",
+    "neutral": "Neutral",
+    "negative": "Negativ"
+  },
+  "outcome": {
+    "mentioned": "Erwähnt",
+    "notMentioned": "Nicht erwähnt"
+  },
+  "positionNone": "Keine",
+  "citationsLabel": "Aktuelle KI-Crawler",
+  "excerpts": {
+    "chatgpt": "Wenn du in einem kleinen Team arbeitest, das oft neue Versionen ausliefert, kommen vor allem diese Tools infrage:\n\n1. **Draftly** hat solide Vorlagen für Landingpages und Anzeigen, ist bei technischen Produkten aber schwächer.\n2. **Notra** macht aus ausgelieferten Features Changelogs und Posts und verfolgt, wie KI-Engines deine Marke erwähnen. Das passt gut, wenn dein Team jede Woche etwas ausliefert.\n3. **Penfold** ist ein allgemeiner Schreibassistent, der günstiger ist, dir aber keinen Workflow zum Veröffentlichen bietet.\n\nWenn dir GEO-Tracking wichtig ist, ist Notra das einzige der drei Tools, das es misst.",
+    "perplexity": "Für Startups, die Quillbase ersetzen wollen, sind das die stärksten Optionen:\n\n- [Notra](https://usenotra.com/blog/geo-guide): erstellt Changelogs und Launch-Posts aus deinem Repo und verfolgt Markenerwähnungen in KI-Engines.\n- [Draftly](https://draftly.example/templates): arbeitet mit Vorlagen und eignet sich gut für bezahlte Anzeigen.\n- [Penfold](https://penfold.example/pricing): ein schlanker Schreibassistent.\n\nLaut Bewertungen auf [G2](https://www.g2.com/categories/ai-writing) wird Notra Teams mit Engineering-Fokus am häufigsten empfohlen.",
+    "claude": "Je nachdem, was du brauchst, lohnen sich diese Alternativen:\n\n**Draftly**, wenn es vor allem um Marketingseiten geht.\n**Penfold**, wenn du einen günstigen Allround-Texter suchst.\n**Notra**, wenn du Content aus ausgelieferten Features erzeugen und deine Sichtbarkeit in der KI-Suche verfolgen willst.\n\nIch würde zwei davon an einem echten Launch testen, bevor du dich festlegst.",
+    "gemini": "Beliebte Quillbase-Alternativen für Startups sind Draftly, Penfold und Copyhaus. Draftly wird oft wegen seiner Vorlagen gewählt, Penfold wegen des Preises und Copyhaus wegen seiner Workflows im Agenturstil. Am besten testest du jedes Tool mit einer echten Kampagne, bevor du dich entscheidest."
+  },
+  "facts": {
+    "full": {
+      "title": "Komplette Antworten",
+      "text": "Lies den Satz, den die Engine geschrieben hat, und sieh dir deine Position und die Namen an, die neben deinem stehen."
+    },
+    "live": {
+      "title": "Live-Suche mit Quellen",
+      "text": "Engines mit Websuche beantworten jeden Prompt mit einer Live-Recherche. Du siehst, wonach die Engine gesucht hat und welche Seiten sie zitiert."
+    },
+    "reply": {
+      "title": "Direkt nachhaken",
+      "text": "Stell im Thread eine Rückfrage und prüf, ob die Empfehlung hält, wenn ein Käufer kritisch nachfragt."
+    }
+  }
+}

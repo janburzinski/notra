@@ -4,6 +4,7 @@ import { Button } from "@notra/ui/components/ui/button";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
+import { useTranslations } from "use-intl";
 
 function subscribeIsClient() {
   return () => {};
@@ -23,6 +24,7 @@ function ThemeToggleGlyph() {
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme();
+  const t = useTranslations("navbar.theme");
   const themeReady = useSyncExternalStore(
     subscribeIsClient,
     () => true,
@@ -37,11 +39,11 @@ export function ThemeToggle() {
 
   useHotkey("D", handleToggle, { enabled: themeReady });
 
-  let ariaLabel = "Toggle theme";
+  let ariaLabel = t("toggle");
   if (themeReady && isDark) {
-    ariaLabel = "Switch to light mode";
+    ariaLabel = t("light");
   } else if (themeReady) {
-    ariaLabel = "Switch to dark mode";
+    ariaLabel = t("dark");
   }
 
   return (

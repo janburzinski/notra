@@ -1,0 +1,67 @@
+{
+  "websiteLabel": "Deine Website",
+  "websitePlaceholder": "firma.de",
+  "websiteInvalid": "Gib eine gültige Website ein, zum Beispiel firma.de",
+  "demoOpen": "Demo ansehen",
+  "demoPreviewAlt": "GEO-Übersicht in Notra mit der Sichtbarkeit je KI-Engine und den letzten Änderungen",
+  "variantSwitcherLabel": "Vorschau der Hero-Varianten",
+  "variantSwitcherHide": "Variantenauswahl ausblenden",
+  "variants": {
+    "control": {
+      "lineOne": "Sei die Antwort,",
+      "lineTwoPrefix": "wenn Käufer",
+      "lineTwoSuffix": " fragen.",
+      "subhead": "Notra ist ein GEO-Tool, das ChatGPT, Claude und Gemini die Fragen stellt, die deine Käufer stellen. Du siehst, ob du in den Antworten vorkommst, wer stattdessen genannt wird und wie du das änderst.",
+      "cta": "Kostenlos starten",
+      "secondaryLabel": "Gespräch buchen"
+    },
+    "visibility": {
+      "lineOne": "Finde heraus, ob du",
+      "lineTwoPrefix": "in",
+      "lineTwoSuffix": " auftauchst.",
+      "subhead": "Sieh, welche Prompts deine Käufer der KI stellen, ob du in der Antwort auftauchst und was du veröffentlichen musst, um die verlorenen Prompts zurückzugewinnen.",
+      "cta": "KI-Sichtbarkeit prüfen",
+      "secondaryLabel": "Gespräch buchen"
+    },
+    "slack": {
+      "lineOne": "Werde mit <brand>Slack</brand>",
+      "lineTwoPrefix": "in",
+      "lineTwoSuffix": " sichtbar.",
+      "subhead": "Frag Notra in Slack, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. Notra antwortet im Thread mit den Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst, sodass du alles direkt in Slack freigeben kannst.",
+      "cta": "Zu Slack hinzufügen",
+      "secondaryLabel": "Zur Slack-App"
+    },
+    "claude": {
+      "lineOne": "Frag <brand>Claude</brand>, ob Käufer",
+      "lineTwoPrefix": "dich in",
+      "lineTwoSuffix": " finden.",
+      "subhead": "Notra ist ein verifizierter Claude-Connector. Frag Claude, wo deine Marke in KI-Antworten auftaucht, wer stattdessen genannt wird und was du als Nächstes veröffentlichen solltest, und zwar direkt in dem Chat, den du ohnehin nutzt.",
+      "cta": "Kostenlos starten",
+      "secondaryLabel": "Zu Claude hinzufügen"
+    },
+    "claude-expert": {
+      "lineOne": "Mach <brand>Claude</brand> zum",
+      "lineTwoPrefix": "SEO- und GEO-Experten",
+      "lineTwoSuffix": ".",
+      "subhead": "Verbinde Notra mit Claude und frag, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. Claude findet die Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst.",
+      "cta": "Kostenlos starten",
+      "secondaryLabel": "Zu Claude hinzufügen"
+    },
+    "chatgpt": {
+      "lineOne": "Frag <brand>ChatGPT</brand>, ob Käufer",
+      "lineTwoPrefix": "dich in",
+      "lineTwoSuffix": " finden.",
+      "subhead": "Notra ist eine ChatGPT-App. Frag ChatGPT, wo deine Marke in KI-Antworten auftaucht, wer stattdessen genannt wird und was du als Nächstes veröffentlichen solltest, und zwar direkt in dem Chat, den du ohnehin nutzt.",
+      "cta": "Kostenlos starten",
+      "secondaryLabel": "Zu ChatGPT hinzufügen"
+    },
+    "chatgpt-expert": {
+      "lineOne": "Mach <brand>ChatGPT</brand> zum",
+      "lineTwoPrefix": "SEO- und GEO-Experten",
+      "lineTwoSuffix": ".",
+      "subhead": "Verbinde Notra mit ChatGPT und frag, wie deine Marke in ChatGPT, Claude und Gemini abschneidet. ChatGPT findet die Prompts, die du verlierst, und entwirft die Seiten, mit denen du sie zurückholst.",
+      "cta": "Kostenlos starten",
+      "secondaryLabel": "Zu ChatGPT hinzufügen"
+    }
+  }
+}

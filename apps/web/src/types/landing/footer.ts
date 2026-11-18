@@ -1,13 +1,14 @@
 import type { ComponentType } from "react";
+import type { Messages } from "use-intl";
 
 export interface FooterLink {
-  label: string;
+  id: Extract<keyof Messages["footer"]["links"], string>;
   href?: string;
   external?: boolean;
 }
 
 interface FooterLinkGroup {
-  title: string;
+  id: Extract<keyof Messages["footer"]["groups"], string>;
   links: readonly FooterLink[];
 }
 

@@ -4,7 +4,9 @@ import {
   HeadContent,
   lazyRouteComponent,
   Outlet,
+  redirect,
   Scripts,
+  useRouterState,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { DevTools } from "c15t/react/devtools";
@@ -20,15 +22,22 @@ import {
   createConsentStateHandler,
 } from "c15t/tanstack-start/server";
 import { NuqsAdapter } from "nuqs/adapters/tanstack-router";
-import type { ReactNode } from "react";
+import { type ReactNode, use } from "react";
+import { IntlProvider } from "use-intl";
 
 import { AppLinkTracking } from "@/components/app-link-tracking";
 import { ThemeProvider } from "@/components/theme-provider";
 import { consentScripts } from "@/consent-scripts";
 import { DUB_CLEAR_ON_REVOCATION } from "@/constants/dub";
+import { LANDING_HOME_PATHS } from "@/constants/i18n";
 import interCore from "@/fonts/subsets/inter-core.woff2?url";
 import { consentComponents, consentTheme } from "@/lib/consent-manager/theme";
+import { getCatalog, loadCatalog } from "@/lib/i18n/catalog";
 import { RSS_FEED_PATH, RSS_FEED_TITLE } from "@/utils/constants";
+import {
+  localeFromPathname,
+  preferredLandingLocale,
+} from "@/utils/landing-locale";
 import { buildNavbarSessionScript } from "@/utils/navbar-session";
 
 import globalsCss from "@/styles/globals.css?url";
@@ -43,6 +52,16 @@ const getConsentState = createServerFn({ method: "GET" }).handler(
 
 export const Route = createRootRoute({
   ...consentLoaderOptions,
+  beforeLoad: async ({ location }) => {
+    if (
+      typeof document !== "undefined" &&
+      location.pathname === LANDING_HOME_PATHS.en &&
+      preferredLandingLocale() === "de"
+    ) {
+      throw redirect({ href: `${LANDING_HOME_PATHS.de}${location.searchStr}` });
+    }
+    await loadCatalog(localeFromPathname(location.pathname));
+  },
   loader: async () => ({ consent: await getConsentState() }),
   head: () => ({
     meta: [
@@ -95,9 +114,14 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: ReactNode }) {
   const { consent } = Route.useLoaderData();
+  const locale = useRouterState({
+    select: (state) =>
+      localeFromPathname((state.resolvedLocation ?? state.location).pathname),
+  });
+  const messages = getCatalog(locale) ?? use(loadCatalog(locale));
   return (
     <html
-      lang="en"
+      lang={locale}
       style={{ scrollbarGutter: "stable" }}
       suppressHydrationWarning
     >
@@ -143,7 +167,9 @@ function RootDocument({ children }: { children: ReactNode }) {
             />
             <ConsentDialog />
             {process.env.NODE_ENV !== "production" && <DevTools />}
-            <NuqsAdapter>{children}</NuqsAdapter>
+            <IntlProvider locale={locale} messages={messages} timeZone="UTC">
+              <NuqsAdapter>{children}</NuqsAdapter>
+            </IntlProvider>
           </ConsentRoot>
           <AppLinkTracking />
           <Toaster position="bottom-right" />

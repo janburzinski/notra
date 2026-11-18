@@ -31,6 +31,7 @@ import { Route as DotwellKnownHttpMessageSignaturesDirectoryRouteImport } from '
 import { Route as DotwellKnownIntegrationsDotjsonRouteImport } from './routes/[.]well-known/integrations[.]json'
 import { Route as DotwellKnownOauthProtectedResourceRouteImport } from './routes/[.]well-known/oauth-protected-resource'
 import { Route as LandingIndexRouteImport } from './routes/_landing/index'
+import { Route as LandingDeRouteImport } from './routes/_landing/de'
 import { Route as LandingLandingRouteImport } from './routes/_landing/landing'
 import { Route as SiteLegalRouteImport } from './routes/_site/_legal'
 import { Route as SiteShowcaseRouteImport } from './routes/_site/_showcase'
@@ -226,6 +227,11 @@ const DotwellKnownOauthProtectedResourceRoute =
 const LandingIndexRoute = LandingIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => LandingRoute,
+} as any)
+const LandingDeRoute = LandingDeRouteImport.update({
+  id: '/de',
+  path: '/de',
   getParentRoute: () => LandingRoute,
 } as any)
 const LandingLandingRoute = LandingLandingRouteImport.update({
@@ -682,6 +688,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/http-message-signatures-directory': typeof DotwellKnownHttpMessageSignaturesDirectoryRoute
   '/.well-known/integrations.json': typeof DotwellKnownIntegrationsDotjsonRoute
   '/.well-known/oauth-protected-resource': typeof DotwellKnownOauthProtectedResourceRoute
+  '/de': typeof LandingDeRoute
   '/landing': typeof LandingLandingRoute
   '/about': typeof SiteAboutRoute
   '/agent': typeof SiteAgentRoute
@@ -785,6 +792,7 @@ export interface FileRoutesByTo {
   '/.well-known/http-message-signatures-directory': typeof DotwellKnownHttpMessageSignaturesDirectoryRoute
   '/.well-known/integrations.json': typeof DotwellKnownIntegrationsDotjsonRoute
   '/.well-known/oauth-protected-resource': typeof DotwellKnownOauthProtectedResourceRoute
+  '/de': typeof LandingDeRoute
   '/landing': typeof LandingLandingRoute
   '/about': typeof SiteAboutRoute
   '/agent': typeof SiteAgentRoute
@@ -890,6 +898,7 @@ export interface FileRoutesById {
   '/.well-known/http-message-signatures-directory': typeof DotwellKnownHttpMessageSignaturesDirectoryRoute
   '/.well-known/integrations.json': typeof DotwellKnownIntegrationsDotjsonRoute
   '/.well-known/oauth-protected-resource': typeof DotwellKnownOauthProtectedResourceRoute
+  '/_landing/de': typeof LandingDeRoute
   '/_landing/landing': typeof LandingLandingRoute
   '/_site/_legal': typeof SiteLegalRouteWithChildren
   '/_site/_showcase': typeof SiteShowcaseRouteWithChildren
@@ -998,6 +1007,7 @@ export interface FileRouteTypes {
     | '/.well-known/http-message-signatures-directory'
     | '/.well-known/integrations.json'
     | '/.well-known/oauth-protected-resource'
+    | '/de'
     | '/landing'
     | '/about'
     | '/agent'
@@ -1101,6 +1111,7 @@ export interface FileRouteTypes {
     | '/.well-known/http-message-signatures-directory'
     | '/.well-known/integrations.json'
     | '/.well-known/oauth-protected-resource'
+    | '/de'
     | '/landing'
     | '/about'
     | '/agent'
@@ -1205,6 +1216,7 @@ export interface FileRouteTypes {
     | '/.well-known/http-message-signatures-directory'
     | '/.well-known/integrations.json'
     | '/.well-known/oauth-protected-resource'
+    | '/_landing/de'
     | '/_landing/landing'
     | '/_site/_legal'
     | '/_site/_showcase'
@@ -1494,6 +1506,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LandingIndexRouteImport
+      parentRoute: typeof LandingRoute
+    }
+    '/_landing/de': {
+      id: '/_landing/de'
+      path: '/de'
+      fullPath: '/de'
+      preLoaderRoute: typeof LandingDeRouteImport
       parentRoute: typeof LandingRoute
     }
     '/_landing/landing': {
@@ -2081,11 +2100,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface LandingRouteChildren {
+  LandingDeRoute: typeof LandingDeRoute
   LandingLandingRoute: typeof LandingLandingRoute
   LandingIndexRoute: typeof LandingIndexRoute
 }
 
 const LandingRouteChildren: LandingRouteChildren = {
+  LandingDeRoute: LandingDeRoute,
   LandingLandingRoute: LandingLandingRoute,
   LandingIndexRoute: LandingIndexRoute,
 }

@@ -3,8 +3,6 @@ import { InthLogo } from "@/components/landing/marquee-logos/inth-logo";
 import { TopGgLogo } from "@/components/landing/marquee-logos/top-gg-logo";
 import type { MarqueeLogo } from "@/types/landing/marquee-quote";
 
-export const MARQUEE_CAPTION = "Used by teams that ship every week";
-
 export const MARQUEE_EDGE_MASK =
   "linear-gradient(to right, transparent, black 8%, black 92%, transparent)";
 

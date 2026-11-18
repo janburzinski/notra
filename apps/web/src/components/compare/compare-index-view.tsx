@@ -1,4 +1,5 @@
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
+import { useTranslations } from "use-intl";
 
 import { CompareCard } from "@/components/compare/compare-card";
 import { CompareHeroDuel } from "@/components/compare/compare-hero-duel";
@@ -10,10 +11,10 @@ import {
   COMPARE_INDEX_SUBTITLE,
   COMPARE_SIGNUP_SOURCE,
 } from "@/constants/compare/page";
-import { CTA_BANNER_PRIMARY_LABEL } from "@/constants/landing/cta-banner";
 import type { CompareIndexViewProps } from "@/types/compare";
 
 export function CompareIndexView({ competitors }: CompareIndexViewProps) {
+  const ctaT = useTranslations("landing.cta");
   return (
     <div className="flex w-full flex-col items-center gap-16 pb-14 antialiased [font-synthesis:none] lg:gap-20">
       <MarketingHeroWash
@@ -29,7 +30,7 @@ export function CompareIndexView({ competitors }: CompareIndexViewProps) {
           size="lg"
           variant="primary"
         >
-          {CTA_BANNER_PRIMARY_LABEL}
+          {ctaT("primary")}
         </CtaButton>
       </MarketingHeroWash>
 

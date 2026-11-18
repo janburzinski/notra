@@ -1,6 +1,7 @@
 import { CtaButton } from "@notra/ui/components/shared/cta-button";
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { useTranslations } from "use-intl";
 
 import { CtaBanner } from "@/components/landing/cta-banner";
 import { LandingPricingSection } from "@/components/landing/pricing-section";
@@ -11,11 +12,7 @@ import {
   FEATURE_SECTION_CLASS,
   FEATURE_SECTION_HEADING_CLASS,
 } from "@/constants/feature-pages/layout";
-import {
-  CTA_BANNER_CONTACT_HREF,
-  CTA_BANNER_PRIMARY_LABEL,
-  CTA_BANNER_SECONDARY_LABEL,
-} from "@/constants/landing/cta-banner";
+import { CTA_BANNER_CONTACT_HREF } from "@/constants/landing/cta-banner";
 import type { FeatureDetailPageProps } from "@/types/feature-detail-page";
 import { buildFeatureDetailBreadcrumb } from "@/utils/feature-detail-page";
 import { serializeJsonLd } from "@/utils/jsonld";
@@ -30,6 +27,7 @@ export function FeatureDetailPage({
   children,
   footer,
 }: FeatureDetailPageProps) {
+  const ctaT = useTranslations("landing.cta");
   return (
     <div className="flex w-full flex-col items-center gap-20 pb-20 antialiased [font-synthesis:none] lg:gap-24 lg:pb-28">
       <script
@@ -54,7 +52,7 @@ export function FeatureDetailPage({
               size="lg"
               variant="primary"
             >
-              {CTA_BANNER_PRIMARY_LABEL}
+              {ctaT("primary")}
             </CtaButton>
             <CtaButton
               nativeButton={false}
@@ -62,7 +60,7 @@ export function FeatureDetailPage({
               size="lg"
               variant="light"
             >
-              {CTA_BANNER_SECONDARY_LABEL}
+              {ctaT("secondary")}
             </CtaButton>
           </>
         )}

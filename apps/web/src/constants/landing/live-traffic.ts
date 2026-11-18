@@ -75,13 +75,6 @@ export const LIVE_TRAFFIC_MAX_ROWS = 20;
 
 export const LIVE_TRAFFIC_INTERVAL_MS = 3200;
 
-export const LIVE_TRAFFIC_HEADERS = {
-  when: "When",
-  provider: "Provider",
-  path: "Path",
-  purpose: "Purpose",
-};
-
 export const LIVE_TRAFFIC_SEED_ROWS: CitationRow[] = [
   {
     id: "c-1",

@@ -50,7 +50,7 @@ export const NAVBAR_RESOURCES_POSTS: readonly NavbarResourcesPost[] = [
     description:
       "Turn your MCP server into a Meta Muse connector and submit it to the directory.",
     author: { name: "Dominik Koch", image: "/blog/authors/dominik.png" },
-    date: "Oct 7",
+    date: "2026-10-07",
   },
   {
     title:
@@ -58,7 +58,7 @@ export const NAVBAR_RESOURCES_POSTS: readonly NavbarResourcesPost[] = [
     description:
       "Sync your ranking queries weekly and see them surface as prompt suggestions.",
     author: { name: "Jan Burzinski", image: "/blog/authors/jan.webp" },
-    date: "Sep 16",
+    date: "2026-09-16",
   },
 ];
 
@@ -69,22 +69,22 @@ export const NAVBAR_RESOURCES_RELEASE_TYPES = {
 
 export const NAVBAR_RESOURCES_RELEASES: readonly NavbarResourcesRelease[] = [
   {
-    date: "Oct 10",
+    date: "2026-10-10",
     type: "feat",
     title: "AI traffic from Vercel log drains and Cloudflare Logpush",
   },
   {
-    date: "Oct 10",
+    date: "2026-10-10",
     type: "feat",
     title: "Web search toggle in the offering check",
   },
   {
-    date: "Oct 10",
+    date: "2026-10-10",
     type: "feat",
     title: "Brand icons in report summaries",
   },
   {
-    date: "Oct 10",
+    date: "2026-10-10",
     type: "fix",
     title: "Deployment timeline bars grow in real time",
   },

@@ -1,8 +1,5 @@
 import type { Testimonial } from "@/types/landing/testimonials";
 
-export const TESTIMONIALS_SUBHEADING =
-  "Teams that ship every week use Notra for their changelogs and launch posts.";
-
 export const FEATURED_TESTIMONIAL: Testimonial = {
   quote:
     '"Notra is connected to our entire content pipeline. It creates valuable content from our PRs that our audience actually want to read. There\'s now no more relevant features that are shipped and not talk about. Notra closes that loop for us."',

@@ -1,5 +1,6 @@
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import {
   NavbarBentoFeatureTile,
@@ -25,14 +26,17 @@ import type {
   NavbarResourcesMock,
 } from "@/types/navbar-bento";
 
+const SHORT_DATE = { month: "short", day: "numeric" } as const;
+
 function BlogMock() {
+  const format = useFormatter();
   return (
     <span className="flex gap-3">
       {NAVBAR_RESOURCES_POSTS.map((post) => (
         <span className={cn(CLASSES.mockCard, "w-75")} key={post.title}>
           <span className="flex flex-col gap-2 px-4.5 pt-4.5 pb-4">
             <span className="font-mono text-xs/4 text-[#8A8A8A]">
-              {post.date}
+              {format.dateTime(new Date(post.date), SHORT_DATE)}
             </span>
             <span className={CLASSES.mockTitle}>{post.title}</span>
             <span className="font-sans text-sm/5.25 text-[#6B6B6B] dark:text-neutral-400">
@@ -58,11 +62,16 @@ function BlogMock() {
 }
 
 function ChangelogMock() {
+  const t = useTranslations("navbar.resources");
+  const format = useFormatter();
   return (
     <span className={cn(CLASSES.mockCard, "w-130")}>
-      <NavbarBentoMockHeader meta="Shipped this week" title="Notra changelog">
+      <NavbarBentoMockHeader
+        meta={t("changelog.meta")}
+        title={t("changelog.title")}
+      >
         <span className="size-1.75 shrink-0 rounded-full bg-[#22A55A] shadow-[0_0_0_0.1875rem_#22A55A2E]" />
-        <span className={CLASSES.mockPillLabel}>Live</span>
+        <span className={CLASSES.mockPillLabel}>{t("live")}</span>
       </NavbarBentoMockHeader>
       <span className="flex flex-col pt-1.5 pb-2">
         {NAVBAR_RESOURCES_RELEASES.map((release, index) => (
@@ -74,7 +83,7 @@ function ChangelogMock() {
             key={release.title}
           >
             <span className="w-13 shrink-0 font-mono text-xs/4 text-[#8A8A8A]">
-              {release.date}
+              {format.dateTime(new Date(release.date), SHORT_DATE)}
             </span>
             <span
               className={cn(
@@ -95,12 +104,10 @@ function ChangelogMock() {
 }
 
 function ContributorsMock() {
+  const t = useTranslations("navbar.resources.contributors");
   return (
     <span className={cn(CLASSES.mockCard, "w-130")}>
-      <NavbarBentoMockHeader
-        meta="usenotra/notra · last 7 days"
-        title="Merged pull requests"
-      >
+      <NavbarBentoMockHeader meta={t("meta")} title={t("title")}>
         <Github aria-hidden="true" className="size-3.5 shrink-0" />
         <span className={CLASSES.mockPillLabel}>GitHub</span>
       </NavbarBentoMockHeader>

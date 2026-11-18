@@ -14,22 +14,21 @@ import {
   useReducedMotion,
 } from "motion/react";
 import { useState } from "react";
+import { useTranslations } from "use-intl";
 
 import { AUTH_DASHBOARD_URL, AUTH_SIGNIN_URL } from "@/constants/auth";
 import {
   NAVBAR_MOBILE_OVERLAY_LAYOUT,
   NAVBAR_MOBILE_SIGNUP_SOURCE,
 } from "@/constants/navbar";
+import { useMarketingNav } from "@/lib/navigation/use-marketing-nav";
 import type {
+  MarketingNavGroup,
+  MarketingNavRailItem,
   NavbarAuthActionsProps,
   NavbarMobileGroupProps,
   NavbarMobileMenuProps,
 } from "@/types/navbar";
-import {
-  MARKETING_NAV,
-  type MarketingNavGroup,
-  type MarketingNavRailItem,
-} from "@/utils/navigation";
 
 import { NavbarChevron } from "./navbar-glyphs";
 import { NavbarHref } from "./navbar-href";
@@ -167,11 +166,13 @@ function MobileNavOverlay({
   stagger: Variants;
 }) {
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const t = useTranslations("navbar");
+  const nav = useMarketingNav();
 
   return (
     <m.div
       animate="visible"
-      aria-label="Navigation"
+      aria-label={t("mobile.label")}
       aria-modal="true"
       className={cn(
         "pointer-events-none fixed inset-0 z-40 flex flex-col overflow-hidden overscroll-none bg-white lg:hidden dark:bg-neutral-950",
@@ -190,7 +191,7 @@ function MobileNavOverlay({
         )}
         variants={stagger}
       >
-        {MARKETING_NAV.map((entry) => {
+        {nav.map((entry) => {
           if (entry.type === "link") {
             return (
               <m.div key={entry.href} variants={item}>
@@ -206,13 +207,13 @@ function MobileNavOverlay({
           }
 
           return (
-            <m.div key={entry.label} variants={item}>
+            <m.div key={entry.id} variants={item}>
               <GroupDropdown
                 group={entry}
                 item={item}
-                onOpenChange={(next) => setOpenGroup(next ? entry.label : null)}
+                onOpenChange={(next) => setOpenGroup(next ? entry.id : null)}
                 onSelect={onNavigate}
-                open={openGroup === entry.label}
+                open={openGroup === entry.id}
                 stagger={stagger}
               />
             </m.div>
@@ -332,6 +333,7 @@ function MobileAuthActions({
   onNavigate,
   item,
 }: NavbarAuthActionsProps & { onNavigate: () => void; item: Variants }) {
+  const t = useTranslations("navbar.auth");
   if (!isResolved) {
     return null;
   }
@@ -344,7 +346,7 @@ function MobileAuthActions({
           href={AUTH_DASHBOARD_URL}
           onClick={onNavigate}
         >
-          Dashboard
+          {t("dashboard")}
         </a>
       </m.div>
     );
@@ -358,7 +360,7 @@ function MobileAuthActions({
           href={AUTH_SIGNIN_URL}
           onClick={onNavigate}
         >
-          Sign In
+          {t("signIn")}
         </a>
       </m.div>
       <m.div className="flex-1" variants={item}>
@@ -367,7 +369,7 @@ function MobileAuthActions({
           onClick={onNavigate}
           source={NAVBAR_MOBILE_SIGNUP_SOURCE}
         >
-          Sign Up
+          {t("signUp")}
         </TrackedSignupLink>
       </m.div>
     </>

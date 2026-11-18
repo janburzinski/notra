@@ -1,0 +1,50 @@
+{
+  "heading": "Pricing that grows with you.",
+  "subheading": "Every paid plan includes tracking, attribution and the writer. Start free and cancel anytime.",
+  "enginesCaption": "Track the answers people actually see in ChatGPT, Claude, Gemini, Copilot and Google",
+  "annualBadge": "2 months free",
+  "customPrice": "Custom",
+  "carouselLabel": "Plans",
+  "carouselDot": "Show the {plan} plan",
+  "billing": {
+    "monthly": "Monthly",
+    "yearly": "Yearly"
+  },
+  "perPeriod": {
+    "monthly": "/month",
+    "yearly": "/year"
+  },
+  "cta": {
+    "startFree": "Start for free",
+    "getStarted": "Get started",
+    "contactUs": "Contact us"
+  },
+  "plans": {
+    "free": "Track AI agents and people visiting your site with one shared event allowance, and collect agent feedback.",
+    "starter": "For founders tracking their first prompts.",
+    "growth": "For teams tracking prompts across engines and languages.",
+    "scale": "For agencies and teams running several brands.",
+    "enterprise": "For large orgs with custom scale and compliance needs."
+  },
+  "features": {
+    "answers": "{count, number} AI answers tracked / mo",
+    "answersUnlimited": "Unlimited AI answers tracked",
+    "events": "{count}M analytics events / mo",
+    "eventsShared": "shared by agent and web analytics",
+    "eventsUnlimited": "Unlimited analytics events",
+    "agentFeedback": "Agent feedback",
+    "images": "{count} image generations / mo",
+    "imagesUnlimited": "Unlimited image generations",
+    "posts": "{count} long-form posts / mo",
+    "postsUnlimited": "Unlimited long-form posts",
+    "social": "Unlimited social posts",
+    "projects": "{count, plural, one {# project} other {# projects}}",
+    "projectsUnlimited": "Unlimited projects",
+    "references": "{count, number} references",
+    "referencesOverage": "then {price} per ref / mo",
+    "referencesUnlimited": "Unlimited references",
+    "supportStandard": "Standard support + Slack",
+    "supportPriority": "Priority support",
+    "supportDedicated": "Dedicated support"
+  }
+}

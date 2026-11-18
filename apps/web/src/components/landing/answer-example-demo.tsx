@@ -5,13 +5,13 @@ import { PromptEngineSwitcher } from "@notra/ui/components/geo/prompt-engine-swi
 import { Button } from "@notra/ui/components/ui/button";
 import { cn } from "@notra/ui/lib/utils";
 import { useState } from "react";
+import { useFormatter, useTranslations } from "use-intl";
 
 import {
   ANSWER_EXAMPLE_DEFAULT_ENGINE,
-  ANSWER_EXAMPLE_EXPAND_LABEL,
-  ANSWER_EXAMPLE_PROMPT,
   ANSWER_EXAMPLE_RESULTS,
   ANSWER_EXAMPLE_TIMESTAMP,
+  ANSWER_EXAMPLE_TIMESTAMP_FORMAT,
 } from "@/constants/landing/answer-example";
 import { GEO_ENGINE_NAMES } from "@/constants/landing/geo-engines";
 
@@ -23,6 +23,9 @@ const SWITCHER_ITEMS = ANSWER_EXAMPLE_RESULTS.map((result) => ({
 }));
 
 export function AnswerExampleDemo() {
+  const t = useTranslations("landing.answers");
+  const format = useFormatter();
+  const prompt = t("prompt");
   const [engine, setEngine] = useState<string>(ANSWER_EXAMPLE_DEFAULT_ENGINE);
   const [expanded, setExpanded] = useState(false);
   const active =
@@ -33,7 +36,7 @@ export function AnswerExampleDemo() {
     <div className="border-border bg-background flex flex-col overflow-hidden rounded-2xl border shadow-[0_0.125rem_1.4375rem_#0000001A,0_0.0625rem_0.125rem_#0000000A] lg:h-[40rem] dark:shadow-none">
       <div className="border-border flex shrink-0 flex-col gap-3 border-b px-4 pt-4 pb-3 sm:px-6 sm:pt-5">
         <p className="text-lg leading-snug font-semibold text-balance sm:text-xl">
-          {ANSWER_EXAMPLE_PROMPT}
+          {prompt}
         </p>
         <PromptEngineSwitcher
           active={engine}
@@ -54,13 +57,16 @@ export function AnswerExampleDemo() {
           <GeoPromptAnswerThread
             fitContentBelowLg
             key={active.id}
-            prompt={ANSWER_EXAMPLE_PROMPT}
+            prompt={prompt}
             result={{
               engine: active.id,
-              excerpt: active.excerpt,
+              excerpt: t(`excerpts.${active.id}`),
               mentioned: active.mentioned,
             }}
-            timestamp={ANSWER_EXAMPLE_TIMESTAMP}
+            timestamp={format.dateTime(
+              ANSWER_EXAMPLE_TIMESTAMP,
+              ANSWER_EXAMPLE_TIMESTAMP_FORMAT
+            )}
           />
         </div>
       ) : null}
@@ -72,7 +78,7 @@ export function AnswerExampleDemo() {
             type="button"
             variant="outline"
           >
-            {ANSWER_EXAMPLE_EXPAND_LABEL}
+            {t("expand")}
             <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} />
           </Button>
         </div>

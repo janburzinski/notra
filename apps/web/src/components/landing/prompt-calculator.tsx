@@ -31,6 +31,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useFormatter, useTranslations } from "use-intl";
 
 import {
   FadeText,
@@ -39,7 +40,6 @@ import {
 } from "@/components/landing/animated-text";
 import { PricingProShader } from "@/components/landing/pricing-pro-shader";
 import { TrackedSignupLink } from "@/components/tracked-signup-link";
-import { PRICING_ANNUAL_BADGE } from "@/constants/landing/pricing";
 import { PRICING_ICONS } from "@/constants/landing/pricing-icons";
 import {
   PROMPT_CALCULATOR_ANCHOR,
@@ -47,12 +47,10 @@ import {
   PROMPT_CALCULATOR_DEFAULT_MODELS,
   PROMPT_CALCULATOR_DEFAULT_PROMPTS,
   PROMPT_CALCULATOR_FREQUENCIES,
-  PROMPT_CALCULATOR_HEADING,
   PROMPT_CALCULATOR_MAX_PROMPTS,
   PROMPT_CALCULATOR_MILESTONES,
   PROMPT_CALCULATOR_STOPS,
   PROMPT_CALCULATOR_MIN_PROMPTS,
-  PROMPT_CALCULATOR_SUBHEADING,
 } from "@/constants/landing/prompt-calculator";
 import {
   PROMPT_CALCULATOR_ENGINES,
@@ -80,7 +78,6 @@ import {
 import { pricingPlanHref } from "@/utils/signup";
 import { SITE_URL } from "@/utils/urls";
 
-const numberFormat = new Intl.NumberFormat("en-US");
 const NON_DIGITS = /\D/g;
 
 const calculatorParsers = {
@@ -154,6 +151,7 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
   const inputId = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const milestone = milestoneFor(value.prompts);
+  const t = useTranslations("landing.promptCalculator");
 
   return (
     <div className="m-1.75 flex flex-col gap-5 rounded-2xl bg-white px-4.25 pt-6 pb-6 shadow-[0_0.125rem_0.3125rem_#00000008] sm:px-6 dark:bg-white/[0.04]">
@@ -162,7 +160,7 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
           className="font-display col-start-1 row-start-1 self-center text-[1.375rem] leading-7 font-medium tracking-[0.01em] text-black sm:self-start dark:text-white"
           htmlFor={inputId}
         >
-          Prompts
+          {t("promptsLabel")}
         </label>
         <div className="col-start-2 row-start-1 flex items-baseline gap-2 sm:row-span-2">
           <input
@@ -183,7 +181,7 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
             value={draft ?? value.prompts}
           />
           <span className="font-sans text-sm leading-[1.125rem] tracking-[-0.015em] text-[#1E1E1EB3] dark:text-white/60">
-            prompts
+            {t("promptsUnit")}
           </span>
         </div>
         <div
@@ -193,18 +191,21 @@ function PromptsPanel({ value, onChange }: PromptCalculatorPanelProps) {
           <StaggeredCaption
             className="min-h-[4.5rem] font-sans text-[0.9375rem] leading-6 tracking-[-0.015em] text-pretty text-[#1E1E1EB3] min-[25rem]:min-h-12 dark:text-white/50"
             id={milestone.prompts}
-            lead={milestone.name}
+            lead={t(`milestones.${milestone.id}.name`)}
             leadClassName="font-medium text-[#1E1E1E] dark:text-white"
-            rest={milestone.detail}
+            rest={t(`milestones.${milestone.id}.detail`)}
           />
         </div>
       </div>
 
       <StepSlider
-        aria-label="Prompts"
+        aria-label={t("promptsLabel")}
         formatLabel={formatStopLabel}
         getValueText={(prompts) =>
-          `${numberFormat.format(prompts)} prompts, ${milestoneFor(prompts).name}`
+          t("sliderValue", {
+            count: prompts,
+            milestone: t(`milestones.${milestoneFor(prompts).id}.name`),
+          })
         }
         majorSteps={MAJOR_STOPS}
         onValueChange={(prompts) => onChange({ prompts })}
@@ -312,6 +313,7 @@ function EngineStrip({
 }) {
   const stripRef = useRef<HTMLDivElement>(null);
   const [edges, setEdges] = useState({ atStart: true, atEnd: false });
+  const t = useTranslations("landing.promptCalculator");
 
   const updateEdges = useCallback(() => {
     const strip = stripRef.current;
@@ -421,9 +423,7 @@ function EngineStrip({
       </div>
       {canScroll ? (
         <button
-          aria-label={
-            edges.atEnd ? "Back to the first models" : "See more models"
-          }
+          aria-label={edges.atEnd ? t("backToFirstModels") : t("seeMoreModels")}
           className={cn(
             PILL_BASE,
             PILL_INACTIVE,
@@ -439,7 +439,7 @@ function EngineStrip({
               edges.atEnd ? "opacity-0" : "opacity-100"
             )}
           >
-            See {MORE_ENGINE_COUNT} more
+            {t("seeMore", { count: MORE_ENGINE_COUNT })}
             <HugeiconsIcon className="size-3.5" icon={ArrowRight02Icon} />
           </span>
           <span
@@ -450,7 +450,7 @@ function EngineStrip({
             )}
           >
             <HugeiconsIcon className="size-3.5" icon={ArrowLeft02Icon} />
-            Back
+            {t("back")}
           </span>
         </button>
       ) : null}
@@ -469,6 +469,7 @@ function ExactModels({
 }) {
   const exactPanelId = useId();
   const [showExact, setShowExact] = useState(false);
+  const t = useTranslations("landing.promptCalculator");
 
   return (
     <div>
@@ -479,7 +480,7 @@ function ExactModels({
         onClick={() => setShowExact((current) => !current)}
         type="button"
       >
-        {showExact ? "Hide exact models" : "Pick exact models"}
+        {showExact ? t("hideExactModels") : t("showExactModels")}
         <HugeiconsIcon
           aria-hidden="true"
           className={cn(
@@ -546,6 +547,7 @@ function ExactModels({
 
 function ModelPills({ value, onChange }: PromptCalculatorPanelProps) {
   const selectedModels = new Set(value.models);
+  const t = useTranslations("landing.promptCalculator");
 
   function toggleModel(id: string) {
     if (value.models.includes(id)) {
@@ -576,9 +578,9 @@ function ModelPills({ value, onChange }: PromptCalculatorPanelProps) {
   return (
     <fieldset className="flex min-w-0 flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
-        <legend className={GROUP_LABEL}>Models</legend>
+        <legend className={GROUP_LABEL}>{t("models")}</legend>
         <span className={GROUP_META}>
-          {value.models.length} {value.models.length === 1 ? "model" : "models"}
+          {t("modelCount", { count: value.models.length })}
         </span>
       </div>
       <EngineDropdown
@@ -604,18 +606,17 @@ function ModelPills({ value, onChange }: PromptCalculatorPanelProps) {
 function FrequencyPills({ value, onChange }: PromptCalculatorPanelProps) {
   const name = useId();
   const scans = Math.round(scansPerMonth(value.frequency) * 10) / 10;
+  const t = useTranslations("landing.promptCalculator");
 
   return (
     <fieldset className="flex flex-col gap-3">
       <div className="flex items-baseline justify-between gap-3">
-        <legend className={GROUP_LABEL}>Scan frequency</legend>
-        <span className={GROUP_META}>
-          {scans} {scans === 1 ? "scan" : "scans"} / month
-        </span>
+        <legend className={GROUP_LABEL}>{t("scanFrequency")}</legend>
+        <span className={GROUP_META}>{t("scansPerMonth", { scans })}</span>
       </div>
       <div className="relative sm:hidden">
         <select
-          aria-label="Scan frequency"
+          aria-label={t("scanFrequency")}
           className={cn(MOBILE_FIELD, "appearance-none pr-10")}
           onChange={(event) =>
             onChange({
@@ -626,7 +627,7 @@ function FrequencyPills({ value, onChange }: PromptCalculatorPanelProps) {
         >
           {PROMPT_CALCULATOR_FREQUENCIES.map((option) => (
             <option key={option.id} value={option.id}>
-              {option.label}
+              {t(`frequencies.${option.id}.label`)}
             </option>
           ))}
         </select>
@@ -654,7 +655,7 @@ function FrequencyPills({ value, onChange }: PromptCalculatorPanelProps) {
                 type="radio"
                 value={id}
               />
-              {option.label}
+              {t(`frequencies.${option.id}.label`)}
             </label>
           );
         })}
@@ -663,43 +664,38 @@ function FrequencyPills({ value, onChange }: PromptCalculatorPanelProps) {
   );
 }
 
-function planHeadroom(estimate: PromptCalculatorEstimate) {
-  if (estimate.usage === null) {
-    return "More than our largest plan includes";
-  }
-  return estimate.promptHeadroom === 0
-    ? "Right at the plan limit"
-    : `Room for ${numberFormat.format(estimate.promptHeadroom ?? 0)} more prompts`;
-}
-
 function EstimatePrice({ plan }: { plan: PricingPlan }) {
-  const isCustom = plan.answersPerMonth === null;
+  const t = useTranslations("landing.promptCalculator");
+  const tPricing = useTranslations("landing.pricing");
 
   return (
     <>
       <div className="flex items-baseline gap-2">
         <span className="font-display text-[2.625rem] leading-13 font-normal tracking-[-0.01em] text-white tabular-nums">
-          {isCustom ? (
-            <FadeText text={plan.price.monthly} />
-          ) : (
+          {plan.price ? (
             <RollingNumber
               numeric={Number(plan.price.monthly.replace(NON_DIGITS, ""))}
               value={plan.price.monthly}
             />
+          ) : (
+            <FadeText text={tPricing("customPrice")} />
           )}
         </span>
-        {plan.priceSuffix ? (
+        {plan.price ? (
           <span className="font-sans text-sm leading-[1.125rem] tracking-[-0.015em] text-white/90">
-            {plan.priceSuffix.monthly}
+            {tPricing("perPeriod.monthly")}
           </span>
         ) : null}
       </div>
       <span className="-mt-2 font-sans text-xs leading-4 text-white/90 tabular-nums">
         <FadeText
           text={
-            isCustom
-              ? "Priced to your usage"
-              : `or ${plan.price.yearly}${plan.priceSuffix?.yearly ?? ""}, ${PRICING_ANNUAL_BADGE}`
+            plan.price
+              ? t("yearlyAlternative", {
+                  price: plan.price.yearly,
+                  badge: tPricing("annualBadge"),
+                })
+              : t("customPricing")
           }
         />
       </span>
@@ -710,6 +706,14 @@ function EstimatePrice({ plan }: { plan: PricingPlan }) {
 function PlanAllowance({ estimate }: { estimate: PromptCalculatorEstimate }) {
   const ProjectsIcon = PRICING_ICONS.projects;
   const { plan } = estimate;
+  const t = useTranslations("landing.promptCalculator");
+  let headroom = t("overLargestPlan");
+  if (estimate.usage !== null) {
+    headroom =
+      estimate.promptHeadroom === 0
+        ? t("atPlanLimit")
+        : t("headroom", { count: estimate.promptHeadroom ?? 0 });
+  }
 
   return (
     <div className="flex items-center gap-2">
@@ -719,13 +723,13 @@ function PlanAllowance({ estimate }: { estimate: PromptCalculatorEstimate }) {
           <FadeText
             text={
               plan.answersPerMonth === null
-                ? "Custom answer quota"
-                : `${numberFormat.format(plan.answersPerMonth)} included`
+                ? t("customQuota")
+                : t("included", { count: plan.answersPerMonth })
             }
           />
         </span>
         <span className="min-h-8 font-sans text-xs leading-4 text-white/90 tabular-nums min-[25rem]:min-h-4">
-          <FadeText text={planHeadroom(estimate)} />
+          <FadeText text={headroom} />
         </span>
       </div>
     </div>
@@ -740,6 +744,7 @@ function CadenceSuggestion({
   onApply: () => void;
 }) {
   const ProjectsIcon = PRICING_ICONS.projects;
+  const t = useTranslations("landing.promptCalculator");
 
   return (
     <button
@@ -750,10 +755,15 @@ function CadenceSuggestion({
       <ProjectsIcon className="size-6 shrink-0 text-white" />
       <span className="flex flex-1 flex-col">
         <span className="font-sans text-sm leading-[1.125rem] font-medium text-white">
-          Stay on {fit.plan.name} for {fit.plan.price.monthly}/mo
+          {t("stayOnPlan", {
+            plan: fit.plan.name,
+            price: fit.plan.price?.monthly ?? "",
+          })}
         </span>
         <span className="min-h-8 font-sans text-xs leading-4 text-white/90 min-[25rem]:min-h-4">
-          Scan {fit.label.toLowerCase()} instead
+          {t("scanInstead", {
+            frequency: t(`frequencies.${fit.frequency}.inline`),
+          })}
         </span>
       </span>
       <HugeiconsIcon
@@ -773,6 +783,9 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
   const isEnterprise = estimate.usage === null;
   const scans = Math.round(estimate.scansPerMonth * 10) / 10;
   const TrackingIcon = PRICING_ICONS.tracking;
+  const t = useTranslations("landing.promptCalculator");
+  const tPricing = useTranslations("landing.pricing");
+  const format = useFormatter();
 
   const ctaLink =
     plan.cta.kind === "signup" ? (
@@ -787,7 +800,7 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
   function copyLink() {
     copyToClipboard(
       `${SITE_URL}/pricing${buildPromptCalculatorSearch(value)}`,
-      "Link to this estimate copied"
+      t("linkCopied")
     );
   }
 
@@ -807,11 +820,11 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
               <FadeText text={plan.name} />
             </h3>
             <span className="rounded-full bg-white/10 px-2 py-1 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-white outline -outline-offset-1 outline-[#F6F8FA80]">
-              Recommended
+              {t("recommended")}
             </span>
           </div>
           <p className="line-clamp-2 min-h-[2.25rem] font-sans text-[0.9375rem] leading-[1.125rem] tracking-[-0.015em] text-white/90">
-            <FadeText text={plan.description} wrap />
+            <FadeText text={tPricing(`plans.${plan.id}`)} wrap />
           </p>
         </div>
 
@@ -825,7 +838,9 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
               variant="light"
             >
               <span>
-                {isEnterprise ? plan.cta.label : `Start with ${plan.name}`}
+                {isEnterprise
+                  ? tPricing(`cta.${plan.cta.labelId}`)
+                  : t("startWith", { plan: plan.name })}
               </span>
               {plan.cta.showArrow ? (
                 <HugeiconsIcon className="size-4" icon={ArrowRight02Icon} />
@@ -837,7 +852,7 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
               type="button"
             >
               <HugeiconsIcon className="size-4" icon={Link01Icon} />
-              Copy link to this estimate
+              {t("copyLink")}
             </button>
           </div>
 
@@ -850,14 +865,16 @@ function EstimateCard({ value, onChange }: PromptCalculatorPanelProps) {
                 <span className="font-sans text-sm leading-[1.125rem] text-white tabular-nums">
                   <RollingNumber
                     numeric={estimate.answersPerMonth}
-                    value={numberFormat.format(estimate.answersPerMonth)}
+                    value={format.number(estimate.answersPerMonth)}
                   />{" "}
-                  AI answers / mo
+                  {t("answersUnit")}
                 </span>
                 <span className="min-h-8 font-sans text-xs leading-4 text-white/90 tabular-nums min-[25rem]:min-h-4">
-                  {numberFormat.format(value.prompts)}{" "}
-                  {value.prompts === 1 ? "prompt" : "prompts"} ×{" "}
-                  {value.models.length} models × {scans} scans
+                  {t("breakdown", {
+                    prompts: value.prompts,
+                    models: value.models.length,
+                    scans,
+                  })}
                 </span>
               </div>
             </li>
@@ -915,6 +932,8 @@ function UrlBoundPromptCalculator() {
 }
 
 export function PromptCalculatorSection() {
+  const t = useTranslations("landing.promptCalculator");
+
   return (
     <LazyMotion features={domMax}>
       <section
@@ -923,10 +942,10 @@ export function PromptCalculatorSection() {
       >
         <div className="flex flex-col items-center gap-4">
           <h2 className="font-display max-w-[59rem] text-center text-[2rem] leading-[1.12] font-medium tracking-[-0.02em] text-balance text-[#1E1E1E] sm:text-[2.875rem] sm:leading-13 dark:text-white">
-            {PROMPT_CALCULATOR_HEADING}
+            {t("heading")}
           </h2>
           <p className="max-w-[43rem] text-center font-sans text-lg leading-7 font-medium text-balance text-[#1E1E1EBF] sm:text-xl dark:text-white/70">
-            {PROMPT_CALCULATOR_SUBHEADING}
+            {t("subheading")}
           </p>
         </div>
 

@@ -5,6 +5,7 @@ import { Badge } from "@notra/ui/components/ui/badge";
 import { Github } from "@notra/ui/components/ui/svgs/github";
 import { Openai } from "@notra/ui/components/ui/svgs/openai";
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import { RankBadge } from "@/components/feature-pages/rank-badge";
 import {
@@ -23,13 +24,14 @@ import { NAVBAR_BENTO_CLASSES as CLASSES } from "@/constants/navbar-bento";
 import {
   NAVBAR_PRODUCTS_CARDS,
   NAVBAR_PRODUCTS_CLASSES as PRODUCTS,
+  NAVBAR_PRODUCTS_CONVERSATION_PLAYED_AT,
   NAVBAR_PRODUCTS_CRAWLER_ROWS,
   NAVBAR_PRODUCTS_LINK_TILES,
   NAVBAR_PRODUCTS_LOGO_ROWS,
   NAVBAR_PRODUCTS_LOGOS,
   NAVBAR_PRODUCTS_PERSONAS,
   NAVBAR_PRODUCTS_PURPOSES,
-  NAVBAR_PRODUCTS_SITE,
+  NAVBAR_PRODUCTS_SITE_DOMAIN,
   NAVBAR_PRODUCTS_TERMINAL_LINES,
   NAVBAR_PRODUCTS_TURNS,
 } from "@/constants/navbar-products";
@@ -41,6 +43,7 @@ import type {
 } from "@/types/navbar-bento";
 
 function PersonasMock() {
+  const t = useTranslations("navbar.products.personas");
   return (
     <span className={cn(CLASSES.mockSlot, "gap-3")}>
       {NAVBAR_PRODUCTS_PERSONAS.map((persona) => (
@@ -56,16 +59,16 @@ function PersonasMock() {
             <span className="flex flex-col gap-0.5">
               <span className={CLASSES.mockTitle}>{persona.name}</span>
               <span className={cn(CLASSES.mockMeta, "leading-4.5")}>
-                {persona.role}
+                {t(`people.${persona.id}.role`)}
               </span>
             </span>
           </span>
           <span className="flex grow flex-col gap-1.5 px-4.5 pb-4.5">
             <span className="font-mono text-[0.6875rem]/3.5 font-medium tracking-[0.08em] text-[#8A8A8A]">
-              REMEMBERS
+              {t("remembers")}
             </span>
             <span className="font-sans text-sm/5.25 text-[#1E1E1E] dark:text-neutral-200">
-              {persona.memory}
+              {t(`people.${persona.id}.memory`)}
             </span>
           </span>
           <span className="flex items-center justify-between border-t border-[#EFEFEF] bg-[#FAFAFA] px-4.5 py-3 dark:border-white/10 dark:bg-white/5">
@@ -76,7 +79,7 @@ function PersonasMock() {
                 strokeWidth={1.8}
               />
               <span className="font-sans text-[0.8125rem]/4 font-medium text-[#3D9A5F]">
-                Notra mentioned
+                {t("mentioned")}
               </span>
             </span>
             <RankBadge rank={persona.rank} size="md" />
@@ -88,12 +91,26 @@ function PersonasMock() {
 }
 
 function ConversationsMock() {
+  const t = useTranslations("navbar.products.conversation");
+  const format = useFormatter();
   return (
     <span className={CLASSES.mockSlot}>
       <span className={cn(CLASSES.mockCard, "w-130")}>
         <NavbarBentoMockHeader
-          meta="3 turns · played Sep 27, 14:03"
-          title="Changelog tool research"
+          meta={t("meta", {
+            turns: NAVBAR_PRODUCTS_TURNS.length,
+            date: format.dateTime(
+              new Date(NAVBAR_PRODUCTS_CONVERSATION_PLAYED_AT),
+              {
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hourCycle: "h23",
+              }
+            ),
+          })}
+          title={t("title")}
         >
           <Openai
             aria-hidden="true"
@@ -103,19 +120,19 @@ function ConversationsMock() {
         </NavbarBentoMockHeader>
         <span className="flex flex-col gap-5.5 px-5 pt-5.5 pb-6">
           {NAVBAR_PRODUCTS_TURNS.map((turn) => (
-            <span className="flex flex-col gap-3" key={turn.question}>
+            <span className="flex flex-col gap-3" key={turn.id}>
               <span className="flex justify-end">
                 <span className="rounded-full bg-[#EEEFF4] px-4 py-2.5 font-sans text-[0.9375rem]/5 text-[#1E1E1E] dark:bg-white/10 dark:text-white">
-                  {turn.question}
+                  {t(`turns.${turn.id}.question`)}
                 </span>
               </span>
               <span className="flex items-start justify-between gap-5">
                 <span className="flex flex-col gap-1">
                   <span className="font-sans text-xs/4 text-[#8A8A8A]">
-                    {turn.sources}
+                    {t("sources", { count: turn.sources })}
                   </span>
                   <span className="font-sans text-[0.9375rem]/5.5 text-[#1E1E1E] dark:text-neutral-200">
-                    {turn.answer}
+                    {t(`turns.${turn.id}.answer`)}
                   </span>
                 </span>
                 <span className="shrink-0">
@@ -131,15 +148,13 @@ function ConversationsMock() {
 }
 
 function CrawlerMock() {
+  const t = useTranslations("navbar.products.crawler");
   return (
     <span className={CLASSES.mockSlot}>
       <span className={cn(CLASSES.mockCard, "w-155")}>
-        <NavbarBentoMockHeader
-          meta="usenotra.com · last 60 minutes"
-          title="Crawler log"
-        >
+        <NavbarBentoMockHeader meta={t("meta")} title={t("title")}>
           <span className="size-1.75 shrink-0 rounded-full bg-[#22A55A] shadow-[0_0_0_0.1875rem_#22A55A2E]" />
-          <span className={CLASSES.mockPillLabel}>Live</span>
+          <span className={CLASSES.mockPillLabel}>{t("live")}</span>
         </NavbarBentoMockHeader>
         <span className="flex flex-col pt-1.5 pb-2">
           {NAVBAR_PRODUCTS_CRAWLER_ROWS.map((row, index) => (
@@ -166,10 +181,10 @@ function CrawlerMock() {
                 <span
                   className={cn(
                     "rounded-md border px-2 py-0.5 font-sans text-xs/4 font-medium",
-                    NAVBAR_PRODUCTS_PURPOSES[row.purpose].className
+                    NAVBAR_PRODUCTS_PURPOSES[row.purpose]
                   )}
                 >
-                  {NAVBAR_PRODUCTS_PURPOSES[row.purpose].label}
+                  {t(`purposes.${row.purpose}`)}
                 </span>
               </span>
             </span>
@@ -181,12 +196,13 @@ function CrawlerMock() {
 }
 
 function SitesMock() {
+  const t = useTranslations("navbar.products.site");
   return (
     <span className={CLASSES.mockSlot}>
       <span className={cn(CLASSES.mockCard, "w-128")}>
         <NavbarBentoMockHeader
-          meta={NAVBAR_PRODUCTS_SITE.deployed}
-          title={NAVBAR_PRODUCTS_SITE.domain}
+          meta={t("deployed")}
+          title={NAVBAR_PRODUCTS_SITE_DOMAIN}
         >
           <Github aria-hidden="true" className="size-3.5 shrink-0" />
           <span className={CLASSES.mockPillLabel}>
@@ -295,6 +311,9 @@ function ProductCard({
   card: NavbarProductsCard;
   onSelect: () => void;
 }) {
+  const t = useTranslations("navbar.products.cards");
+  const label = t(`${card.id}.label`);
+  const description = t(`${card.id}.description`);
   return (
     <NavbarHref
       className={cn(PRODUCTS.card, card.tintClassName)}
@@ -302,7 +321,7 @@ function ProductCard({
       onClick={onSelect}
       role="menuitem"
     >
-      <span className="sr-only">{`${card.label}. ${card.description}`}</span>
+      <span className="sr-only">{`${label}. ${description}`}</span>
       <span aria-hidden="true" className={PRODUCTS.copy}>
         <span className={cn(PRODUCTS.icon, card.iconClassName)}>
           <HugeiconsIcon
@@ -311,8 +330,8 @@ function ProductCard({
             strokeWidth={2.4}
           />
         </span>
-        <span className={PRODUCTS.title}>{card.label}</span>
-        <span className={PRODUCTS.description}>{card.description}</span>
+        <span className={PRODUCTS.title}>{label}</span>
+        <span className={PRODUCTS.description}>{description}</span>
       </span>
       <span aria-hidden="true" className={PRODUCTS.mockArea}>
         <span className={PRODUCTS.mockStage}>
@@ -325,6 +344,7 @@ function ProductCard({
 }
 
 export function NavbarProductsPanel({ onSelect }: NavbarBentoPanelProps) {
+  const t = useTranslations("navbar.products.tiles");
   return (
     <div className={cn(CLASSES.panel, PRODUCTS.panel)}>
       <div className={PRODUCTS.cards}>
@@ -336,7 +356,11 @@ export function NavbarProductsPanel({ onSelect }: NavbarBentoPanelProps) {
         {NAVBAR_PRODUCTS_LINK_TILES.map((tile) => (
           <NavbarBentoLinkTile
             key={tile.href}
-            link={tile}
+            link={{
+              href: tile.href,
+              label: t(`${tile.id}.label`),
+              description: t(`${tile.id}.description`),
+            }}
             onSelect={onSelect}
             style={tile}
           >

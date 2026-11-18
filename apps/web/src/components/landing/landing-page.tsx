@@ -1,4 +1,5 @@
 import { cn } from "@notra/ui/lib/utils";
+import { useLocale, useTranslations } from "use-intl";
 
 import { AnnouncementBanner } from "@/components/landing/announcement-banner";
 import { AnswerExampleSection } from "@/components/landing/answer-example-section";
@@ -9,7 +10,8 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { LogoMarquee } from "@/components/landing/logo-marquee";
 import { LandingPricingSection } from "@/components/landing/pricing-section";
 import { TestimonialsSection } from "@/components/landing/testimonials-section";
-import { FAQ_CONTENT } from "@/constants/landing/faq";
+import { LANDING_HOME_PATHS } from "@/constants/i18n";
+import { useLandingFaqContent } from "@/hooks/use-landing-faq-content";
 import type { LandingPageProps } from "@/types/landing/flags";
 import {
   NOTRA_CONTACT_EMAIL,
@@ -18,7 +20,6 @@ import {
   siteUrl,
 } from "@/utils/agent-metadata";
 import { serializeJsonLd } from "@/utils/jsonld";
-import { SITE_DESCRIPTION, SITE_TITLE } from "@/utils/metadata";
 import { SITE_URL } from "@/utils/urls";
 
 const DEFERRED_SECTION_CLASS = {
@@ -33,90 +34,102 @@ const DEFERRED_SECTION_CLASS = {
   cta: "[content-visibility:auto] [contain-intrinsic-size:auto_34rem] lg:[contain-intrinsic-size:auto_27rem]",
 };
 
-const softwareJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Notra",
-  url: SITE_URL,
-  applicationCategory: "BusinessApplication",
-  operatingSystem: "Web",
-  description: SITE_DESCRIPTION,
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  creator: {
-    "@type": "Organization",
-    name: "Notra",
-    url: SITE_URL,
-  },
-};
-
-const organizationJsonLd = {
+const organizationBase = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "Notra",
   url: SITE_URL,
   logo: siteUrl("/notra-mark.svg"),
-  description: SITE_DESCRIPTION,
-  sameAs: NOTRA_SAME_AS,
-  contactPoint: [
-    {
-      "@type": "ContactPoint",
-      email: NOTRA_CONTACT_EMAIL,
-      contactType: "sales",
-      availableLanguage: ["en"],
-    },
-    {
-      "@type": "ContactPoint",
-      email: NOTRA_SUPPORT_EMAIL,
-      contactType: "customer support",
-      availableLanguage: ["en"],
-    },
-  ],
-  address: {
-    "@type": "PostalAddress",
-    addressCountry: "US",
-    addressRegion: "Delaware",
+};
+
+const contactPoints = [
+  {
+    "@type": "ContactPoint",
+    email: NOTRA_CONTACT_EMAIL,
+    contactType: "sales",
+    availableLanguage: ["en", "de"],
   },
-};
-
-const serviceJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Notra GEO platform",
-  provider: organizationJsonLd,
-  serviceType: "AI visibility tracking platform",
-  areaServed: "Worldwide",
-  description: SITE_DESCRIPTION,
-};
-
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQ_CONTENT.items.map((item) => ({
-    "@type": "Question",
-    name: item.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: item.answer,
-    },
-  })),
-};
-
-const speakableJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: SITE_TITLE,
-  url: SITE_URL,
-  speakable: {
-    "@type": "SpeakableSpecification",
-    cssSelector: ["h1", "#agent-readable-summary"],
+  {
+    "@type": "ContactPoint",
+    email: NOTRA_SUPPORT_EMAIL,
+    contactType: "customer support",
+    availableLanguage: ["en", "de"],
   },
-};
+];
 
 function LandingPageJsonLd() {
+  const locale = useLocale();
+  const t = useTranslations("landing.page");
+  const faq = useLandingFaqContent();
+  const description = t("description");
+
+  const softwareJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Notra",
+    url: SITE_URL,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
+    creator: {
+      "@type": "Organization",
+      name: "Notra",
+      url: SITE_URL,
+    },
+  };
+
+  const organizationJsonLd = {
+    ...organizationBase,
+    description,
+    sameAs: NOTRA_SAME_AS,
+    contactPoint: contactPoints,
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: "US",
+      addressRegion: "Delaware",
+    },
+  };
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "Notra GEO platform",
+    provider: organizationJsonLd,
+    serviceType: "AI visibility tracking platform",
+    areaServed: "Worldwide",
+    description,
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
+  const speakableJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: t("title"),
+    url: locale === "de" ? `${SITE_URL}${LANDING_HOME_PATHS.de}` : SITE_URL,
+    inLanguage: locale,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "#agent-readable-summary"],
+    },
+  };
+
   return (
     <>
       <script
@@ -146,6 +159,7 @@ function LandingPageJsonLd() {
 }
 
 export function LandingPage({ flags }: LandingPageProps) {
+  const t = useTranslations("landing.page");
   return (
     <div className="dark:bg-background flex w-full flex-col items-stretch justify-start overflow-x-clip bg-white">
       <LandingPageJsonLd />
@@ -156,7 +170,7 @@ export function LandingPage({ flags }: LandingPageProps) {
           flagVariant={flags.heroVariant}
         />
         <p className="sr-only" id="agent-readable-summary">
-          {SITE_DESCRIPTION}
+          {t("description")}
         </p>
         <LogoMarquee />
         <section className={DEFERRED_SECTION_CLASS.features} id="features">

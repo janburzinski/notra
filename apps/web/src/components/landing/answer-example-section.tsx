@@ -1,6 +1,7 @@
 import { PromptOutcomeIcon } from "@notra/ui/components/geo/prompt-outcome-icon";
 import { Badge } from "@notra/ui/components/ui/badge";
 import { cn } from "@notra/ui/lib/utils";
+import { useTranslations } from "use-intl";
 
 import { DeferredAnswerDemo } from "@/components/landing/deferred-answer-demo";
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
@@ -14,17 +15,9 @@ import {
 } from "@/components/marketing-table";
 import {
   ANSWER_EXAMPLE_FACTS,
-  ANSWER_EXAMPLE_HEADING,
-  ANSWER_EXAMPLE_OUTCOME_LABELS,
   ANSWER_EXAMPLE_POSITION_CLASS,
-  ANSWER_EXAMPLE_POSITION_NONE,
-  ANSWER_EXAMPLE_PROMPT,
-  ANSWER_EXAMPLE_RESULT_HEADERS,
   ANSWER_EXAMPLE_RESULTS,
-  ANSWER_EXAMPLE_RESULTS_TITLE,
   ANSWER_EXAMPLE_SENTIMENT_CLASS,
-  ANSWER_EXAMPLE_SENTIMENT_LABELS,
-  ANSWER_EXAMPLE_SUBCOPY,
 } from "@/constants/landing/answer-example";
 import { GEO_ENGINE_NAMES } from "@/constants/landing/geo-engines";
 import { answerPositionTone } from "@/utils/answer-example";
@@ -33,25 +26,26 @@ const HEADER_CLASS = "text-muted-foreground text-xs";
 const MENTIONED_COL = "max-sm:hidden";
 
 function ResultsTable() {
+  const t = useTranslations("landing.answers");
   return (
     <div className="border-border bg-card overflow-hidden rounded-2xl border">
       <div className="text-foreground px-5 pt-4 pb-3 text-sm font-medium">
-        {ANSWER_EXAMPLE_RESULTS_TITLE}
+        {t("resultsTitle")}
       </div>
       <Table>
         <TableHeader className="bg-muted/60">
           <TableRow>
             <TableHead className={HEADER_CLASS}>
-              {ANSWER_EXAMPLE_RESULT_HEADERS.engine}
+              {t("headers.engine")}
             </TableHead>
             <TableHead className={cn(HEADER_CLASS, MENTIONED_COL)}>
-              {ANSWER_EXAMPLE_RESULT_HEADERS.mentioned}
+              {t("headers.mentioned")}
             </TableHead>
             <TableHead className={HEADER_CLASS}>
-              {ANSWER_EXAMPLE_RESULT_HEADERS.position}
+              {t("headers.position")}
             </TableHead>
             <TableHead className={HEADER_CLASS}>
-              {ANSWER_EXAMPLE_RESULT_HEADERS.sentiment}
+              {t("headers.sentiment")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -68,8 +62,8 @@ function ResultsTable() {
                 <span
                   aria-label={
                     row.mentioned
-                      ? ANSWER_EXAMPLE_OUTCOME_LABELS.mentioned
-                      : ANSWER_EXAMPLE_OUTCOME_LABELS.notMentioned
+                      ? t("outcome.mentioned")
+                      : t("outcome.notMentioned")
                   }
                   className="inline-flex items-center"
                   role="img"
@@ -80,7 +74,7 @@ function ResultsTable() {
               <TableCell className="py-3">
                 {row.position === null ? (
                   <span className="text-muted-foreground text-sm">
-                    {ANSWER_EXAMPLE_POSITION_NONE}
+                    {t("positionNone")}
                   </span>
                 ) : (
                   <Badge
@@ -102,7 +96,7 @@ function ResultsTable() {
                   ANSWER_EXAMPLE_SENTIMENT_CLASS[row.sentiment]
                 )}
               >
-                {ANSWER_EXAMPLE_SENTIMENT_LABELS[row.sentiment]}
+                {t(`sentiment.${row.sentiment}`)}
               </TableCell>
             </TableRow>
           ))}
@@ -113,25 +107,27 @@ function ResultsTable() {
 }
 
 export function AnswerExampleSection() {
+  const t = useTranslations("landing.answers");
+  const firstResult = ANSWER_EXAMPLE_RESULTS[0];
   return (
     <section className="mx-auto flex w-full max-w-360 flex-col items-center px-6 pt-20 antialiased [font-synthesis:none] sm:px-12 sm:pt-24 lg:px-20 lg:pt-40">
       <div className="flex w-full flex-col items-center gap-10 sm:gap-12 lg:gap-16">
         <header className="flex flex-col items-center gap-3 sm:gap-4">
           <h2 className="font-display max-w-[44rem] text-center text-[2rem] leading-[1.15] font-medium tracking-[-0.02em] text-balance text-black sm:text-[2.25rem] lg:text-[3.0625rem]/14 dark:text-white">
-            {ANSWER_EXAMPLE_HEADING}
+            {t("heading")}
           </h2>
           <p className="font-display w-full max-w-[44rem] text-center text-base/6 font-medium tracking-[-0.01em] text-balance text-[#1E1E1EBF] sm:text-xl/7.5 dark:text-white/70">
-            {ANSWER_EXAMPLE_SUBCOPY}
+            {t("subcopy")}
           </p>
         </header>
         <div className="grid w-full grid-cols-1 items-start gap-6 sm:gap-8 lg:grid-cols-[1.25fr_1fr]">
           <DeferredAnswerDemo>
             <div className="border-border bg-background h-[31.5rem] overflow-hidden rounded-2xl border px-4 py-4 sm:px-6 sm:py-5 lg:h-[40rem]">
-              <p className="text-lg font-semibold sm:text-xl">
-                {ANSWER_EXAMPLE_PROMPT}
-              </p>
+              <p className="text-lg font-semibold sm:text-xl">{t("prompt")}</p>
               <p className="text-muted-foreground mt-8">
-                {ANSWER_EXAMPLE_RESULTS[0]?.excerpt.split("\n\n")[0]}
+                {firstResult
+                  ? t(`excerpts.${firstResult.id}`).split("\n\n")[0]
+                  : null}
               </p>
             </div>
           </DeferredAnswerDemo>
@@ -139,12 +135,12 @@ export function AnswerExampleSection() {
             <ResultsTable />
             <ul className="flex flex-col gap-5">
               {ANSWER_EXAMPLE_FACTS.map((fact) => (
-                <li className="flex flex-col gap-1" key={fact.id}>
+                <li className="flex flex-col gap-1" key={fact}>
                   <span className="font-sans text-base font-medium text-[#0A0D14] dark:text-white">
-                    {fact.title}
+                    {t(`facts.${fact}.title`)}
                   </span>
                   <span className="font-sans text-sm/5.5 text-[#6A6B70] sm:text-[0.9375rem]/6 dark:text-white/60">
-                    {fact.text}
+                    {t(`facts.${fact}.text`)}
                   </span>
                 </li>
               ))}

@@ -1,5 +1,4 @@
 import { AUTH_SIGNUP_URL } from "@/constants/auth";
-import { CTA_BANNER_PRIMARY_LABEL } from "@/constants/landing/cta-banner";
 import {
   REPORT_APP_CAPTURE_NOTE,
   REPORT_LEADER_LOGOS,
@@ -32,6 +31,7 @@ import {
 import { buildReportFindings } from "@/utils/state-of-ai-search-findings";
 import { SITE_URL } from "@/utils/urls";
 
+import en from "../../../messages/en.json";
 import { listLatestSummaries } from "./reports";
 
 const LINE_BREAK_REGEX = /\s*\n\s*/g;
@@ -64,7 +64,7 @@ function ctaMarkdown(): string {
   return markdownSection(STATE_OF_AI_SEARCH_CTA_HEADING, [
     STATE_OF_AI_SEARCH_CTA_SUBCOPY,
     "",
-    link(CTA_BANNER_PRIMARY_LABEL, AUTH_SIGNUP_URL),
+    link(en.landing.cta.primary, AUTH_SIGNUP_URL),
   ]);
 }
 

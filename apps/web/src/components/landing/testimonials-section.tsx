@@ -1,10 +1,10 @@
 import { cn } from "@notra/ui/lib/utils";
+import { useTranslations } from "use-intl";
 
 import { TestimonialsShader } from "@/components/landing/testimonials-shader";
 import {
   FEATURED_TESTIMONIAL,
   PAIR_TESTIMONIALS,
-  TESTIMONIALS_SUBHEADING,
 } from "@/constants/landing/testimonials";
 import type { Testimonial } from "@/types/landing/testimonials";
 
@@ -70,14 +70,17 @@ function TestimonialCard({
 }
 
 export function TestimonialsSection() {
+  const t = useTranslations("landing.testimonials");
   return (
     <section className="flex w-full flex-col items-center gap-10 px-6 pt-20 pb-20 sm:px-12 sm:pt-24 sm:pb-27.5 lg:gap-13.5 lg:px-20 lg:pt-70">
       <div className="flex flex-col items-center gap-3 sm:gap-4">
         <h2 className="font-display dark:text-foreground text-center text-[2rem]/tight font-medium tracking-[-0.02em] text-black sm:text-4xl/tight lg:text-[3.0625rem]/14">
-          Teams already <span className="text-primary">ship</span> with Notra.
+          {t.rich("heading", {
+            accent: (chunks) => <span className="text-primary">{chunks}</span>,
+          })}
         </h2>
         <p className="font-display dark:text-muted-foreground max-w-[31.875rem] text-center text-base/6 font-medium tracking-[-0.01em] text-[#1E1E1EBF] sm:text-xl/7.5">
-          {TESTIMONIALS_SUBHEADING}
+          {t("subheading")}
         </p>
       </div>
       <div className="flex w-full max-w-[80rem] flex-col items-start gap-5 sm:gap-8">

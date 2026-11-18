@@ -5,6 +5,7 @@
 import { DropdownMenuPortalContainer } from "@notra/ui/components/ui/dropdown-menu";
 import { ThemeProvider } from "next-themes";
 import { createRoot } from "react-dom/client";
+import { IntlProvider } from "use-intl";
 
 import "@/styles/globals.css";
 
@@ -21,6 +22,7 @@ import {
 } from "@/constants/blog-chrome";
 import type { BlogChromeMount } from "@/types/blog-chrome";
 
+import navbar from "../../../messages/parts/en/navbar.json";
 import { documentRules, shadowSheet } from "./styles";
 
 declare const __WEB_CHROME_CSS__: string;
@@ -29,11 +31,13 @@ const MOUNTS: Record<string, BlogChromeMount> = {
   // The index floats the navbar over its hero. Every other page keeps it in the flow, like the
   // header.mdx fallback, so the page starts below it.
   navbar: (host) => (
-    <Navbar
-      variant={
-        host.dataset.page === BLOG_CHROME_INDEX_PAGE ? "landing" : "static"
-      }
-    />
+    <IntlProvider locale="en" messages={{ navbar }} timeZone="UTC">
+      <Navbar
+        variant={
+          host.dataset.page === BLOG_CHROME_INDEX_PAGE ? "landing" : "static"
+        }
+      />
+    </IntlProvider>
   ),
   "hero-dither": () => <HeroDither />,
   "footer-dither": () => <FooterDither />,

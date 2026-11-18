@@ -1,0 +1,50 @@
+{
+  "heading": "Preise, die mit dir wachsen.",
+  "subheading": "Jeder bezahlte Plan enthält Tracking, Attribution und den Writer. Du startest kostenlos und kannst jederzeit kündigen.",
+  "enginesCaption": "Tracke die Antworten, die Menschen in ChatGPT, Claude, Gemini, Copilot und Google wirklich sehen",
+  "annualBadge": "2 Monate gratis",
+  "customPrice": "Individuell",
+  "carouselLabel": "Pläne",
+  "carouselDot": "Plan {plan} anzeigen",
+  "billing": {
+    "monthly": "Monatlich",
+    "yearly": "Jährlich"
+  },
+  "perPeriod": {
+    "monthly": "/Monat",
+    "yearly": "/Jahr"
+  },
+  "cta": {
+    "startFree": "Kostenlos starten",
+    "getStarted": "Loslegen",
+    "contactUs": "Kontakt aufnehmen"
+  },
+  "plans": {
+    "free": "Erfasse KI-Agents und Menschen auf deiner Website mit einem gemeinsamen Event-Kontingent und sammle Feedback von Agents.",
+    "starter": "Für Gründer, die ihre ersten Prompts tracken.",
+    "growth": "Für Teams, die Prompts über mehrere KI-Engines und Sprachen hinweg tracken.",
+    "scale": "Für Agenturen und Teams, die mehrere Marken betreuen.",
+    "enterprise": "Für große Organisationen mit individuellen Anforderungen an Umfang und Compliance."
+  },
+  "features": {
+    "answers": "{count, number} getrackte KI-Antworten / Monat",
+    "answersUnlimited": "Unbegrenzt viele getrackte KI-Antworten",
+    "events": "{count} Mio. Analytics-Events / Monat",
+    "eventsShared": "geteilt zwischen Agent- und Web-Analytics",
+    "eventsUnlimited": "Unbegrenzt viele Analytics-Events",
+    "agentFeedback": "Agent-Feedback",
+    "images": "{count} Bildgenerierungen / Monat",
+    "imagesUnlimited": "Unbegrenzt viele Bildgenerierungen",
+    "posts": "{count} Longform-Beiträge / Monat",
+    "postsUnlimited": "Unbegrenzt viele Longform-Beiträge",
+    "social": "Unbegrenzt viele Social-Media-Posts",
+    "projects": "{count, plural, one {# Projekt} other {# Projekte}}",
+    "projectsUnlimited": "Unbegrenzt viele Projekte",
+    "references": "{count, number} Referenzen",
+    "referencesOverage": "danach {price} pro Referenz / Monat",
+    "referencesUnlimited": "Unbegrenzt viele Referenzen",
+    "supportStandard": "Standard-Support + Slack",
+    "supportPriority": "Priorisierter Support",
+    "supportDedicated": "Persönlicher Support"
+  }
+}

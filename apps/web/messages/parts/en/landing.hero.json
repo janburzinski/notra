@@ -1,0 +1,67 @@
+{
+  "websiteLabel": "Your website",
+  "websitePlaceholder": "company.com",
+  "websiteInvalid": "Enter a valid website, like company.com",
+  "demoOpen": "Explore the demo",
+  "demoPreviewAlt": "Notra GEO overview with visibility by engine and what changed",
+  "variantSwitcherLabel": "Hero variant preview",
+  "variantSwitcherHide": "Hide variant switcher",
+  "variants": {
+    "control": {
+      "lineOne": "Be the answer when",
+      "lineTwoPrefix": "buyers ask",
+      "lineTwoSuffix": ".",
+      "subhead": "Notra is a GEO tool that asks ChatGPT, Claude and Gemini the questions your buyers ask. It shows whether you appear, who appears instead and how to fix it.",
+      "cta": "Start for free",
+      "secondaryLabel": "Book a Call"
+    },
+    "visibility": {
+      "lineOne": "See if you show up",
+      "lineTwoPrefix": "in",
+      "lineTwoSuffix": ".",
+      "subhead": "See which prompts your buyers ask AI, whether you show up in the answer and exactly what to publish to win the ones you lose.",
+      "cta": "Check your AI visibility",
+      "secondaryLabel": "Book a Call"
+    },
+    "slack": {
+      "lineOne": "Use <brand>Slack</brand> to show up",
+      "lineTwoPrefix": "in",
+      "lineTwoSuffix": ".",
+      "subhead": "Ask Notra in Slack how your brand shows up in ChatGPT, Claude and Gemini. It replies in the thread with the prompts you lose and drafts the pages that win them back, ready to approve without leaving Slack.",
+      "cta": "Add Notra to Slack",
+      "secondaryLabel": "See the Slack app"
+    },
+    "claude": {
+      "lineOne": "Ask <brand>Claude</brand> if buyers",
+      "lineTwoPrefix": "find you in",
+      "lineTwoSuffix": ".",
+      "subhead": "Notra is a verified Claude connector. Ask Claude where your brand appears in AI answers, who shows up instead and what to publish next, all from the chat you already use.",
+      "cta": "Start for free",
+      "secondaryLabel": "Add to Claude"
+    },
+    "claude-expert": {
+      "lineOne": "Turn <brand>Claude</brand> into an",
+      "lineTwoPrefix": "SEO & GEO expert",
+      "lineTwoSuffix": ".",
+      "subhead": "Connect Notra to Claude and ask how your brand shows up in ChatGPT, Claude and Gemini. Claude finds the prompts you lose and drafts the pages that win them back.",
+      "cta": "Start for free",
+      "secondaryLabel": "Add to Claude"
+    },
+    "chatgpt": {
+      "lineOne": "Ask <brand>ChatGPT</brand> if buyers",
+      "lineTwoPrefix": "find you in",
+      "lineTwoSuffix": ".",
+      "subhead": "Notra is a ChatGPT app. Ask ChatGPT where your brand appears in AI answers, who shows up instead and what to publish next, all from the chat you already use.",
+      "cta": "Start for free",
+      "secondaryLabel": "Add to ChatGPT"
+    },
+    "chatgpt-expert": {
+      "lineOne": "Turn <brand>ChatGPT</brand> into an",
+      "lineTwoPrefix": "SEO & GEO expert",
+      "lineTwoSuffix": ".",
+      "subhead": "Connect Notra to ChatGPT and ask how your brand shows up in ChatGPT, Claude and Gemini. ChatGPT finds the prompts you lose and drafts the pages that win them back.",
+      "cta": "Start for free",
+      "secondaryLabel": "Add to ChatGPT"
+    }
+  }
+}

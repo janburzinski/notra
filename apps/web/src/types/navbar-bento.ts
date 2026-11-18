@@ -1,10 +1,12 @@
+import type { IconSvgElement } from "@hugeicons/react";
 import type { ComponentType, ReactNode } from "react";
+import type { Messages } from "use-intl";
 
 import type {
   MarketingNavCard,
   MarketingNavGroup,
   MarketingNavRailItem,
-} from "@/utils/navigation";
+} from "@/types/navbar";
 
 export interface NavbarBentoPanelProps {
   group: MarketingNavGroup;
@@ -67,27 +69,22 @@ export interface NavbarBentoMockProps<TMock extends string> {
   mock: TMock;
 }
 
+type NavbarProductsMessages = Messages["navbar"]["products"];
+
 export interface NavbarProductsPersona {
+  id: Extract<keyof NavbarProductsMessages["personas"]["people"], string>;
   name: string;
-  role: string;
   avatar: string;
-  memory: string;
   rank: number;
 }
 
 export interface NavbarProductsTurn {
-  question: string;
-  sources: string;
-  answer: string;
+  id: Extract<keyof NavbarProductsMessages["conversation"]["turns"], string>;
+  sources: number;
   rank: number;
 }
 
 export type NavbarProductsPurpose = "live" | "search" | "referral" | "training";
-
-export interface NavbarProductsPurposeStyle {
-  label: string;
-  className: string;
-}
 
 export interface NavbarProductsCrawlerRow {
   time: string;
@@ -113,14 +110,19 @@ export type NavbarProductsMock =
   | "integrations"
   | "terminal";
 
-export interface NavbarProductsCard extends MarketingNavCard {
+export interface NavbarProductsCard {
+  id: Extract<keyof NavbarProductsMessages["cards"], string>;
+  href: string;
+  icon: IconSvgElement;
   iconClassName: string;
   tintClassName: string;
   mock: NavbarProductsMock;
 }
 
-export interface NavbarProductsLinkTile
-  extends NavbarBentoLink, NavbarBentoLinkStyle<NavbarProductsMock> {}
+export interface NavbarProductsLinkTile extends NavbarBentoLinkStyle<NavbarProductsMock> {
+  id: Extract<keyof NavbarProductsMessages["tiles"], string>;
+  href: string;
+}
 
 interface NavbarBentoLogoProps {
   className?: string;

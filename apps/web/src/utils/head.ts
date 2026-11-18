@@ -77,6 +77,11 @@ export function buildHead(page: Metadata = {}): Head {
       href: absoluteUrl(metadata.alternates.canonical),
     });
   }
+  for (const [hrefLang, href] of Object.entries(
+    metadata.alternates?.languages ?? {}
+  )) {
+    links.push({ rel: "alternate", hrefLang, href: absoluteUrl(href) });
+  }
   for (const [type, href] of Object.entries(metadata.alternates?.types ?? {})) {
     links.push({ rel: "alternate", type, href: absoluteUrl(href) });
   }

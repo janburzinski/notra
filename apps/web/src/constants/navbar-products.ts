@@ -20,7 +20,6 @@ import type {
   NavbarProductsMock,
   NavbarProductsPersona,
   NavbarProductsPurpose,
-  NavbarProductsPurposeStyle,
   NavbarProductsTurn,
 } from "@/types/navbar-bento";
 
@@ -42,28 +41,24 @@ export const NAVBAR_PRODUCTS_CLASSES = {
 
 export const NAVBAR_PRODUCTS_CARDS: readonly NavbarProductsCard[] = [
   {
+    id: "aiSearch",
     href: "/features",
-    label: "AI Search",
-    description:
-      "See where you stand when buyers ask ChatGPT, Claude and Perplexity.",
     icon: AiSearch02Icon,
     iconClassName: NAVBAR_BENTO_TINTS.violet,
     tintClassName: "from-[#8B5CF6]/10",
     mock: "conversations",
   },
   {
+    id: "aiCrawlerLogs",
     href: "/features/ai-crawler-logs",
-    label: "AI Crawler Logs",
-    description: "See every AI bot that reads your site, and why it came.",
     icon: Robot01Icon,
     iconClassName: NAVBAR_BENTO_TINTS.amber,
     tintClassName: "from-[#E8833A]/10",
     mock: "crawler",
   },
   {
+    id: "sites",
     href: "/features/sites",
-    label: "Sites",
-    description: "Host your blog and changelog from GitHub.",
     icon: BrowserIcon,
     iconClassName: NAVBAR_BENTO_TINTS.green,
     tintClassName: "from-[#16A34A]/10",
@@ -73,17 +68,15 @@ export const NAVBAR_PRODUCTS_CARDS: readonly NavbarProductsCard[] = [
 
 export const NAVBAR_PRODUCTS_LINK_TILES: readonly NavbarProductsLinkTile[] = [
   {
+    id: "integrations",
     href: "/integrations",
-    label: "Integrations",
-    description: "Notra in the tools you already use.",
     className: "grow-[1.25]",
     copyClassName: "w-56",
     mock: "integrations",
   },
   {
+    id: "mcp",
     href: "/mcp",
-    label: "MCP & CLI",
-    description: "Bring Notra into your agent.",
     className: "grow",
     copyClassName: "w-44",
     mock: "terminal",
@@ -104,65 +97,30 @@ export const NAVBAR_PRODUCTS_LOGOS: Record<
 
 export const NAVBAR_PRODUCTS_PERSONAS: readonly NavbarProductsPersona[] = [
   {
+    id: "maya",
     name: "Maya Chen",
-    role: "Head of Growth · Series B SaaS",
     avatar: "/features/personas/maya.svg",
-    memory: "Budget under $500 a month. SOC 2 is a must.",
     rank: 1,
   },
   {
+    id: "daniel",
     name: "Daniel Okafor",
-    role: "Founder · Developer tools",
     avatar: "/features/personas/daniel.svg",
-    memory: "Team of four. Wants a free plan to start.",
     rank: 3,
   },
 ];
 
 export const NAVBAR_PRODUCTS_TURNS: readonly NavbarProductsTurn[] = [
-  {
-    question: "What's the best tool to automate changelogs from GitHub?",
-    sources: "Searched the web · 12 sources",
-    answer:
-      "Beamer is the best known. Notra turns merged PRs into changelogs and launch posts.",
-    rank: 2,
-  },
-  {
-    question: "Which of those is cheapest for a team of five?",
-    sources: "Searched the web · 8 sources",
-    answer:
-      "Notra has a free plan and doesn't charge per seat. Beamer starts at $59 a month.",
-    rank: 1,
-  },
-  {
-    question: "Can it post the update to LinkedIn too?",
-    sources: "Searched the web · 6 sources",
-    answer:
-      "Yes. Notra drafts the post and publishes it to X or LinkedIn after approval.",
-    rank: 1,
-  },
+  { id: "bestTool", sources: 12, rank: 2 },
+  { id: "cheapest", sources: 8, rank: 1 },
+  { id: "linkedin", sources: 6, rank: 1 },
 ];
 
-export const NAVBAR_PRODUCTS_PURPOSES: Record<
-  NavbarProductsPurpose,
-  NavbarProductsPurposeStyle
-> = {
-  live: {
-    label: "Live answer",
-    className: "border-[#DDCFFC] bg-[#F1EBFE] text-[#6D3FD9]",
-  },
-  search: {
-    label: "Search index",
-    className: "border-[#D3E0F4] bg-[#EEF3FB] text-[#2F5C9E]",
-  },
-  referral: {
-    label: "Referral",
-    className: "border-[#CBE8D4] bg-[#EAF6EE] text-[#2F7D4B]",
-  },
-  training: {
-    label: "Training",
-    className: "border-[#F2DABA] bg-[#FDF3E7] text-[#A8601A]",
-  },
+export const NAVBAR_PRODUCTS_PURPOSES: Record<NavbarProductsPurpose, string> = {
+  live: "border-[#DDCFFC] bg-[#F1EBFE] text-[#6D3FD9]",
+  search: "border-[#D3E0F4] bg-[#EEF3FB] text-[#2F5C9E]",
+  referral: "border-[#CBE8D4] bg-[#EAF6EE] text-[#2F7D4B]",
+  training: "border-[#F2DABA] bg-[#FDF3E7] text-[#A8601A]",
 };
 
 export const NAVBAR_PRODUCTS_CRAWLER_ROWS: readonly NavbarProductsCrawlerRow[] =
@@ -231,7 +189,6 @@ export const NAVBAR_PRODUCTS_TERMINAL_LINES = [
   "$ notra geo scans start proj_123 --wait",
 ] as const;
 
-export const NAVBAR_PRODUCTS_SITE = {
-  domain: "usenotra.com/blog",
-  deployed: "Deployed 21 s ago",
-} as const;
+export const NAVBAR_PRODUCTS_SITE_DOMAIN = "usenotra.com/blog";
+
+export const NAVBAR_PRODUCTS_CONVERSATION_PLAYED_AT = "2026-09-27T14:03:00Z";

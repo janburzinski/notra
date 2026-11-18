@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslations } from "use-intl";
 import type { OfferLike } from "~types/jsonld";
 
 import { CtaBanner } from "@/components/landing/cta-banner";
@@ -6,7 +7,6 @@ import { LandingPricingSection } from "@/components/landing/pricing-section";
 import { PromptCalculatorSection } from "@/components/landing/prompt-calculator";
 import { MarketingHeroWash } from "@/components/marketing-hero-wash";
 import PricingComparisonTable from "@/components/pricing-comparison-table";
-import { PRICING_SUBHEADING } from "@/constants/landing/pricing";
 import type { Metadata } from "@/types/metadata";
 import { PRICING_PLANS } from "@/utils/constants";
 import { buildHead } from "@/utils/head";
@@ -116,6 +116,8 @@ export const Route = createFileRoute("/_site/pricing")({
 });
 
 function PricingPage() {
+  const t = useTranslations("landing.pricing");
+
   return (
     <>
       <script
@@ -128,7 +130,7 @@ function PricingPage() {
       />
 
       <MarketingHeroWash
-        subtitle={PRICING_SUBHEADING}
+        subtitle={t("subheading")}
         title={
           <>
             Simple pricing that scales with what you{" "}

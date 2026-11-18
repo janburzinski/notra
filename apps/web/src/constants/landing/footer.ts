@@ -14,9 +14,6 @@ import type {
 } from "@/types/landing/footer";
 import { SOCIAL_LINKS } from "@/utils/social-links";
 
-export const FOOTER_TAGLINE =
-  "Find out what AI engines say about you, and fix it.";
-
 export const FOOTER_DITHERING: FooterDitheringConfig = {
   speed: 0.57,
   shape: "wave",
@@ -40,29 +37,29 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
   {
     groups: [
       {
-        title: "Product",
+        id: "product",
         links: [
-          { label: "AI Traffic", href: "/features/ai-crawler-logs" },
-          { label: "Personas", href: "/features/personas" },
-          { label: "Conversations", href: "/features/conversations" },
-          { label: "Sites", href: "/features/sites" },
-          { label: "Free scan", href: "/features/free-scan" },
-          { label: "Pricing", href: "/pricing" },
-          { label: "Compare", href: "/compare" },
-          { label: "Changelog", href: "/changelog" },
+          { id: "aiTraffic", href: "/features/ai-crawler-logs" },
+          { id: "personas", href: "/features/personas" },
+          { id: "conversations", href: "/features/conversations" },
+          { id: "sites", href: "/features/sites" },
+          { id: "freeScan", href: "/features/free-scan" },
+          { id: "pricing", href: "/pricing" },
+          { id: "compare", href: "/compare" },
+          { id: "changelog", href: "/changelog" },
         ],
       },
       {
-        title: "Integrations",
+        id: "integrations",
         links: [
-          { label: "Marketplace", href: "/integrations" },
+          { id: "marketplace", href: "/integrations" },
           {
-            label: "Framer",
+            id: "framer",
             href: "https://www.framer.com/marketplace/plugins/notra/",
             external: true,
           },
           {
-            label: "Raycast",
+            id: "raycast",
             href: "https://www.raycast.com/dominikdev/notra",
             external: true,
           },
@@ -73,36 +70,36 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
   {
     groups: [
       {
-        title: "Developers",
+        id: "developers",
         links: [
           {
-            label: "GEO SDK",
+            id: "geoSdk",
             href: "https://www.npmjs.com/package/@usenotra/sdk",
             external: true,
           },
           {
-            label: "Docs",
+            id: "docs",
             href: "https://www.usenotra.com/docs",
             external: true,
           },
           {
-            label: "CLI",
+            id: "cli",
             href: "https://www.usenotra.com/docs/devtools/cli",
             external: true,
           },
           {
-            label: "MCP Server",
+            id: "mcpServer",
             href: "/mcp",
           },
         ],
       },
       {
-        title: "Sources",
+        id: "sources",
         links: [
-          { label: "GitHub", href: "/integrations/github" },
-          { label: "Linear", href: "/integrations/linear" },
-          { label: "Slack", href: "/integrations/slack" },
-          { label: "Granola", href: "/integrations/granola" },
+          { id: "github", href: "/integrations/github" },
+          { id: "linear", href: "/integrations/linear" },
+          { id: "slack", href: "/integrations/slack" },
+          { id: "granola", href: "/integrations/granola" },
         ],
       },
     ],
@@ -110,32 +107,32 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
   {
     groups: [
       {
-        title: "Company",
+        id: "company",
         links: [
-          { label: "Brand Assets", href: "/brand" },
+          { id: "brandAssets", href: "/brand" },
           {
-            label: "Reviews",
+            id: "reviews",
             href: "https://www.notrareviews.com/",
             external: true,
           },
-          { label: "Contact", href: "/contact" },
+          { id: "contact", href: "/contact" },
         ],
       },
       {
-        title: "Community",
+        id: "community",
         links: [
-          { label: "State of AI Search", href: "/state-of-ai-search" },
-          { label: "State of AI Traffic", href: "/data" },
+          { id: "stateOfAiSearch", href: "/state-of-ai-search" },
+          { id: "stateOfAiTraffic", href: "/data" },
         ],
       },
       {
-        title: "Free Tools",
+        id: "freeTools",
         links: [
-          { label: "GitHub Star Video Generator", href: "/repo-star-video" },
-          { label: "AI Crawler IP Checker", href: "/ip-checker" },
-          { label: "AI Feature Check", href: "/offering" },
-          { label: "UTM Builder", href: "/utm-builder" },
-          { label: "QR Code Generator", href: "/qr-code-generator" },
+          { id: "starVideo", href: "/repo-star-video" },
+          { id: "ipChecker", href: "/ip-checker" },
+          { id: "featureCheck", href: "/offering" },
+          { id: "utmBuilder", href: "/utm-builder" },
+          { id: "qrCode", href: "/qr-code-generator" },
         ],
       },
     ],
@@ -143,9 +140,9 @@ export const FOOTER_LINK_COLUMNS: readonly FooterLinkColumn[] = [
 ];
 
 export const FOOTER_LEGAL_LINKS: readonly FooterLink[] = [
-  { label: "Privacy", href: "/privacy" },
-  { label: "Legal", href: "/legal" },
-  { label: "Terms", href: "/terms" },
+  { id: "privacy", href: "/privacy" },
+  { id: "legal", href: "/legal" },
+  { id: "terms", href: "/terms" },
 ];
 
 export const GLITTER_EGG_CLICKS = 5;

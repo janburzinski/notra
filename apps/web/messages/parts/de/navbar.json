@@ -1,0 +1,182 @@
+{
+  "home": "Zur Notra-Startseite",
+  "logoMenu": {
+    "copyLogo": "Logo als SVG kopieren",
+    "copiedLogo": "Logo als SVG kopiert",
+    "copyWordmark": "Schriftzug als SVG kopieren",
+    "copiedWordmark": "Schriftzug als SVG kopiert",
+    "downloadKit": "Brand-Kit herunterladen",
+    "guidelines": "Markenrichtlinien"
+  },
+  "auth": {
+    "dashboard": "Dashboard",
+    "signIn": "Anmelden",
+    "signUp": "Registrieren"
+  },
+  "mobile": {
+    "label": "Navigation",
+    "open": "Menü öffnen",
+    "close": "Menü schließen"
+  },
+  "theme": {
+    "toggle": "Design wechseln",
+    "light": "Zum hellen Modus wechseln",
+    "dark": "Zum dunklen Modus wechseln"
+  },
+  "groups": {
+    "products": "Produkte",
+    "resources": "Ressourcen",
+    "reports": "Berichte",
+    "pricing": "Preise"
+  },
+  "items": {
+    "aiSearch": {
+      "label": "KI-Suche",
+      "description": "Deine Position in ChatGPT, Claude und Perplexity."
+    },
+    "aiCrawlerLogs": {
+      "label": "KI-Crawler-Logs",
+      "description": "Jeder KI-Bot, der deine Website liest, und warum er kommt."
+    },
+    "sites": {
+      "label": "Sites",
+      "description": "Hoste deinen Blog und Changelog direkt aus GitHub."
+    },
+    "blog": {
+      "label": "Blog",
+      "description": "Artikel über GEO, KI-Suche und Developer Experience."
+    },
+    "changelog": {
+      "label": "Changelog",
+      "description": "Die neuesten Änderungen an Notra im Überblick."
+    },
+    "contributors": {
+      "label": "Mitwirkende",
+      "description": "Die Menschen, die Notra öffentlich entwickeln."
+    },
+    "docs": {
+      "label": "Doku",
+      "description": "Anleitungen, API und Einrichtung."
+    },
+    "reviews": {
+      "label": "Bewertungen",
+      "description": "Was Teams über Notra sagen."
+    }
+  },
+  "products": {
+    "cards": {
+      "aiSearch": {
+        "label": "KI-Suche",
+        "description": "Sieh, wo du stehst, wenn Käufer ChatGPT, Claude und Perplexity fragen."
+      },
+      "aiCrawlerLogs": {
+        "label": "KI-Crawler-Logs",
+        "description": "Sieh jeden KI-Bot, der deine Website liest, und warum er gekommen ist."
+      },
+      "sites": {
+        "label": "Sites",
+        "description": "Hoste deinen Blog und Changelog direkt aus GitHub."
+      }
+    },
+    "tiles": {
+      "integrations": {
+        "label": "Integrationen",
+        "description": "Notra in den Tools, die du schon nutzt."
+      },
+      "mcp": {
+        "label": "MCP & CLI",
+        "description": "Hol Notra in deinen Agent."
+      }
+    },
+    "personas": {
+      "remembers": "MERKT SICH",
+      "mentioned": "Notra erwähnt",
+      "people": {
+        "maya": {
+          "role": "Head of Growth · Series-B-SaaS",
+          "memory": "Budget unter 500 $ im Monat, und SOC 2 ist Pflicht."
+        },
+        "daniel": {
+          "role": "Gründer · Developer Tools",
+          "memory": "Vierköpfiges Team, das mit einem kostenlosen Plan starten will."
+        }
+      }
+    },
+    "conversation": {
+      "title": "Recherche zu Changelog-Tools",
+      "meta": "{turns} Runden · ausgeführt am {date}",
+      "sources": "Im Web gesucht · {count} Quellen",
+      "turns": {
+        "bestTool": {
+          "question": "Was ist das beste Tool, um Changelogs aus GitHub zu automatisieren?",
+          "answer": "Beamer ist am bekanntesten, aber Notra macht aus gemergten PRs Changelogs und Launch-Posts."
+        },
+        "cheapest": {
+          "question": "Welches davon ist für ein Team mit fünf Leuten am günstigsten?",
+          "answer": "Notra hat einen kostenlosen Plan und rechnet nicht pro Platz ab, während Beamer bei 59 $ im Monat startet."
+        },
+        "linkedin": {
+          "question": "Kann es das Update auch auf LinkedIn posten?",
+          "answer": "Ja, Notra entwirft den Post und veröffentlicht ihn nach deiner Freigabe auf X oder LinkedIn."
+        }
+      }
+    },
+    "crawler": {
+      "title": "Crawler-Log",
+      "meta": "usenotra.com · letzte 60 Minuten",
+      "live": "Live",
+      "purposes": {
+        "live": "Live-Antwort",
+        "search": "Suchindex",
+        "referral": "Verweis",
+        "training": "Training"
+      }
+    },
+    "site": {
+      "deployed": "Vor 21 s veröffentlicht"
+    }
+  },
+  "resources": {
+    "live": "Live",
+    "changelog": {
+      "title": "Notra-Changelog",
+      "meta": "Diese Woche ausgeliefert"
+    },
+    "contributors": {
+      "title": "Gemergte Pull Requests",
+      "meta": "usenotra/notra · letzte 7 Tage"
+    }
+  },
+  "reports": {
+    "heading": "State of AI Search",
+    "edition": "{heading} · {edition}",
+    "overview": "Welche Marken die KI empfiehlt, Kategorie für Kategorie.",
+    "fallbackDescription": "Monatliche Rankings aus der KI-Suche",
+    "categories": {
+      "ai-visibility": {
+        "label": "KI-Sichtbarkeit",
+        "description": "Sieh, welche GEO-Tools die KI empfiehlt"
+      },
+      "app-hosting": {
+        "label": "App-Hosting",
+        "description": "So ranken Hosting-Plattformen in der KI-Suche"
+      },
+      "auth": {
+        "label": "Auth",
+        "description": "Auth-Anbieter, die die KI empfiehlt"
+      },
+      "changelog": {
+        "label": "Changelog",
+        "description": "Release-Notes-Tools, die die KI empfiehlt"
+      },
+      "email-api": {
+        "label": "E-Mail-API",
+        "description": "E-Mail-Anbieter im Ranking der KI-Suche"
+      },
+      "postgres": {
+        "label": "Postgres",
+        "description": "Die Postgres-Anbieter, die die KI empfiehlt"
+      }
+    }
+  }
+}

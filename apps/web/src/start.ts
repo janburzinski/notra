@@ -8,7 +8,8 @@ import {
 } from "@/constants/proxy";
 import { appendHeaderValue, negotiateMarkdown } from "@/lib/proxy/markdown";
 import { findRedirect } from "@/lib/proxy/redirects";
-import { isProxiedPath } from "@/utils/proxy-paths";
+import { landingLocaleRedirect } from "@/utils/landing-locale";
+import { isAgentRequest, isProxiedPath } from "@/utils/proxy-paths";
 import { HOMEPAGE_LINK_HEADER, SITE_URL } from "@/utils/urls";
 
 const geoTagLinks = resolveTagLinksConfig({
@@ -60,7 +61,9 @@ async function proxy(request: Request, next: () => Promise<Response>) {
 }
 
 const siteMiddleware = createMiddleware().server(async ({ request, next }) => {
-  const redirect = findRedirect(new URL(request.url));
+  const redirect =
+    findRedirect(new URL(request.url)) ??
+    (isAgentRequest(request) ? undefined : landingLocaleRedirect(request));
   if (redirect) {
     return redirect;
   }

@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode, SVGProps } from "react";
+import type { Messages } from "use-intl";
 
 import type { EngineId } from "@/types/landing/geo";
 
@@ -7,17 +8,21 @@ export interface HeroCycleWord {
   engine: EngineId;
 }
 
-export interface HeroHeadlineBrand {
-  before: string;
-  name: string;
-  after: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  iconClassName?: string;
+type HeroVariantId = Extract<
+  keyof Messages["landing"]["hero"]["variants"],
+  string
+>;
+
+export interface HeroVariant {
+  id: HeroVariantId;
+  brandIcon?: ComponentType<SVGProps<SVGSVGElement>>;
+  brandIconClassName?: string;
+  cycles: boolean;
+  secondaryHref: string;
 }
 
 export interface HeroHeadlineProps {
-  lineOne: string | HeroHeadlineBrand;
-  lineTwo: HeroHeadlineLineTwo;
+  variant: HeroVariant;
 }
 
 export interface CycleMarkProps {
@@ -39,18 +44,6 @@ export interface CycleWordProps {
   animated: boolean;
   className?: string;
 }
-
-type HeroHeadlineLineTwo =
-  | { headlineLineTwoPrefix: string }
-  | { headlineLineTwo: string };
-
-export type HeroVariantCopy = HeroHeadlineLineTwo & {
-  headlineLineOne: string | HeroHeadlineBrand;
-  subhead: string;
-  cta: string;
-  secondaryLabel: string;
-  secondaryHref: string;
-};
 
 export interface HeroWebsiteFormProps {
   cta: string;

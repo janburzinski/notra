@@ -1,6 +1,7 @@
 import { PurposeBadge } from "@notra/ui/components/geo/purpose-badge";
 import { StatTiles } from "@notra/ui/components/geo/stat-tiles";
 import { cn } from "@notra/ui/lib/utils";
+import { useFormatter, useTranslations } from "use-intl";
 
 import { LandingEngineIcon } from "@/components/landing/landing-engine-icon";
 import { MockFrame } from "@/components/landing/mock-frame";
@@ -14,8 +15,6 @@ import {
 } from "@/components/marketing-table";
 import {
   FEATURES_TABLE_OPTIONAL_COL,
-  FEATURES_TRAFFIC_FRAME,
-  FEATURES_TRAFFIC_HEADERS,
   FEATURES_TRAFFIC_KPIS,
   FEATURES_TRAFFIC_ROWS,
 } from "@/constants/landing/features";
@@ -23,29 +22,29 @@ import {
 const HEADER_CLASS = "text-muted-foreground text-xs";
 const VISITS_COL = "w-16";
 const LAST_SEEN_COL = "w-[5.5rem]";
+const SECONDS_PER_MINUTE = 60;
 
 export function FeaturesCardTraffic() {
+  const t = useTranslations("landing.features");
+  const format = useFormatter();
   return (
-    <MockFrame
-      heading={FEATURES_TRAFFIC_FRAME.heading}
-      subhead={FEATURES_TRAFFIC_FRAME.subhead}
-    >
+    <MockFrame heading={t("traffic.heading")} subhead={t("traffic.subhead")}>
       <StatTiles
         className="border-border grid-cols-3 divide-x divide-y-0 border-b max-sm:[&_span]:text-xl max-sm:[&>div]:px-3 max-sm:[&>div]:py-3"
         tiles={FEATURES_TRAFFIC_KPIS.map((kpi) => ({
           key: kpi.id,
-          label: kpi.label,
-          value: kpi.value,
+          label: t(`traffic.kpis.${kpi.id}`),
+          value: format.number(kpi.value),
         }))}
       />
       <Table className="table-fixed">
         <TableHeader className="bg-muted/60">
           <TableRow>
             <TableHead className={HEADER_CLASS}>
-              {FEATURES_TRAFFIC_HEADERS.source}
+              {t("traffic.headers.source")}
             </TableHead>
             <TableHead className={cn(HEADER_CLASS, "w-[11.5rem]")}>
-              {FEATURES_TRAFFIC_HEADERS.purpose}
+              {t("traffic.headers.purpose")}
             </TableHead>
             <TableHead
               className={cn(
@@ -54,7 +53,7 @@ export function FeaturesCardTraffic() {
                 VISITS_COL
               )}
             >
-              {FEATURES_TRAFFIC_HEADERS.visits}
+              {t("traffic.headers.visits")}
             </TableHead>
             <TableHead
               className={cn(
@@ -63,7 +62,7 @@ export function FeaturesCardTraffic() {
                 LAST_SEEN_COL
               )}
             >
-              {FEATURES_TRAFFIC_HEADERS.lastSeen}
+              {t("traffic.headers.lastSeen")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -77,7 +76,11 @@ export function FeaturesCardTraffic() {
                 </span>
               </TableCell>
               <TableCell className="w-[11.5rem] overflow-hidden py-3">
-                <PurposeBadge category={row.purpose} />
+                <PurposeBadge
+                  category={row.purpose}
+                  description={t(`purposes.${row.purpose}.description`)}
+                  label={t(`purposes.${row.purpose}.label`)}
+                />
               </TableCell>
               <TableCell
                 className={cn(
@@ -86,7 +89,7 @@ export function FeaturesCardTraffic() {
                   VISITS_COL
                 )}
               >
-                {row.visits.toLocaleString()}
+                {format.number(row.visits)}
               </TableCell>
               <TableCell
                 className={cn(
@@ -95,7 +98,11 @@ export function FeaturesCardTraffic() {
                   LAST_SEEN_COL
                 )}
               >
-                {row.lastSeen}
+                {row.lastSeenSeconds < SECONDS_PER_MINUTE
+                  ? t("traffic.secondsAgo", { count: row.lastSeenSeconds })
+                  : t("traffic.minutesAgo", {
+                      count: row.lastSeenSeconds / SECONDS_PER_MINUTE,
+                    })}
               </TableCell>
             </TableRow>
           ))}

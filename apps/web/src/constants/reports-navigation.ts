@@ -9,10 +9,13 @@ import {
 } from "@hugeicons/core-free-icons";
 import type { IconSvgElement } from "@hugeicons/react";
 
-import { STATE_OF_AI_SEARCH_TITLE } from "@/constants/state-of-ai-search";
 import { listLatestSummaries } from "@/lib/state-of-ai-search/summaries";
+import type {
+  MarketingNavGroupConfig,
+  ReportCategoryId,
+  ReportNavCategory,
+} from "@/types/navbar";
 import type { StateOfAiSearchRankingRow } from "@/types/state-of-ai-search";
-import type { MarketingNavGroup } from "@/utils/navigation";
 import { reportCategoryPath } from "@/utils/state-of-ai-search";
 
 const REPORT_CATEGORY_ICONS: Record<string, IconSvgElement> = {
@@ -24,14 +27,14 @@ const REPORT_CATEGORY_ICONS: Record<string, IconSvgElement> = {
   postgres: Database02Icon,
 };
 
-const REPORT_CATEGORY_DESCRIPTIONS: Record<string, string> = {
-  "ai-visibility": "See which GEO tools AI recommends",
-  "app-hosting": "How hosting platforms rank in AI search",
-  auth: "Auth providers recommended by AI",
-  changelog: "Release note tools recommended by AI",
-  "email-api": "Email providers ranked in AI search",
-  postgres: "The Postgres providers AI recommends",
-};
+export const REPORT_CATEGORY_IDS: readonly ReportCategoryId[] = [
+  "ai-visibility",
+  "app-hosting",
+  "auth",
+  "changelog",
+  "email-api",
+  "postgres",
+];
 
 const LATEST_REPORTS = listLatestSummaries();
 
@@ -45,21 +48,21 @@ export const REPORTS_NAV_LEADERS: Record<string, StateOfAiSearchRankingRow[]> =
     ])
   );
 
-export const REPORTS_NAV_EDITION = LATEST_REPORTS[0]?.editionLabel;
+export const REPORTS_NAV_EDITION = LATEST_REPORTS[0]?.edition;
 
-export const REPORTS_NAV: MarketingNavGroup = {
+export const REPORTS_NAV_CATEGORIES: readonly ReportNavCategory[] =
+  LATEST_REPORTS.map((report) => ({
+    slug: report.slug,
+    subject: report.subject,
+    href: reportCategoryPath(report.slug),
+    icon: REPORT_CATEGORY_ICONS[report.slug] ?? ChartHistogramIcon,
+  }));
+
+export const REPORTS_NAV: MarketingNavGroupConfig = {
   type: "group",
+  id: "reports",
   layout: "compact",
   panel: "reports",
-  label: "Reports",
-  cardsHeading: STATE_OF_AI_SEARCH_TITLE,
   cards: [],
-  railHeading: "Categories",
-  rail: LATEST_REPORTS.map((report) => ({
-    href: reportCategoryPath(report.slug),
-    label: report.subject,
-    description:
-      REPORT_CATEGORY_DESCRIPTIONS[report.slug] ?? "Monthly AI search rankings",
-    icon: REPORT_CATEGORY_ICONS[report.slug] ?? ChartHistogramIcon,
-  })),
+  rail: [],
 };

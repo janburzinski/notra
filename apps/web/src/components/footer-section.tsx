@@ -1,15 +1,16 @@
 import { cn } from "@notra/ui/lib/utils";
 import { Link } from "@tanstack/react-router";
 import { ConsentDialogLink } from "c15t/tanstack-start/components/consent-dialog-link";
+import { useTranslations } from "use-intl";
 
 import { DeferredDithering } from "@/components/deferred-dithering";
 import { GlitterWordmark } from "@/components/landing/glitter-wordmark";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import {
   FOOTER_DITHERING,
   FOOTER_LEGAL_LINKS,
   FOOTER_LINK_COLUMNS,
   FOOTER_SOCIAL_LINKS,
-  FOOTER_TAGLINE,
 } from "@/constants/landing/footer";
 import { useGlitterEgg } from "@/hooks/use-glitter-egg";
 import type { FooterLink } from "@/types/landing/footer";
@@ -21,6 +22,7 @@ const LINK_CLASS =
   "font-medium font-sans text-[#1e1e1ebf] text-base leading-6 tracking-[-0.01em] transition-colors hover:text-[#5b21b6] dark:text-foreground/60 dark:hover:text-[#a78bfa]";
 
 function FooterColumnLink({ link }: { link: FooterLink }) {
+  const t = useTranslations("footer.links");
   if (!link.href) {
     return (
       <span
@@ -28,7 +30,7 @@ function FooterColumnLink({ link }: { link: FooterLink }) {
           "dark:text-foreground/60 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1ebf]"
         )}
       >
-        {link.label}
+        {t(link.id)}
       </span>
     );
   }
@@ -41,7 +43,7 @@ function FooterColumnLink({ link }: { link: FooterLink }) {
       rel={link.external ? "noopener noreferrer" : undefined}
       target={link.external ? "_blank" : undefined}
     >
-      {link.label}
+      {t(link.id)}
     </Link>
   );
 }
@@ -66,6 +68,7 @@ export function FooterDither() {
 export default function FooterSection() {
   const year = new Date().getFullYear();
   const glitter = useGlitterEgg();
+  const t = useTranslations("footer");
 
   return (
     <footer className="relative isolate overflow-hidden rounded-t-3xl bg-[linear-gradient(in_oklab_180deg,oklab(80.3%_0.045_-0.074/15%)_0%,oklab(71.8%_0.066_-0.109/50%)_100%)] pt-6 shadow-[0_0.0625rem_0.125rem_#28282814,0_0_0_0.0625rem_#ececec] dark:bg-[#141019] dark:bg-none dark:shadow-none">
@@ -111,14 +114,14 @@ export default function FooterSection() {
                 </span>
               </div>
               <p className="dark:text-foreground/70 font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#1e1e1ebf]">
-                {FOOTER_TAGLINE}
+                {t("tagline")}
               </p>
             </div>
 
             <div className="flex items-center gap-4">
               {FOOTER_SOCIAL_LINKS.map((social) => (
                 <Link
-                  aria-label={`Visit Notra on ${social.label}`}
+                  aria-label={t("socialLabel", { network: social.label })}
                   className="dark:text-foreground/50 dark:hover:text-foreground text-[#1e1e1e80] transition-colors hover:text-[#1e1e1e]"
                   to={social.href}
                   key={social.label}
@@ -136,38 +139,36 @@ export default function FooterSection() {
                   <Link
                     className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6] transition-colors hover:text-[#1e1e1e]"
                     to={link.href ?? "/"}
-                    key={link.label}
+                    key={link.id}
                   >
-                    {link.label}
+                    {t(`links.${link.id}`)}
                   </Link>
                 ))}
                 <ConsentDialogLink
                   slotKey="trigger.text"
                   className="dark:text-foreground/50 dark:hover:text-foreground font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6] transition-colors hover:text-[#1e1e1e]"
                 >
-                  Privacy settings
+                  {t("privacySettings")}
                 </ConsentDialogLink>
               </div>
               <p className="dark:text-foreground/50 font-sans text-[0.8125rem] leading-[1.125rem] font-medium text-[#1e1e1ea6]">
-                {`© ${year} Notra, Inc.`}
+                {t("copyright", { year })}
               </p>
+              <LanguageSwitcher />
             </div>
           </div>
 
           <div className="grid w-full grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:w-auto lg:flex-1 lg:justify-items-end">
             {FOOTER_LINK_COLUMNS.map((column) => (
-              <div
-                className="flex flex-col gap-8"
-                key={column.groups[0]?.title}
-              >
+              <div className="flex flex-col gap-8" key={column.groups[0]?.id}>
                 {column.groups.map((group) => (
-                  <div className="flex flex-col gap-4" key={group.title}>
+                  <div className="flex flex-col gap-4" key={group.id}>
                     <h3 className="font-sans text-base leading-6 font-medium tracking-[-0.01em] text-[#5b21b6] dark:text-[#a78bfa]">
-                      {group.title}
+                      {t(`groups.${group.id}`)}
                     </h3>
                     <ul className="flex flex-col gap-4.5">
                       {group.links.map((link) => (
-                        <li key={link.label}>
+                        <li key={link.id}>
                           <FooterColumnLink link={link} />
                         </li>
                       ))}
