@@ -1,0 +1,73 @@
+apps/dashboard/src/lib/autopilot/pages.ts
+  ai_agent 26,79-83,87-88,96,113-115
+packages/ai/src/schemas/google-search-console.ts
+  ai_agent 37-40,45-48,54
+packages/ai/src/prompts/autopilot-planner.ts
+  ai_agent 17
+packages/ai/src/types/autopilot-planner.ts
+  ai_agent 20
+apps/dashboard/src/constants/autopilot.ts
+  ai_agent 345-346
+packages/db/src/types/autopilot.ts
+  ai_agent 103-108,135-141,264-269,272-280
+apps/dashboard/src/lib/autopilot/live.ts
+  ai_agent 17,32,35,39,163-164,166,171-189,192-193,215,238-248,251-270,282-284,327-331,357,371,378,413-420,422-437,441
+apps/dashboard/src/lib/autopilot/refresh.ts
+  ai_agent 38,41,163-168,308-312,327-330,357-362,372-374,426-439,824-835,854-855
+apps/dashboard/src/lib/autopilot/impact.ts
+  ai_agent 31-33,49,387,398-435
+apps/dashboard/src/types/autopilot-runtime.ts
+  ai_agent 106-111,220-221
+apps/dashboard/src/lib/autopilot/blog.ts
+  ai_agent 8,65,69,90,95-99,101-104,152-153,159,193-194,197,200,258-275,282-284,286-287,290-309,316-317,338,348-373,383-391,627-658,681-703,706,717-720,722-727,729-764,802,817-820,824-830,859-867,874-900,904,906,1056,1090,1426-1438,1440-1442,1448-1455,1512-1548,1550-1568,1570,1574-1587,1590-1591,1594,1599,1602-1615,1620,1716-1722,1724,1729-1731,1735,1750
+apps/dashboard/src/utils/autopilot-blog.ts
+  ai_agent 1-2,35-49,173-176
+apps/dashboard/src/lib/autopilot/landing.ts
+  ai_agent 47,52,267-271,298-301,342-346,355-357,414-425,702-713,733-734
+apps/dashboard/tests/autopilot-flow.test.ts
+  ai_agent 3,6,22-23,34,37,47,50,79-82,101-106,145-151,239-277,299-300,303-305,457-458,460-470,557-588,651-653,655-664,667-683,692-694,699-702,761-762,766,818,821,823-824,891-894,897-903,951-952,959,972,978-983,1089,2582-2613,2719-3370
+apps/docs/autopilot/automations/content.mdx
+  ai_agent 50,58-64
+packages/ai/src/integrations/google-search-console.ts
+  ai_agent 33,55-56,531-532,542,588-589,604,617-619,621,663-686,688-694,698-699,714-812
+apps/dashboard/src/lib/autopilot/findings.ts
+  ai_agent 51,72,983-1117
+apps/dashboard/tests/autopilot-template-flows.test.ts
+  ai_agent 121-122,124,133-136,183-192,208-224,456,787,794-797,835-847,907-931,936,994,996,1076,1144-1244
+apps/dashboard/src/lib/autopilot/writer.test.ts
+  ai_agent 170-188
+apps/dashboard/src/constants/autopilot-live.ts
+  ai_agent 1-5,22-26
+apps/dashboard/src/utils/autopilot-rendering.ts
+  ai_agent 2-3,38-59,74-100,134-173
+apps/dashboard/src/lib/autopilot/links.ts
+  ai_agent 33,38,199-202,207,212,339-341,375-386,558-568,587-590
+apps/dashboard/src/lib/autopilot/github.ts
+  ai_agent 29-32,95-96,98-99,102-112,114-138,140-144,195-196,212-215
+apps/dashboard/src/lib/autopilot/results.ts
+  ai_agent 259-264
+packages/ai/src/utils/autopilot-planner.ts
+  ai_agent 170-175
+apps/dashboard/src/app/(dashboard)/[slug]/autopilot/findings/[id]/page-client.tsx
+  ai_agent 49,193-218,385-388
+apps/dashboard/src/lib/autopilot/planner.ts
+  ai_agent 314-322,329
+apps/dashboard/src/lib/autopilot/search-impact.ts
+  ai_agent 1-223
+apps/dashboard/src/lib/autopilot/writer.ts
+  ai_agent 110,303-306,369-372,390-398
+apps/dashboard/src/lib/autopilot/search-console.ts
+  ai_agent 3-4,59-84
+apps/dashboard/src/utils/autopilot-impact.ts
+  ai_agent 17-45
+apps/dashboard/tests/autopilot-sandbox.test.ts
+  ai_agent 139,141
+packages/ai/src/integrations/google-search-console.test.ts
+  ai_agent 10-15,52-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "363e4a6e5b9cc88709479693717bd4623bd36505",
+  "prompts": {}
+}
