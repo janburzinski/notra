@@ -1,0 +1,32 @@
+apps/ui/registry/notra/card/types/card.ts
+  s_d5c36fd4ecc0a2::t_286dcf640f3994 1-2,4-18
+  s_d5c36fd4ecc0a2::t_2a28dcea795c44 3
+apps/ui/registry/notra/card/components/title-card.tsx
+  s_d5c36fd4ecc0a2::t_19d686a445a15a 1-82
+apps/ui/docs/components/card.mdx
+  s_d5c36fd4ecc0a2::t_dc564a33ed2244 3,6,14,18-48,64
+apps/ui/registry/notra/card/examples/instrument-module-demo.tsx
+  s_d5c36fd4ecc0a2::t_e5a5549d0d3651 1-48
+apps/ui/registry/notra/card/constants/card.ts
+  ai_agent 11
+apps/ui/registry/notra/card/examples/card-demo.tsx
+  s_d5c36fd4ecc0a2::t_e5a5549d0d3651 1-2,4,7,11-19,21,23-35,37-38,40-45
+apps/ui/registry.json
+  s_d5c36fd4ecc0a2::t_c76572d71b681b 1230,1291-1294
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4072fb318c4fa4040eca50aa61749baa726b0be6",
+  "prompts": {},
+  "sessions": {
+    "s_d5c36fd4ecc0a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ce61a15c-f06e-4683-8aae-7cad79380be9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
