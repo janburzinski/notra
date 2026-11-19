@@ -1,0 +1,19 @@
+apps/ui/registry/notra/package-command/components/package-command.tsx
+  s_0dba9835b8b081::t_fd8d865951526c 101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "911c87bfe827388882aeb02611a7e9a3256c74fe",
+  "prompts": {},
+  "sessions": {
+    "s_0dba9835b8b081": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fd0445e8-6833-4fbb-917d-dfc5ab5a5688",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
