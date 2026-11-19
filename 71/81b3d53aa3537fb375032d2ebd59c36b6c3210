@@ -1,0 +1,32 @@
+apps/dashboard/src/components/dashboard/sidebar-onboarding.tsx
+  s_43abea96cca27c::t_cf7b151446a70a 4-5,16,74-75
+  s_43abea96cca27c::t_56ae440a37d60b 3,50,56,62,68,86-88,107,109-113,115-116,118,120-124,126-129,132,134-135,139-140,143,145,148-174,177,185
+  s_43abea96cca27c::t_95557dd4880bd1 105,125
+  s_43abea96cca27c::t_12e5af1b20efb5 144
+  s_43abea96cca27c::t_f15d6f0caa3e8c 146
+  s_43abea96cca27c::t_272c3181fcb5e2 82
+  s_43abea96cca27c::t_f1ba5fc8717d72 142
+  s_43abea96cca27c::t_ecc7a528e2fcf4 7-10,15,76-79,83-85,89-94,96-101,103-104,106,117,119,130-131,133,136-138,141,147,175-176,178-184,186-187
+apps/dashboard/messages/de.json
+  s_43abea96cca27c::t_56ae440a37d60b 6653-6658
+  s_43abea96cca27c::t_0ce4af935e8ba7 6660
+apps/dashboard/messages/en.json
+  s_43abea96cca27c::t_56ae440a37d60b 6653-6658
+  s_43abea96cca27c::t_0ce4af935e8ba7 6660
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7181b3d53aa3537fb375032d2ebd59c36b6c3210",
+  "prompts": {},
+  "sessions": {
+    "s_43abea96cca27c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a0b849e-15a7-4e61-abf9-b5540c6bcaa9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
