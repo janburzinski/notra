@@ -1,0 +1,42 @@
+apps/docs/sites/reference/limits.mdx
+  s_ebd7461f8638a9::t_a2d388b8322a7a 55,57,87
+apps/docs/sites/previews.mdx
+  s_ebd7461f8638a9::t_a2d388b8322a7a 48-49,73
+packages/sites-compiler/tests/validate.test.ts
+  s_ebd7461f8638a9::t_8006644eafc21b 871-902
+  s_ebd7461f8638a9::t_b6ed7163c9c4f1 840
+packages/sites-compiler/src/utils/language-code.ts
+  s_ebd7461f8638a9::t_6fd3123fb3e54a 1-12
+apps/docs/sites/translations.mdx
+  s_ebd7461f8638a9::t_a2d388b8322a7a 107,111,150
+  s_ebd7461f8638a9::t_2e2aa6afbc5a85 19-24,26,28,30-32,34-40,42-45,47-49,51-54,56-60,62-70,76,78-93,95,97,99-106,108-109,113-115,117-119,122,124,126,128-134,139-141,145-149,151-164
+apps/sites-builder/compiler/cli.ts
+  s_ebd7461f8638a9::t_af3f586a37f9e1 207-226,228-229,244-245,284-314
+  s_ebd7461f8638a9::t_826ab5ceebb749 419
+  s_ebd7461f8638a9::t_bef97086d67e9d 47,121,125-130
+apps/sites-builder/README.md
+  s_ebd7461f8638a9::t_a2d388b8322a7a 26-27
+apps/docs/sites/repository.mdx
+  s_ebd7461f8638a9::t_a2d388b8322a7a 56
+packages/sites-compiler/src/validate.ts
+  s_ebd7461f8638a9::t_6fd3123fb3e54a 475-484,486-490,495-498,632-640,646
+  s_ebd7461f8638a9::t_32a10278511e1a 52,66
+apps/sites-builder/compiler/utils/translations.ts
+  s_ebd7461f8638a9::t_bef97086d67e9d 84-120
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e8b6698f994c4fac29dbc5fb068016a0f045e950",
+  "prompts": {},
+  "sessions": {
+    "s_ebd7461f8638a9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "71b0166c-d2ae-4309-977a-e7b3e31c614a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
