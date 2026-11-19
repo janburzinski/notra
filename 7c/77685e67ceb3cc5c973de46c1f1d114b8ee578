@@ -1,0 +1,21 @@
+packages/schemas/src/schemas/api/geo-diagnostics.ts
+  s_fea18c71c33775::t_f35855586dc4bf 12,144,165
+packages/db/src/utils/geo-checks.ts
+  s_fea18c71c33775::t_f35855586dc4bf 71-76,79-80,90-96,136,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7c77685e67ceb3cc5c973de46c1f1d114b8ee578",
+  "prompts": {},
+  "sessions": {
+    "s_fea18c71c33775": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aa6f107b-9fbd-4c72-b6d9-28cd8f919a69",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Jan Burzinski <156842394+janburzinski@users.noreply.github.com>"
+    }
+  }
+}
